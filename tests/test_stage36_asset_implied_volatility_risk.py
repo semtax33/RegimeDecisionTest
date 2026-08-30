@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -259,6 +260,44 @@ def test_stage36_detailed_implementation_guide_is_self_contained() -> None:
     ):
         assert phrase in text
 
+
+def test_stage36_readme_follows_notebook_and_routes_to_stage36_folder() -> None:
+    readme = STAGE36 / "README.md"
+    text = readme.read_text(encoding="utf-8")
+
+    assert readme.stat().st_size > 20_000
+    for phrase in (
+        "Stage35가 거시·시장공포·기술·기업이익",
+        "전체 입력변수 지도",
+        "기술신뢰도 식",
+        "confidence는 예측이 맞을 통계적 확률이 아니라",
+        "Stage36 GVZ·OVX 오버레이",
+        "SLSQP 목적함수와 위험제약",
+        "232개월 중 106개월",
+        "Google Colab에서 실행",
+        "전체 구현은 Stage36 폴더를 함께 참고할 것",
+        "Stage36 메인 소스의 핵심 함수",
+        "실제 의존경로",
+        "주요 산출물",
+    ):
+        assert phrase in text
+
+    for metric in (
+        "10.499%",
+        "1.105",
+        "-12.407%",
+        "97.15%",
+        "86.85%",
+    ):
+        assert metric in text
+
+    local_links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+    assert len(local_links) >= 10
+    for link in local_links:
+        if "://" in link or link.startswith("#"):
+            continue
+        assert (STAGE36 / link).resolve().exists(), link
+
     linked_files = (
         "asset_implied_volatility_risk_slsqp.py",
         "../stage35_earnings_credit_fundamentals/earnings_credit_fundamentals_slsqp.py",
@@ -268,3 +307,40 @@ def test_stage36_detailed_implementation_guide_is_self_contained() -> None:
     )
     for relative in linked_files:
         assert (STAGE36 / relative).resolve().is_file()
+
+
+def test_main_readme_is_stage36_first_and_all_local_links_resolve() -> None:
+    readme = ROOT / "README.md"
+    text = readme.read_text(encoding="utf-8")
+
+    assert readme.stat().st_size > 15_000
+    for phrase in (
+        "Stage36 GVZ·OVX 위험 오버레이",
+        "현재 이 README가 중심적으로 설명하는 경로",
+        "22개 설명 셀",
+        "노트북 설명을 기준으로 한 읽기 순서",
+        "Stage36의 핵심 아이디어",
+        "Stage35에서 물려받는 본체",
+        "인과적 변환: 왜 expanding percentile을 쓰는가",
+        "네 자산의 원화 월수익률",
+        "VKOSPI·VIX6: 거시보다 빠른 공포를 읽는다",
+        "soft-regime 조건부 평균과 공분산",
+        "EPS·밸류에이션·신용",
+        "GVZ·OVX를 `Σ35`에 연결하는 방법",
+        "2,000회 paired block bootstrap",
+        "Google Colab에서 재현",
+        "Stage36 폴더에서 무엇을 볼 것인가",
+        "주요 Stage36 결과 파일",
+        "전체 구현을 분석하거나 수정할 때",
+    ):
+        assert phrase in text
+
+    assert "현재 비교 기준: 무SJM" not in text
+    assert "stage10_vix6_router" not in text
+
+    local_links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+    assert len(local_links) >= 20
+    for link in local_links:
+        if "://" in link or link.startswith("#"):
+            continue
+        assert (ROOT / link).resolve().exists(), link
