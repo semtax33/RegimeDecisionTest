@@ -1,0 +1,30 @@
+[project]
+name = "regime-decision-test"
+version = "0.2.0"
+description = "Economic-regime multi-asset strategy research and VKOSPI risk overlays"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy",
+  "pandas",
+  "scipy",
+  "scikit-learn",
+  "openpyxl",
+]
+
+[project.optional-dependencies]
+research = [
+  "lightgbm",
+  "statsmodels",
+  "jumpmodels",
+  "yfinance",
+  "matplotlib",
+  "nbformat",
+  "nbclient",
+]
+test = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["_workspace", "artifacts", "cache", "raw_data", "results"]
+addopts = "-ra"
+
