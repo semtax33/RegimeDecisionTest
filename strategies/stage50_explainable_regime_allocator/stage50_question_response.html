@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Stage50 질문 검토 및 반박 가능 범위</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --paper: #ffffff;
+      --ink: #17202a;
+      --muted: #5d6d7e;
+      --line: #d9e0e7;
+      --navy: #17375e;
+      --blue: #2367a6;
+      --blue-soft: #eaf3fb;
+      --green: #176b46;
+      --green-soft: #e8f5ee;
+      --amber: #8a5a00;
+      --amber-soft: #fff4d6;
+      --red: #9d2d2d;
+      --red-soft: #fdecec;
+      --gray-soft: #eef1f4;
+      --shadow: 0 14px 40px rgba(25, 45, 65, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.72;
+      word-break: keep-all;
+    }
+
+    a { color: var(--blue); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 32px auto 64px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 52px clamp(24px, 6vw, 72px);
+      border-radius: 24px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 92% 12%, rgba(94, 188, 255, 0.32), transparent 32%),
+        linear-gradient(135deg, #102b4c 0%, #174b78 62%, #1d628f 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #bfe1fa;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { line-height: 1.3; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.35rem); letter-spacing: -0.04em; }
+    h2 { margin: 0 0 20px; color: var(--navy); font-size: clamp(1.45rem, 3vw, 2rem); letter-spacing: -0.025em; }
+    h3 { margin: 0 0 10px; font-size: 1.08rem; }
+
+    .hero .subtitle {
+      max-width: 850px;
+      margin: 18px 0 0;
+      color: #e7f2fa;
+      font-size: 1.08rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .hero-meta span {
+      padding: 7px 11px;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: #f3f9fd;
+      font-size: 0.83rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+      gap: 28px;
+      margin-top: 28px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .toc strong { display: block; margin-bottom: 10px; color: var(--navy); }
+    .toc a { display: block; padding: 6px 0; color: var(--muted); font-size: 0.9rem; text-decoration: none; }
+    .toc a:hover { color: var(--blue); }
+
+    main { min-width: 0; }
+
+    section {
+      margin-bottom: 28px;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    p:first-child { margin-top: 0; }
+    p:last-child { margin-bottom: 0; }
+
+    .lead {
+      font-size: 1.06rem;
+      color: #25384b;
+    }
+
+    .verdict {
+      margin: 24px 0 0;
+      padding: 22px 24px;
+      border-left: 5px solid var(--blue);
+      border-radius: 10px;
+      background: var(--blue-soft);
+      color: #173653;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .formula {
+      overflow-x: auto;
+      margin: 20px 0;
+      padding: 18px 20px;
+      border: 1px solid #cad7e3;
+      border-radius: 10px;
+      background: #f7fafc;
+      color: #17375e;
+      font-family: "Cambria Math", "Times New Roman", serif;
+      font-size: 1.05rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fafbfd;
+    }
+
+    .stat-card .number { display: block; color: var(--navy); font-size: 1.65rem; font-weight: 850; line-height: 1.2; }
+    .stat-card .label { display: block; margin-top: 5px; color: var(--muted); font-size: 0.86rem; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .na { color: #425466; background: var(--gray-soft); }
+    .evidence { color: var(--green); background: var(--green-soft); }
+    .partial { color: var(--amber); background: var(--amber-soft); }
+    .unresolved { color: var(--red); background: var(--red-soft); }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 18px 0 6px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 670px;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      color: #f8fbfd;
+      background: var(--navy);
+      font-weight: 750;
+    }
+
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .question-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .question {
+      padding: 18px 18px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcfd;
+    }
+
+    .question header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .question h3 { color: #243a50; }
+    .question p { margin: 0; color: var(--muted); font-size: 0.91rem; }
+
+    .callout {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: 12px;
+      background: var(--amber-soft);
+      color: #5b420d;
+    }
+
+    .warning {
+      border-left: 5px solid var(--red);
+      background: var(--red-soft);
+      color: #682323;
+    }
+
+    .good {
+      border-left: 5px solid var(--green);
+      background: var(--green-soft);
+      color: #14563a;
+    }
+
+    ul, ol { padding-left: 1.25rem; }
+    li + li { margin-top: 7px; }
+
+    .response-box {
+      padding: 26px;
+      border-radius: 14px;
+      background: #102f4f;
+      color: #edf6fc;
+    }
+
+    .response-box p { margin: 0; }
+
+    .source-list {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .source-list li {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fafbfd;
+    }
+
+    footer {
+      margin-top: 26px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .toc a { display: inline-block; margin-right: 12px; }
+      .status-grid { grid-template-columns: 1fr; }
+      .question-list { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 18px, 1180px); margin-top: 9px; }
+      .hero { padding: 34px 22px; border-radius: 16px; }
+      section { padding: 22px 18px; }
+      body { font-size: 15px; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f151b;
+        --paper: #171f27;
+        --ink: #edf3f8;
+        --muted: #aebcca;
+        --line: #34414d;
+        --navy: #85c6f4;
+        --blue: #7ec5f7;
+        --blue-soft: #17314a;
+        --green-soft: #143b2a;
+        --amber-soft: #45340d;
+        --red-soft: #452323;
+        --gray-soft: #29343e;
+        --shadow: 0 14px 40px rgba(0, 0, 0, 0.23);
+      }
+      .lead, .question h3 { color: #dce8f1; }
+      .stat-card, .question, .source-list li, tbody tr:nth-child(even) { background: #1b252e; }
+      .formula { background: #121b23; border-color: #394b5b; color: #bce1fb; }
+      .verdict { color: #d8efff; }
+      .callout { color: #ffe9a9; }
+      .warning { color: #ffd3d3; }
+      .good { color: #c9f5de; }
+    }
+
+    @media print {
+      :root {
+        --bg: #fff;
+        --paper: #fff;
+        --ink: #111;
+        --muted: #444;
+        --line: #bbb;
+        --shadow: none;
+      }
+      @page { size: A4; margin: 15mm; }
+      body { background: #fff; font-size: 10.5pt; }
+      .page { width: 100%; margin: 0; }
+      .hero { border-radius: 0; box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .layout { display: block; }
+      .toc { display: none; }
+      section { break-inside: avoid; box-shadow: none; margin: 14px 0; }
+      a { color: inherit; text-decoration: none; }
+      .question-list { display: block; }
+      .question { break-inside: avoid; margin-bottom: 9px; }
+      table { font-size: 8.5pt; }
+      .response-box, th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="eyebrow">Model review brief · 2026-09-03</p>
+      <h1>Stage50 질문 검토 및 반박 가능 범위</h1>
+      <p class="subtitle">
+        기존 다중 overlay 전략에 제기된 12개 질문을 Stage50의 실제 구조와 검증 결과에 대조한다.
+        방어 가능한 부분, 설계 제거로 소멸한 부분, 아직 반박하면 안 되는 한계를 명확히 구분한다.
+      </p>
+      <div class="hero-meta">
+        <span>독립 실행 경로</span>
+        <span>Legacy layer ablation</span>
+        <span>OOS encoding diagnostic</span>
+        <span>Beta stability audit</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="toc" aria-label="문서 목차">
+        <strong>목차</strong>
+        <a href="#conclusion">1. 핵심 결론</a>
+        <a href="#architecture">2. Stage50 구조</a>
+        <a href="#questions">3. 12개 질문별 판정</a>
+        <a href="#evidence">4. 실증 검증 결과</a>
+        <a href="#methodology">5. 방법론 판단</a>
+        <a href="#remaining">6. 남은 한계</a>
+        <a href="#performance">7. 성과 비교</a>
+        <a href="#response">8. 권장 답변문</a>
+        <a href="#sources">9. 근거자료</a>
+      </nav>
+
+      <main>
+        <section id="conclusion">
+          <h2>1. 핵심 결론</h2>
+          <p class="lead">
+            원 질문들은 기존 다중 overlay 구조에는 상당히 타당하다. Stage50은 그 구조가 옳았다고
+            이론적으로 방어하는 모델이 아니다. 경제적·통계적 정당화가 약했던 stress, technical,
+            ATR, credit, GVZ/OVX 레이어를 운영 경로에서 제거해 질문의 대상을 없앤 단순화 모델이다.
+          </p>
+          <div class="verdict">
+            정확한 반박은 “과거 설계가 맞다”가 아니라 “해당 휴리스틱은 현재 Stage50에 존재하지
+            않으므로 Stage50의 유효성을 공격하는 질문은 아니다”이다.
+          </div>
+          <div class="status-grid" aria-label="판정 요약">
+            <div class="stat-card">
+              <span class="number">10개 내외</span>
+              <span class="label">레이어 제거로 Stage50에 적용되지 않는 질문</span>
+            </div>
+            <div class="stat-card">
+              <span class="number">3개 축</span>
+              <span class="label">stress 범위·encoding·beta 안정성 실증 검증</span>
+            </div>
+            <div class="stat-card">
+              <span class="number">1개 핵심</span>
+              <span class="label">추가 설명이 필요한 posterior uncertainty</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="architecture">
+          <h2>2. Stage50의 실제 구조</h2>
+          <p>운영 전략은 다음 한 방향만 가진다.</p>
+          <div class="formula" role="img" aria-label="Stage50 처리 흐름">
+            Macro rank score → BayesianRidge μ → shrinkage Σ → constrained allocation
+          </div>
+          <ul>
+            <li><strong>기대수익률:</strong> 직전 월까지의 거시 국면 score로 자산별 BayesianRidge를 학습한다.</li>
+            <li><strong>공분산:</strong> 직전 252 거래일 KRW 수익률에 constant-correlation shrinkage를 적용하고 21일 월 공분산으로 환산한다.</li>
+            <li><strong>배분:</strong> long-only·완전투자 조건에서 거래비용, 연 13% 변동성 한도, 90% CDaR 16% 한도를 적용한다.</li>
+          </ul>
+          <div class="callout good">
+            Stage50 운영 경로에는 VKOSPI/VIX6 stress, stress/recovery beta, high-stress covariance,
+            technical neutral, ATR, credit, EPS/value add-on, GVZ, OVX variance multiplier가 없다.
+          </div>
+        </section>
+
+        <section id="questions">
+          <h2>3. 원 질문 12개에 대한 판정</h2>
+          <div class="question-list">
+            <article class="question">
+              <header><h3>1. VKOSPI를 전 자산 risk-off proxy로 사용</h3><span class="badge na">적용 불가</span></header>
+              <p>Stage50은 VKOSPI/VIX6 stress를 사용하지 않으며 일간 stress 마지막 값을 월간 신호로 내리는 과정도 없다.</p>
+            </article>
+            <article class="question">
+              <header><h3>2. Stress를 μ와 Σ에 다르게 반영</h3><span class="badge na">적용 불가</span></header>
+              <p>Stress expected-return adjustment와 stress covariance blend를 모두 제거했다. <code>R² × beta</code>도 사용하지 않는다.</p>
+            </article>
+            <article class="question">
+              <header><h3>3. Regime × stress 가중 high-stress covariance</h3><span class="badge na">적용 불가</span></header>
+              <p>High-stress covariance가 없으므로 과거 고스트레스 월의 조건부 공분산이라는 해석도 필요하지 않다.</p>
+            </article>
+            <article class="question">
+              <header><h3>4. <code>1 + rank</code> 1~2배 variance scaling</h3><span class="badge na">적용 불가</span></header>
+              <p>Stage50은 rank 기반 variance multiplier를 사용하지 않는다. Macro state score의 rank와는 역할이 다르다.</p>
+            </article>
+            <article class="question">
+              <header><h3>5. 여러 위험 scaling의 중복</h3><span class="badge partial">Stage50에서 회피</span></header>
+              <p>운영 경로에는 별도 covariance overlay가 없다. 다만 legacy 전략의 중복 여부를 완전히 식별한 것은 아니다.</p>
+            </article>
+            <article class="question">
+              <header><h3>6. Credit을 alpha가 아닌 risk signal로 제한</h3><span class="badge na">적용 불가</span></header>
+              <p>Stage50은 credit을 평균과 공분산 어느 쪽에도 사용하지 않는다. Legacy ablation에서는 risk throttle 성격이 확인됐다.</p>
+            </article>
+            <article class="question">
+              <header><h3>7. Credit을 KODEX200에만 적용</h3><span class="badge na">적용 불가</span></header>
+              <p>자산별 credit mapping 자체가 제거됐다. 과거 설계는 경제적으로 가능한 설명은 있지만 필연적 설계는 아니다.</p>
+            </article>
+            <article class="question">
+              <header><h3>8. Rank와 z-score의 역할 분리</h3><span class="badge na">적용 불가</span></header>
+              <p>Stress·credit·fundamental add-on과 역할별 혼합 규칙이 없다. Stage50은 Macro state 구성에 일관된 causal rank만 사용한다.</p>
+            </article>
+            <article class="question">
+              <header><h3>9. Technical neutral을 횡단면 평균으로 설정</h3><span class="badge na">적용 불가</span></header>
+              <p>Technical confidence filter와 cross-sectional neutral을 모두 제거했다.</p>
+            </article>
+            <article class="question">
+              <header><h3>10. Technical → stress → fundamental 순서</h3><span class="badge na">적용 불가</span></header>
+              <p>세 레이어가 모두 없으므로 결합 순서와 의미 중첩 문제가 발생하지 않는다.</p>
+            </article>
+            <article class="question">
+              <header><h3>11. “서열은 rank, 방향·크기는 z-score” 기준</h3><span class="badge na">적용 불가</span></header>
+              <p>Stage50에는 수익·위험별 rank/z-score 혼합 규칙이 없으므로 해당 역할 분리 질문은 현재 운영 경로에 적용되지 않는다.</p>
+            </article>
+            <article class="question">
+              <header><h3>12. Ablation·stress 범위·beta 안정성</h3><span class="badge evidence">검증 완료</span></header>
+              <p>동결 기준 재현 후 6개 one-at-a-time ablation, KODEX200-only stress, encoding OOS loss, beta stability를 측정했다.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="evidence">
+          <h2>4. 실증 검증 결과</h2>
+
+          <h3>4.1 레이어별 ablation</h3>
+          <p>기준 전략에서 한 레이어만 제거했다. 아래 값은 <strong>제거 후보 − 전체 레이어 기준</strong>이며, MDD Δ가 음수면 낙폭이 더 나빠졌다는 뜻이다.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>제거 레이어</th><th class="num">CAGR Δ</th><th class="num">변동성 Δ</th><th class="num">Sharpe Δ</th><th class="num">MDD Δ</th><th>해석</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Stress expected-return</td><td class="num">+0.26%p</td><td class="num">+0.10%p</td><td class="num">+0.015</td><td class="num">-0.39%p</td><td>수익·Sharpe 정당화가 약함</td></tr>
+                <tr><td>Stress covariance blend</td><td class="num">+0.18%p</td><td class="num">+0.22%p</td><td class="num">-0.006</td><td class="num">-0.02%p</td><td>효과가 작고 혼재</td></tr>
+                <tr><td>Technical confidence</td><td class="num">+0.49%p</td><td class="num">+0.24%p</td><td class="num">+0.021</td><td class="num">-2.02%p</td><td>수익과 drawdown의 교환</td></tr>
+                <tr><td>ATR covariance scaling</td><td class="num">+1.90%p</td><td class="num">+2.60%p</td><td class="num">-0.073</td><td class="num">-2.26%p</td><td>명확한 위험 throttle</td></tr>
+                <tr><td>Credit stress/risk scaling</td><td class="num">+0.78%p</td><td class="num">+1.18%p</td><td class="num">-0.045</td><td class="num">-0.97%p</td><td>alpha보다 위험 throttle</td></tr>
+                <tr><td>GVZ/OVX variance scaling</td><td class="num">+0.11%p</td><td class="num">+0.57%p</td><td class="num">-0.048</td><td class="num">-1.34%p</td><td>tail-risk 완충 역할</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="callout">
+            One-at-a-time ablation은 개별 레이어의 한계효과는 보여주지만 레이어 간 interaction과 이중계산을 완전히 식별하지 않는다.
+            그 검증에는 factorial ablation 또는 Shapley decomposition이 추가로 필요하다.
+          </p>
+
+          <h3 style="margin-top:30px">4.2 전 자산 stress와 KODEX200-only</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>기간</th><th class="num">KODEX200-only CAGR Δ</th><th class="num">변동성 Δ</th><th class="num">Sharpe Δ</th><th class="num">MDD Δ</th></tr></thead>
+              <tbody>
+                <tr><td>2007-04~2026-07</td><td class="num">+0.31%p</td><td class="num">+0.18%p</td><td class="num">+0.011</td><td class="num">-0.38%p</td></tr>
+                <tr><td>2018-01~2026-07</td><td class="num">+0.41%p</td><td class="num">+0.01%p</td><td class="num">+0.035</td><td class="num">+0.17%p</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            전 자산 stress가 전체 표본 MDD를 조금 더 방어했지만 KODEX200-only가 CAGR과 Sharpe는 높았다.
+            Locked 기간에는 MDD도 개선됐다. VKOSPI를 모든 자산의 systemic state proxy로 사용해야 한다는 강한 성과 근거는 확인되지 않았다.
+          </p>
+
+          <h3 style="margin-top:30px">4.3 Rank-only, z-score-only, 혼합</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Credit encoding 정책</th><th class="num">8개 task 최저 MSE 횟수</th><th class="num">평균 상대 MSE</th><th class="num">최악 상대 MSE</th></tr></thead>
+              <tbody>
+                <tr><td>Rank-only</td><td class="num">5</td><td class="num">1.006</td><td class="num">1.032</td></tr>
+                <tr><td>Z-score-only</td><td class="num">3</td><td class="num">1.013</td><td class="num">1.050</td></tr>
+                <tr><td>Z-return / rank-risk 혼합</td><td class="num">5</td><td class="num">1.011</td><td class="num">1.050</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>현재 혼합 규칙을 정확히 지지한 자산은 USO 하나뿐이었다. 이 결과는 credit signal 역할 진단이며 전체 portfolio P&amp;L 우월성을 증명하지는 않는다.</p>
+
+          <h3 style="margin-top:30px">4.4 Regime stress/recovery beta 안정성</h3>
+          <div class="status-grid">
+            <div class="stat-card"><span class="number">14 / 32</span><span class="label">0을 제외한 sign switch가 발생한 beta 계열</span></div>
+            <div class="stat-card"><span class="number">28 / 32</span><span class="label">|beta| p90/median이 3배를 넘은 계열</span></div>
+            <div class="stat-card"><span class="number">약 575배</span><span class="label">Slowdown BOND stress의 하위기간 median 크기 차이</span></div>
+          </div>
+          <p>
+            Sign switch 14개는 모두 부호 제약이 없는 BOND·GLD 계열에서 발생했다. KODEX200·USO의 부호 안정성은 sign prior의 영향을 받으므로
+            실증적 안정성의 증거로 사용할 수 없다. 이 beta를 구조적으로 안정적인 경제계수라고 주장하기 어렵다.
+          </p>
+        </section>
+
+        <section id="methodology">
+          <h2>5. 핵심 방법론 판단</h2>
+
+          <h3><code>1 + rank</code> variance multiplier</h3>
+          <p>
+            Rank 변환은 단위와 이상치 크기에 덜 민감한 bounded state 표현으로 의미가 있다. 위험 신호가 커질수록 exposure를 줄이는 volatility management도 문헌적 근거가 있다.
+            그러나 <code>1 + rank</code>의 선형 형태와 최대 분산 2배는 추정된 통계량이 아니라 위험정책이다.
+          </p>
+          <div class="formula">m<sub>t</sub> = 1 + rank<sub>t</sub> ∈ [1, 2], &nbsp; σ<sub>adjusted</sub> = √m<sub>t</sub> · σ</div>
+          <p>즉 최악의 경우 분산은 2배지만 변동성은 √2배다. 수학적으로 일관되지만 1~2배가 최적이라는 증거는 없다.</p>
+
+          <h3 style="margin-top:28px"><code>R² × beta</code></h3>
+          <p>
+            “설명력이 낮은 beta를 덜 믿는다”는 의도는 이해할 수 있지만 표준적인 coefficient shrinkage는 아니다. R²는 표본 내 전체 모형 설명력이며
+            개별 beta의 표준오차, 표본 수, 시간 안정성 또는 OOS 예측력을 직접 나타내지 않는다.
+          </p>
+          <div class="formula">β* = R² · β̂ &nbsp; (heuristic) &nbsp; ≠ &nbsp; Bayesian posterior β</div>
+          <p>
+            더 적절한 대안은 beta 추정분산과 prior precision을 이용한 Bayesian shrinkage 또는 base/stress forecast의 과거 OOS loss로 결합가중치를 추정하는 방식이다.
+            Stage50 운영 경로에서는 <code>R² × beta</code>를 제거했다.
+          </p>
+        </section>
+
+        <section id="remaining">
+          <h2>6. Stage50에 남은 질문</h2>
+          <p>
+            <strong>Bayesian posterior uncertainty를 배분에 사용하지 않음:</strong>
+            BayesianRidge는 expected return과 함께 predictive standard deviation을 계산하고 저장하지만,
+            현재 allocator는 expected mean만 사용한다. 따라서 추정 불확실성이 큰 기대수익률과 작은
+            기대수익률이 배분 단계에서 같은 방식으로 전달된다.
+          </p>
+          <div class="callout warning">
+            남은 검토 포인트는 predictive uncertainty를 expected return shrinkage, robust optimization 또는
+            covariance 보정 중 어느 경로로 반영할지와, 그 변경이 walk-forward OOS 성과를 개선하는지다.
+          </div>
+        </section>
+
+        <section id="performance">
+          <h2>7. 성과 비교와 해석 제한</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>전략·기간</th><th class="num">CAGR</th><th class="num">변동성</th><th class="num">Sharpe</th><th class="num">MDD</th></tr></thead>
+              <tbody>
+                <tr><td>Stage50 · 전체</td><td class="num">11.70%</td><td class="num">11.46%</td><td class="num">1.025</td><td class="num">-15.73%</td></tr>
+                <tr><td>Legacy 전체 레이어 · 전체</td><td class="num">10.50%</td><td class="num">9.47%</td><td class="num">1.105</td><td class="num">-12.41%</td></tr>
+                <tr><td>Stage50 · 2018~2026</td><td class="num">17.03%</td><td class="num">12.47%</td><td class="num">1.329</td><td class="num">-11.45%</td></tr>
+                <tr><td>Legacy 전체 레이어 · 2018~2026</td><td class="num">12.63%</td><td class="num">10.18%</td><td class="num">1.224</td><td class="num">-11.93%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Stage50은 전체 기간 CAGR이 높지만 변동성도 높고 Sharpe와 MDD는 legacy 전체 레이어보다 나쁘다. Locked 기간에는 CAGR·Sharpe·MDD가 모두 개선됐다.
+            따라서 “단순 모델이 전 구간에서 지배한다”가 아니라 “최근 locked 구간에서 단순화의 결과가 유리했고 전체 표본에서는 위험완충과 수익의 교환이 존재한다”고 해석해야 한다.
+          </p>
+        </section>
+
+        <section id="response">
+          <h2>8. 검토자에게 사용할 수 있는 권장 답변문</h2>
+          <div class="response-box">
+            <p>
+              해당 질문들은 기존 다중 overlay 구조에 대해서는 타당합니다. 그러나 Stage50은 VKOSPI stress,
+              high-stress covariance, R² 기반 beta 보정, ATR·credit·GVZ·OVX variance scaling,
+              technical neutral 및 fundamental add-on을 사용하지 않습니다. 따라서 해당 레이어의 경제적 해석,
+              중복 위험, 적용 순서 문제는 Stage50에는 발생하지 않습니다. Stage50은 causal macro score,
+              BayesianRidge 기대수익률, shrinkage covariance 및 명시적 위험제약으로 구성된 단일 경로입니다.
+              과거 레이어를 사후적으로 정당화하지 않고 실제 ablation을 수행한 결과, stress expected-return과
+              혼합 rank/z-score의 근거는 약했고 ATR·credit·GVZ/OVX는 alpha보다 위험 throttle로 작동했습니다.
+              Stage50에 남은 핵심 검토사항은 Bayesian posterior predictive uncertainty를 현재 배분에
+              직접 사용하지 않는다는 점이며, 이를 반영하는 변경은 별도 walk-forward OOS 검증이 필요합니다.
+            </p>
+          </div>
+        </section>
+
+        <section id="sources">
+          <h2>9. 근거자료 및 재현 파일</h2>
+          <ul class="source-list">
+            <li><a href="https://paint-plastic-7c4.notion.site/9-2-3cf5a15d441a8018acf6ec4405e982df">검토 대상: 9월 2일 질문</a></li>
+            <li><a href="explainable_regime_allocator.py">Stage50 독립 전략 코드</a></li>
+            <li><a href="layer_ablation_validation.py">Legacy 레이어 ablation 검증 코드</a></li>
+            <li><a href="README.md">설계·통계 해설과 성과 요약</a></li>
+            <li><a href="outputs/performance.csv">Stage50 성과</a></li>
+            <li><a href="outputs/layer_ablation_performance.csv">레이어별 ablation 성과</a></li>
+            <li><a href="outputs/layer_ablation_bootstrap.csv">12개월 block bootstrap</a></li>
+            <li><a href="outputs/stress_scope_performance.csv">전 자산 vs KODEX200-only stress</a></li>
+            <li><a href="outputs/credit_encoding_policy_comparison.csv">Rank/z-score 정책 비교</a></li>
+            <li><a href="outputs/regime_beta_stability.csv">Regime beta 안정성 감사</a></li>
+          </ul>
+
+          <h3 style="margin-top:28px">관련 방법론 문헌</h3>
+          <ul class="source-list">
+            <li><a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.12513">Moreira &amp; Muir (2017), Volatility-Managed Portfolios</a> — 위험이 높을 때 exposure를 줄이는 원리.</li>
+            <li><a href="https://onlinelibrary.wiley.com/doi/10.1111/0022-1082.00327">Fleming, Kirby &amp; Ostdiek (2001), The Economic Value of Volatility Timing</a> — 조건부 위험예측의 경제적 가치.</li>
+            <li><a href="https://academic.oup.com/rfs/article/33/5/2223/5758276">Gu, Kelly &amp; Xiu (2020), Empirical Asset Pricing via Machine Learning</a> — 금융 특성의 rank normalization 사례.</li>
+            <li><a href="https://doi.org/10.1111/j.1540-6261.1973.tb01452.x">Vasicek (1973), Bayesian Estimation of Security Betas</a> — 추정 precision과 prior 기반 beta shrinkage.</li>
+            <li><a href="https://www.tandfonline.com/doi/abs/10.1057/jors.1969.103">Bates &amp; Granger (1969), The Combination of Forecasts</a> — 과거 forecast error 기반 결합가중치.</li>
+          </ul>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      이 문서는 저장된 Stage50 및 legacy 검증 산출물을 요약한 연구 검토자료다. 인과효과나 미래 운용성과를 보장하지 않는다.
+    </footer>
+  </div>
+</body>
+</html>
