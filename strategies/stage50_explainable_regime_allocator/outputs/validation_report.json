@@ -1,0 +1,72 @@
+{
+  "strategy": "Stage50_ExplainableRegimeAllocator",
+  "checks": {
+    "finite_returns": true,
+    "finite_weights": true,
+    "long_only": true,
+    "fully_invested": true,
+    "macro_signal_strictly_lagged": true,
+    "training_strictly_precedes_decision": true,
+    "covariance_strictly_lagged": true,
+    "positive_definite_covariance": true,
+    "volatility_policy_satisfied": true,
+    "cdar_policy_satisfied": true
+  },
+  "all_checks_pass": true,
+  "months": 232,
+  "start": "2007-04",
+  "end": "2026-07",
+  "fallback_solver_months": 0,
+  "binding_constraints": {
+    "annual_volatility": 91,
+    "historical_cdar": 132
+  },
+  "known_statistical_limitations": {
+    "regime_scores_are_calibrated_probabilities": false,
+    "ridge_prediction_is_reference_category_invariant": false,
+    "posterior_mean_uncertainty_enters_allocator": false,
+    "macro_point_in_time_vintages_verified": false
+  },
+  "declared_heuristics": {
+    "covariance_lookback_days": 252,
+    "trading_days_per_month": 21.0,
+    "observations_per_parameter": 5,
+    "annual_volatility_cap": 0.13,
+    "maximum_cdar": 0.16,
+    "cdar_confidence": 0.9,
+    "proportional_trade_cost": 0.0015,
+    "foreign_exchange_cost": 0.0005
+  },
+  "data_audit": {
+    "monthly_returns": {
+      "market_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\market_daily.csv",
+      "monthly_return_definition": "first-open(t+1)/first-open(t)-1",
+      "foreign_assets_in_krw": true,
+      "rows": 244,
+      "start": "2006-04",
+      "end": "2026-07"
+    },
+    "daily_risk_returns": {
+      "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+      "foreign_assets_in_krw": true,
+      "business_day_forward_fill_limit": 5,
+      "rows": 6951,
+      "start": "2000-01-04",
+      "end": "2026-08-25"
+    },
+    "macro_regime_scores": {
+      "source_columns": [
+        "GDP_YoY",
+        "Export_YoY",
+        "BSI",
+        "CPI_YoY",
+        "PPI_YoY",
+        "ImportPrice_YoY"
+      ],
+      "equal_weight_within_growth_and_inflation": true,
+      "calibrated_probabilities": false,
+      "point_in_time_vintages_verified": false,
+      "rows": 244
+    }
+  }
+}

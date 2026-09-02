@@ -1,0 +1,5 @@
+asset,best_return_encoding,best_risk_encoding,supports_current_mixed_z_return_rank_risk,rank_only_total_wins,zscore_only_total_wins
+KODEX200,rank,rank,False,2,0
+BOND,rank,rank,False,2,0
+GLD,zscore,zscore,False,0,2
+USO,zscore,rank,True,1,1

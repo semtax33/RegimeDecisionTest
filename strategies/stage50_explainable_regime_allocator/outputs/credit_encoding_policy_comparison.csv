@@ -1,0 +1,4 @@
+policy,tasks,task_wins,mean_relative_mse,worst_relative_mse
+rank_only,8,5,1.0061643830472125,1.0324580072768719
+zscore_only,8,3,1.012741612543452,1.0496284076393951
+current_mixed_z_return_rank_risk,8,5,1.0111973760917905,1.0496284076393951

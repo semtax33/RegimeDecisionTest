@@ -1,0 +1,35 @@
+{
+  "design": {
+    "ablation": "one layer removed while every other layer and policy is fixed",
+    "stress_scope_kodex_only": "only KODEX200 variance ratio enters through a PSD-preserving D Sigma D map",
+    "encoding_comparison": "credit next-month return MSE and log-squared-return MSE are reported separately",
+    "beta_stability": "causal expanding coefficients, sign switches ignore exact zeros"
+  },
+  "checks": {
+    "reference_months_match_frozen": true,
+    "reference_return_max_abs_error_below_1e_8": true,
+    "reference_weight_max_abs_error_below_1e_7": true,
+    "all_paths_finite": true,
+    "all_paths_long_only": true,
+    "all_paths_fully_invested": true
+  },
+  "reference_reproduction": {
+    "months": 232,
+    "max_return_absolute_error": 9.8879238130678e-17,
+    "max_weight_absolute_error": 9.71445146547012e-17
+  },
+  "beta_instability_flags": {
+    "series_with_nonzero_sign_switches": 14,
+    "series_total": 32,
+    "series_with_p90_to_median_above_3": 28,
+    "series_with_early_locked_median_sign_change": 0,
+    "unconstrained_bond_gold_series_with_sign_switches": 14,
+    "unconstrained_bond_gold_series_total": 16
+  },
+  "credit_encoding_support": {
+    "assets_supporting_mixed": 1,
+    "assets_total": 4,
+    "best_policy_by_mean_relative_mse": "rank_only"
+  },
+  "all_checks_pass": true
+}
