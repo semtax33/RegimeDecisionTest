@@ -1,0 +1,10 @@
+{
+  "model_name": "gbdt_s_l5_d1",
+  "rank_threshold": 0.95,
+  "hedge_strength": 1.75,
+  "vix_strength": 1.0,
+  "vol_cap": 0.22,
+  "dd_start": -0.03,
+  "dd_strength": 1.0,
+  "borrow_rate": 0.03
+}

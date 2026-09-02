@@ -1,0 +1,208 @@
+{
+  "objective": "Macro sets base allocation; KOSPI/VKOSPI sets risk budget; VIX6 routes crisis type into bounded four-asset tilts and option structures.",
+  "states": [
+    "RiskOn",
+    "HighIVRange",
+    "PreCrash",
+    "DeflationCrisis",
+    "InflationCrisis",
+    "Recovery"
+  ],
+  "option_mapping": {
+    "RiskOn": "None",
+    "HighIVRange": "CoveredCall",
+    "PreCrash": "PutSpread",
+    "DeflationCrisis": "PutSpread",
+    "InflationCrisis": "PutSpread",
+    "Recovery": "CallSpread"
+  },
+  "parameters": {
+    "rebalance_band": 0.2,
+    "financing_rate": 0.04,
+    "maximum_equity_or_oil_fraction_cut": 0.45,
+    "maximum_recovery_equity_tilt": 0.05,
+    "classification": "fixed economic state rules; 24 bounded routing presets are ranked only on pre-2018 windows",
+    "routing_winner": {
+      "routing_preset": "legacy_gold",
+      "confirmation_scale": 0.0,
+      "recovery_relief": 0.0
+    }
+  },
+  "selection": {
+    "candidate_count": 24,
+    "strict_count": 0,
+    "retention_count": 0,
+    "rule": "safe fallback: exact existing Robust VKOSPI allocation",
+    "uses_locked_metrics": false,
+    "development_status": "post-lock exploratory; locked results were already visible in the broader project"
+  },
+  "data": {
+    "daily_observations": 5043,
+    "start": "2007-04-02",
+    "end": "2026-07-31",
+    "option_available_days": 4046
+  },
+  "lookahead_audit": {
+    "signal_strictly_before_action": true,
+    "vix6_state_uses_aligned_prior_signal": true,
+    "selection_uses_locked_metrics": false
+  },
+  "state_counts": {
+    "RiskOn": 4021,
+    "PreCrash": 639,
+    "HighIVRange": 191,
+    "DeflationCrisis": 108,
+    "InflationCrisis": 68,
+    "Recovery": 16
+  },
+  "locked": {
+    "existing": {
+      "CAGR": 0.20907823332988906,
+      "Sharpe": 1.4969186464577038,
+      "MDD": -0.09760421330851343,
+      "Calmar": 2.1421025408915666
+    },
+    "router": {
+      "CAGR": 0.20907823332988862,
+      "Sharpe": 1.4969186464577038,
+      "MDD": -0.09760421330851354,
+      "Calmar": 2.1421025408915595
+    },
+    "deltas": {
+      "CAGR": -4.440892098500626e-16,
+      "Sharpe": 0.0,
+      "MDD": -1.1102230246251565e-16,
+      "Calmar": -7.105427357601002e-15
+    },
+    "all_three_improve": false,
+    "bootstrap": {
+      "probability_cagr_improves": 0.0,
+      "probability_sharpe_improves": 0.1596,
+      "probability_mdd_improves": 0.0416,
+      "probability_all_three_improve": 0.0,
+      "cagr_delta_p05": -4.551914400963104e-16,
+      "cagr_delta_median": -4.440892098500626e-16,
+      "cagr_delta_p95": -2.220446049250313e-16,
+      "sharpe_delta_p05": -1.3322676295501878e-15,
+      "sharpe_delta_median": -4.440892098500626e-16,
+      "sharpe_delta_p95": 6.661338147750939e-16,
+      "mdd_delta_p05": -5.551115123125783e-16,
+      "mdd_delta_median": -2.220446049250313e-16,
+      "mdd_delta_p95": 0.0
+    }
+  },
+  "comparison": [
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "Existing_RobustVKOSPI",
+      "Months": 69.0,
+      "CAGR": 0.19593903094000042,
+      "Volatility": 0.17331534518736672,
+      "Sharpe": 1.1243810201820734,
+      "Sortino": 2.08954078622688,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.5120152670338407,
+      "FinalMultiple": 2.7978664409178116,
+      "PositiveMonths": 0.6666666666666666,
+      "AvgTurnover": 0.1556235988799484
+    },
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "VIX6_ConditionalRouter",
+      "Months": 69.0,
+      "CAGR": 0.19593903094000042,
+      "Volatility": 0.17331534518736683,
+      "Sharpe": 1.1243810201820734,
+      "Sortino": 2.08954078622688,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.5120152670338407,
+      "FinalMultiple": 2.7978664409178093,
+      "PositiveMonths": 0.6666666666666666,
+      "AvgTurnover": 0.15562359887994842
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "Existing_RobustVKOSPI",
+      "Months": 60.0,
+      "CAGR": 0.030518417586614444,
+      "Volatility": 0.08053529297963194,
+      "Sharpe": 0.41330431530126605,
+      "Sortino": 0.6584376214315012,
+      "MDD": -0.1066314522892039,
+      "Calmar": 0.2862046509864926,
+      "FinalMultiple": 1.162194430361526,
+      "PositiveMonths": 0.5166666666666667,
+      "AvgTurnover": 0.13412918689577422
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "VIX6_ConditionalRouter",
+      "Months": 60.0,
+      "CAGR": 0.030518417586614,
+      "Volatility": 0.08053529297963209,
+      "Sharpe": 0.41330431530126505,
+      "Sortino": 0.6584376214314995,
+      "MDD": -0.10663145228920401,
+      "Calmar": 0.2862046509864882,
+      "FinalMultiple": 1.1621944303615235,
+      "PositiveMonths": 0.5166666666666667,
+      "AvgTurnover": 0.13412918689577424
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "Existing_RobustVKOSPI",
+      "Months": 103.0,
+      "CAGR": 0.20907823332988906,
+      "Volatility": 0.13357225120050709,
+      "Sharpe": 1.4969186464577038,
+      "Sortino": 3.581010224776775,
+      "MDD": -0.09760421330851343,
+      "Calmar": 2.1421025408915666,
+      "FinalMultiple": 5.101919757045714,
+      "PositiveMonths": 0.6213592233009708,
+      "AvgTurnover": 0.158863824661938
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "VIX6_ConditionalRouter",
+      "Months": 103.0,
+      "CAGR": 0.20907823332988862,
+      "Volatility": 0.13357225120050722,
+      "Sharpe": 1.4969186464577038,
+      "Sortino": 3.5810102247767723,
+      "MDD": -0.09760421330851354,
+      "Calmar": 2.1421025408915595,
+      "FinalMultiple": 5.101919757045702,
+      "PositiveMonths": 0.6213592233009708,
+      "AvgTurnover": 0.15886382466193807
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "Existing_RobustVKOSPI",
+      "Months": 232.0,
+      "CAGR": 0.15636553973863587,
+      "Volatility": 0.13715819260316825,
+      "Sharpe": 1.1325286822772858,
+      "Sortino": 2.282422546924721,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.2066359733870573,
+      "FinalMultiple": 16.58973285850312,
+      "PositiveMonths": 0.6077586206896551,
+      "AvgTurnover": 0.1515032477441487
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "VIX6_ConditionalRouter",
+      "Months": 232.0,
+      "CAGR": 0.15636553973863565,
+      "Volatility": 0.13715819260316836,
+      "Sharpe": 1.1325286822772858,
+      "Sortino": 2.2824225469247192,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.2066359733870555,
+      "FinalMultiple": 16.589732858503037,
+      "PositiveMonths": 0.6077586206896551,
+      "AvgTurnover": 0.15150324774414875
+    }
+  ]
+}

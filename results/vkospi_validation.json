@@ -1,0 +1,362 @@
+{
+  "data": {
+    "path": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\VKOSPIData.csv",
+    "interpretation": "Korean equity implied-volatility index; domestic analogue of VIX",
+    "daily_start": "2003-01-02",
+    "daily_end": "2026-08-26",
+    "daily_rows": 5837,
+    "raw_features": [
+      "vkospi_raw_close",
+      "vkospi_raw_change",
+      "vkospi_raw_return_pct",
+      "vkospi_raw_open",
+      "vkospi_raw_high",
+      "vkospi_raw_low"
+    ],
+    "derived_features": [
+      "vkospi_return_5",
+      "vkospi_return_21",
+      "vkospi_return_63",
+      "vkospi_mean_ratio_5",
+      "vkospi_mean_ratio_21",
+      "vkospi_level_z_63",
+      "vkospi_level_z_252",
+      "vkospi_return_vol_21",
+      "vkospi_positive_fraction_21",
+      "vkospi_intraday_range_21",
+      "vkospi_close_location_21",
+      "vkospi_month_mean",
+      "vkospi_month_max",
+      "vkospi_month_min",
+      "vkospi_month_range",
+      "vkospi_month_return"
+    ],
+    "open_asset_pricing_source": "https://openassetpricing.com/SignalDoc-Browser.html",
+    "open_asset_pricing_signal_map": {
+      "momentum": [
+        "Mom12m",
+        "Mom6m",
+        "IntMom",
+        "High52"
+      ],
+      "reversal": [
+        "STreversal",
+        "MRreversal",
+        "LRreversal"
+      ],
+      "low_risk_tail": [
+        "RealizedVol",
+        "IdioVol3F",
+        "MaxRet",
+        "ReturnSkew",
+        "betaVIX"
+      ],
+      "excluded_no_volume": [
+        "DolVol",
+        "Illiquidity",
+        "VolumeTrend",
+        "VolSD"
+      ]
+    },
+    "open_asset_pricing_analog_features": [
+      "vkospi_oap_mom12m",
+      "vkospi_oap_mom6m",
+      "vkospi_oap_intmom",
+      "vkospi_oap_streversal",
+      "vkospi_oap_mrreversal",
+      "vkospi_oap_lrreversal",
+      "vkospi_oap_high52",
+      "vkospi_oap_realized_vol_21",
+      "vkospi_oap_max_return_21",
+      "vkospi_oap_return_skew_21",
+      "vkospi_oap_beta_21",
+      "vkospi_oap_residual_vol_21"
+    ],
+    "composite_features": [
+      "vkospi_level_stress",
+      "vkospi_momentum_stress",
+      "vkospi_range_stress",
+      "vkospi_relative_vix_stress"
+    ],
+    "timing": "target-month start minus two calendar days; no target-month observation"
+  },
+  "selection": {
+    "calibration_end": "2017-12",
+    "locked_start": "2018-01",
+    "rule": "CAGR, Sharpe, and MDD must all match or beat the reference; equal-weight percentile rank selects among eligible candidates",
+    "reference": "ReferenceMediumHorizonOAPVol15",
+    "calibration_candidate": "Blend_loss3_domestic_raw_w0.25_s0.250_v0.150",
+    "candidate_parameters": {
+      "source": "loss3_domestic_raw",
+      "vkospi_weight": 0.25,
+      "max_shift": 0.25,
+      "target_vol": 0.15
+    },
+    "eligible_candidates": 2,
+    "total_candidates": 352,
+    "locked_acceptance_rule": "candidate must match or improve CAGR, Sharpe, and MDD, with at least one strict improvement",
+    "candidate_promoted": false,
+    "deployed_strategy": "ReferenceMediumHorizonOAPVol15"
+  },
+  "locked_test": {
+    "reference": {
+      "Months": 103.0,
+      "CAGR": 0.1785694984348749,
+      "Volatility": 0.1450011749594489,
+      "Sharpe": 1.2114625945539081,
+      "Sortino": 2.330611718743151,
+      "MDD": -0.12557237529490894,
+      "Calmar": 1.4220444426212475,
+      "FinalMultiple": 4.096995089697068,
+      "PositiveMonths": 0.6310679611650486
+    },
+    "calibration_candidate": {
+      "Months": 103.0,
+      "CAGR": 0.17535040877798536,
+      "Volatility": 0.14494821197204164,
+      "Sharpe": 1.1928049393599067,
+      "Sortino": 2.2675865056151965,
+      "MDD": -0.12557237529490894,
+      "Calmar": 1.3964091096164408,
+      "FinalMultiple": 4.001933458489509,
+      "PositiveMonths": 0.6310679611650486
+    },
+    "candidate_deltas": {
+      "CAGR": -0.003219089656889551,
+      "Sharpe": -0.01865765519400142,
+      "MDD": 0.0,
+      "Calmar": -0.025635333004806693
+    },
+    "improves_all_three": false,
+    "deployed": {
+      "Months": 103.0,
+      "CAGR": 0.1785694984348749,
+      "Volatility": 0.1450011749594489,
+      "Sharpe": 1.2114625945539081,
+      "Sortino": 2.330611718743151,
+      "MDD": -0.12557237529490894,
+      "Calmar": 1.4220444426212475,
+      "FinalMultiple": 4.096995089697068,
+      "PositiveMonths": 0.6310679611650486
+    },
+    "bootstrap": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.052,
+      "sharpe_delta_p05": -0.032043057394141504,
+      "sharpe_delta_median": -0.01397801033884083,
+      "sharpe_delta_p95": 0.00020975875887734776
+    }
+  },
+  "prediction": {
+    "loss3_domestic_raw": {
+      "target": "final_loss3",
+      "embargo_months": 1,
+      "feature_count": 18,
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.6605042016806723,
+        "average_precision": 0.22024732318772963,
+        "brier_score": 0.15671674770529231,
+        "recall_at_top_20pct": 0.2857142857142857,
+        "precision_at_top_20pct": 0.10526315789473684
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7806451612903226,
+        "average_precision": 0.27117756064690024,
+        "brier_score": 0.21927544327996903,
+        "recall_at_top_20pct": 0.7,
+        "precision_at_top_20pct": 0.3333333333333333
+      }
+    },
+    "loss3_domestic_derived": {
+      "target": "final_loss3",
+      "embargo_months": 1,
+      "feature_count": 32,
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.6235294117647059,
+        "average_precision": 0.20630243204000967,
+        "brier_score": 0.15017240401528822,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7516129032258065,
+        "average_precision": 0.2875025220254279,
+        "brier_score": 0.20249177420086323,
+        "recall_at_top_20pct": 0.5,
+        "precision_at_top_20pct": 0.23809523809523808
+      }
+    },
+    "loss3_domestic_all": {
+      "target": "final_loss3",
+      "embargo_months": 1,
+      "feature_count": 50,
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.7243697478991596,
+        "average_precision": 0.27054125998225376,
+        "brier_score": 0.14214694894835522,
+        "recall_at_top_20pct": 0.5714285714285714,
+        "precision_at_top_20pct": 0.21052631578947367
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7817204301075269,
+        "average_precision": 0.2964053501788149,
+        "brier_score": 0.18190722571421616,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "loss3_domestic_oap": {
+      "target": "final_loss3",
+      "embargo_months": 1,
+      "feature_count": 24,
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.7226890756302521,
+        "average_precision": 0.3976075335954368,
+        "brier_score": 0.12885280764679855,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7935483870967742,
+        "average_precision": 0.36192282355325833,
+        "brier_score": 0.18393169382438307,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "loss3_structure_all": {
+      "target": "final_loss3",
+      "embargo_months": 1,
+      "feature_count": 56,
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.7411764705882353,
+        "average_precision": 0.34734075448361157,
+        "brier_score": 0.13180908071634023,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.8290322580645161,
+        "average_precision": 0.3888797313797314,
+        "brier_score": 0.16372911222619527,
+        "recall_at_top_20pct": 0.7,
+        "precision_at_top_20pct": 0.3333333333333333
+      }
+    },
+    "loss4_structure_all": {
+      "target": "final_loss4",
+      "embargo_months": 1,
+      "feature_count": 56,
+      "calibration": {
+        "observations": 92,
+        "events": 5,
+        "event_rate": 0.05434782608695652,
+        "roc_auc": 0.632183908045977,
+        "average_precision": 0.10555916493416492,
+        "brier_score": 0.1273578403070651,
+        "recall_at_top_20pct": 0.4,
+        "precision_at_top_20pct": 0.10526315789473684
+      },
+      "locked": {
+        "observations": 103,
+        "events": 7,
+        "event_rate": 0.06796116504854369,
+        "roc_auc": 0.7157738095238095,
+        "average_precision": 0.44729384004752015,
+        "brier_score": 0.21316656274279988,
+        "recall_at_top_20pct": 0.5714285714285714,
+        "precision_at_top_20pct": 0.19047619047619047
+      }
+    },
+    "path2m4_structure_all": {
+      "target": "path_loss_2m_4",
+      "embargo_months": 2,
+      "feature_count": 56,
+      "calibration": {
+        "observations": 91,
+        "events": 6,
+        "event_rate": 0.06593406593406594,
+        "roc_auc": 0.5823529411764705,
+        "average_precision": 0.09555267672432571,
+        "brier_score": 0.15367749796259428,
+        "recall_at_top_20pct": 0.3333333333333333,
+        "precision_at_top_20pct": 0.10526315789473684
+      },
+      "locked": {
+        "observations": 102,
+        "events": 12,
+        "event_rate": 0.11764705882352941,
+        "roc_auc": 0.7379629629629629,
+        "average_precision": 0.30830398563535305,
+        "brier_score": 0.18134030606748994,
+        "recall_at_top_20pct": 0.5,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "path2m5_structure_all": {
+      "target": "path_loss_2m_5",
+      "embargo_months": 2,
+      "feature_count": 56,
+      "calibration": {
+        "observations": 91,
+        "events": 5,
+        "event_rate": 0.054945054945054944,
+        "roc_auc": 0.5302325581395348,
+        "average_precision": 0.07191338580720909,
+        "brier_score": 0.14627008473639247,
+        "recall_at_top_20pct": 0.2,
+        "precision_at_top_20pct": 0.05263157894736842
+      },
+      "locked": {
+        "observations": 102,
+        "events": 10,
+        "event_rate": 0.09803921568627451,
+        "roc_auc": 0.6293478260869565,
+        "average_precision": 0.29994481620753594,
+        "brier_score": 0.19669706511642565,
+        "recall_at_top_20pct": 0.4,
+        "precision_at_top_20pct": 0.19047619047619047
+      }
+    }
+  },
+  "notes": [
+    "All model, blend, shift, and volatility-target selection uses data through 2017 only.",
+    "The 2018-2026 locked period never chooses a candidate or hyperparameters; it is only a one-way promotion gate.",
+    "A locked-test failure automatically retains the prior validated reference strategy.",
+    "Raw KRX fields and engineered VKOSPI fields are tested separately before being combined.",
+    "Open Asset Pricing price/risk signals are time-series analogues, not exact stock-level replications.",
+    "Open Asset Pricing volume/liquidity signals are excluded because the VKOSPI export has no volume field.",
+    "Historical simulation does not guarantee future performance."
+  ]
+}

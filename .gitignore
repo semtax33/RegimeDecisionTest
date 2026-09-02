@@ -5,15 +5,5 @@ __pycache__/
 _workspace/
 cache/
 artifacts/archive/
+.codex_tmp/**raw_data/KOSPI200OptionPrice.csv
 .codex_tmp/**
-artifacts/**
-raw_data/**
-results/**
-*.csv
-*.png
-*.json
-*.log
-*.html
-*.xlsx
-*.db
-*.zip

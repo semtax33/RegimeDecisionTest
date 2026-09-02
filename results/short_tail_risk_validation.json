@@ -1,0 +1,119 @@
+{
+  "method": {
+    "target": "volatility-scaled maximum adverse excursion over the next 10/20 trading days",
+    "event_threshold_sigma": 1.25,
+    "feature_set": "Korean-only technical + KOSPI200 + USDKRW + Korean HMM",
+    "model": "quarterly-refit five-year rolling LightGBM",
+    "overlay": "asymmetric de-risk only above causal trailing 80th risk percentile",
+    "factor_start": "2005-01",
+    "calibration_end": "2017-12",
+    "locked_start": "2018-01"
+  },
+  "validation": {
+    "TailRisk10D": {
+      "selected_shift": 0.025,
+      "locked_deltas": {
+        "CAGR": -0.00011980731065075467,
+        "Sharpe": -9.245313427408419e-05,
+        "MDD": 1.1102230246251565e-16,
+        "Calmar": -0.0008040456981885935
+      },
+      "prediction_full": {
+        "observations": 260,
+        "event_rate": 0.2076923076923077,
+        "roc_auc": 0.43788205681409564,
+        "average_precision": 0.1790807585929777,
+        "brier_score": 0.17073533383050052,
+        "recall_at_top_20pct": 0.14814814814814814,
+        "precision_at_top_20pct": 0.1509433962264151
+      },
+      "prediction_locked": {
+        "observations": 104,
+        "event_rate": 0.19230769230769232,
+        "roc_auc": 0.4988095238095238,
+        "average_precision": 0.19816256658345954,
+        "brier_score": 0.15787121063218537,
+        "recall_at_top_20pct": 0.15,
+        "precision_at_top_20pct": 0.14285714285714285
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.4712,
+        "sharpe_delta_p05": -0.003926903000872628,
+        "sharpe_delta_median": -0.00018071882418502216,
+        "sharpe_delta_p95": 0.005043314340205441
+      }
+    },
+    "TailRisk20D": {
+      "selected_shift": 0.025,
+      "locked_deltas": {
+        "CAGR": 0.0003166151896818459,
+        "Sharpe": 0.002185168006983318,
+        "MDD": 0.0,
+        "Calmar": 0.002124854317005598
+      },
+      "prediction_full": {
+        "observations": 259,
+        "event_rate": 0.21235521235521235,
+        "roc_auc": 0.4952317290552585,
+        "average_precision": 0.21411452714869517,
+        "brier_score": 0.17167939151486494,
+        "recall_at_top_20pct": 0.18181818181818182,
+        "precision_at_top_20pct": 0.19230769230769232
+      },
+      "prediction_locked": {
+        "observations": 103,
+        "event_rate": 0.1941747572815534,
+        "roc_auc": 0.5605421686746987,
+        "average_precision": 0.2437189240534337,
+        "brier_score": 0.16020941646019904,
+        "recall_at_top_20pct": 0.3,
+        "precision_at_top_20pct": 0.2857142857142857
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.7156,
+        "sharpe_delta_p05": -0.0038976362154413023,
+        "sharpe_delta_median": 0.002118741263649082,
+        "sharpe_delta_p95": 0.009925967006889067
+      }
+    },
+    "TailRiskEnsemble": {
+      "selected_shift": 0.025,
+      "locked_deltas": {
+        "CAGR": -0.00014792203111513302,
+        "Sharpe": -0.00071317182253261,
+        "MDD": 1.1102230246251565e-16,
+        "Calmar": -0.000992728007493282
+      },
+      "prediction_full": {
+        "observations": 259,
+        "event_rate": 0.26640926640926643,
+        "roc_auc": 0.4822273073989321,
+        "average_precision": 0.2507450918281837,
+        "brier_score": 0.20482532509212384,
+        "recall_at_top_20pct": 0.18840579710144928,
+        "precision_at_top_20pct": 0.25
+      },
+      "prediction_locked": {
+        "observations": 103,
+        "event_rate": 0.24271844660194175,
+        "roc_auc": 0.5571794871794872,
+        "average_precision": 0.27145881976783354,
+        "brier_score": 0.18881275847845105,
+        "recall_at_top_20pct": 0.24,
+        "precision_at_top_20pct": 0.2857142857142857
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.302,
+        "sharpe_delta_p05": -0.003501061457210708,
+        "sharpe_delta_median": -0.0007233231711527566,
+        "sharpe_delta_p95": 0.0016302035013433028
+      }
+    }
+  }
+}

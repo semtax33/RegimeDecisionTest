@@ -1,0 +1,8 @@
+key,zero,robust
+macro_engine,거시수준 expanding rank와 무평활 확률,rolling z-score·3개월 변화·sigmoid·85/15 평활
+base_allocation,사분면 확률을 네 자산 비중으로 직접 사용,hard 국면 40% + SLSQP 위험제어 60%
+tail_logistic,꼬리위험 모델과 자산 tilt 없음,16변수 균형 L2 로지스틱과 최대 20% tilt
+vol_target_leverage,총 자산노출 1배 고정,"15% 변동성 타깃, 0.5~1.5배 노출"
+vkospi_signal,VKOSPI expanding percentile,252일 수준·5일 충격·가속도 robust stress
+overlay_policy,"stress 비율 전부를 채권·금에 균등 이전, 매일 조정","최대 35%를 금으로 이전, 20% 밴드"
+frequency_reconciliation,일간 재구성 수익률을 그대로 사용,월간 기준경로에 일간 overlay 상대효과만 결합

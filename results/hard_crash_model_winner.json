@@ -1,0 +1,9 @@
+{
+  "model_name": "logit_s_l5_c01",
+  "probability_threshold": 0.45,
+  "protection_fraction": 1.0,
+  "vix_threshold": 35.0,
+  "fsi_threshold": 99.0,
+  "vol_cap": 0.18,
+  "dd_start": -0.03
+}

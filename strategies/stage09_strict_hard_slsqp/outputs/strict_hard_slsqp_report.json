@@ -1,0 +1,82 @@
+{
+  "strategy": "StrictHard40_SLSQP60_Monthly",
+  "definition": {
+    "macro": "Zero-Tune expanding empirical macro ranks",
+    "hard_mapping": {
+      "Goldilocks": {
+        "KODEX200": 1.0,
+        "BOND": 0.0,
+        "GLD": 0.0,
+        "USO": 0.0
+      },
+      "Overheating": {
+        "KODEX200": 0.0,
+        "BOND": 0.0,
+        "GLD": 0.0,
+        "USO": 1.0
+      },
+      "Slowdown": {
+        "KODEX200": 0.0,
+        "BOND": 1.0,
+        "GLD": 0.0,
+        "USO": 0.0
+      },
+      "Stagflation": {
+        "KODEX200": 0.0,
+        "BOND": 0.0,
+        "GLD": 1.0,
+        "USO": 0.0
+      }
+    },
+    "base": {
+      "strict_hard_share": 0.4,
+      "slsqp_share": 0.6
+    },
+    "later_current_layers": {
+      "tail_logistic": false,
+      "vol_target": false,
+      "leverage": false,
+      "robust_vkospi_features": false,
+      "current_overlay_policy": false,
+      "frequency_reconciliation": false
+    },
+    "vkospi": "Original Zero-Tune expanding percentile and proportional equal bond/gold transfer"
+  },
+  "full_period": {
+    "Months": 232.0,
+    "CAGR": 0.09599958285278087,
+    "Sharpe": 1.04889762675527,
+    "MDD": -0.11448602277520559,
+    "Calmar": 0.8385266648774845
+  },
+  "locked_period": {
+    "Months": 103.0,
+    "CAGR": 0.10186783034738922,
+    "Sharpe": 1.2023889742182223,
+    "MDD": -0.10742166318247648,
+    "Calmar": 0.9482987632983023
+  },
+  "zero_tune_vkospi_overlay_variant": {
+    "full_period": {
+      "Months": 232.0,
+      "CAGR": 0.07351675575924244,
+      "Sharpe": 0.9334052390017522,
+      "MDD": -0.1272163382188587,
+      "Calmar": 0.5778876894944633
+    },
+    "locked_period": {
+      "Months": 103.0,
+      "CAGR": 0.06242363646755433,
+      "Sharpe": 1.1862613603350023,
+      "MDD": -0.11503536054093266,
+      "Calmar": 0.5426473753289306
+    }
+  },
+  "checks": {
+    "hard_weights_are_binary": true,
+    "one_asset_has_100_percent_each_month": true,
+    "macro_signal_precedes_target_month": true,
+    "vkospi_signal_precedes_action_date": true,
+    "asset_weights_unlevered_before_daily_overlay": true
+  }
+}

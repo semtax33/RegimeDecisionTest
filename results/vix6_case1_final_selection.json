@@ -1,0 +1,435 @@
+{
+  "selected_strategy": "Existing_Final_RobustVKOSPI",
+  "decision": "Keep the existing final strategy: no VIX6 alternative improved locked CAGR, Sharpe and MDD simultaneously.",
+  "development_status": "Post-lock exploratory comparison requested by the user; locked metrics were observed during iteration and are used here for the explicit final keep-or-replace decision.",
+  "existing_reproduction_max_return_error": 9.8879238130678e-17,
+  "tradable_assets": [
+    "KODEX200",
+    "BOND",
+    "GLD",
+    "USO"
+  ],
+  "option_is_allocated_asset": false,
+  "vix6_six_components": [
+    "sticky_strike",
+    "parallel_shift",
+    "put_skew",
+    "call_skew",
+    "downside_convexity",
+    "upside_convexity"
+  ],
+  "input_candidate": {
+    "selected_set": "monthly6",
+    "C": 0.03,
+    "base_features": [
+      "base_USO",
+      "base_GLD",
+      "base_KODEX200",
+      "p_inflation_high",
+      "proxy_mom1",
+      "proxy_mom6",
+      "proxy_vol6",
+      "daily_mom21",
+      "daily_mom252",
+      "daily_vol21",
+      "daily_downvol21",
+      "daily_mean_corr63",
+      "oap_momentum_trend_stress",
+      "oap_reversal_crowding_stress",
+      "oap_low_risk_tail_stress",
+      "oap_liquidity_activity_stress"
+    ],
+    "added_vix6_features": [
+      "asymmetry_mean",
+      "asymmetry_max",
+      "breadth_z_mean",
+      "breadth_z_max",
+      "reaction_z_mean",
+      "left_impulse_z_max"
+    ],
+    "all_features": [
+      "base_USO",
+      "base_GLD",
+      "base_KODEX200",
+      "p_inflation_high",
+      "proxy_mom1",
+      "proxy_mom6",
+      "proxy_vol6",
+      "daily_mom21",
+      "daily_mom252",
+      "daily_vol21",
+      "daily_downvol21",
+      "daily_mean_corr63",
+      "oap_momentum_trend_stress",
+      "oap_reversal_crowding_stress",
+      "oap_low_risk_tail_stress",
+      "oap_liquidity_activity_stress",
+      "asymmetry_mean",
+      "asymmetry_max",
+      "breadth_z_mean",
+      "breadth_z_max",
+      "reaction_z_mean",
+      "left_impulse_z_max"
+    ],
+    "fit_stats": {
+      "fit_count": 194.0,
+      "convergence_warning_count": 0.0
+    },
+    "prelock_gate": true,
+    "candidate_count": 28,
+    "selection_uses_locked_metrics": false
+  },
+  "standalone_overlay": {
+    "config": {
+      "tail_threshold": 1.0,
+      "breadth_threshold": 0.5,
+      "early_scale": 0.1,
+      "confirmed_scale": 0.8,
+      "recovery_relief": 0.5,
+      "right_tail_relief": 0.25,
+      "panic_relief": 0.0,
+      "max_risk_transfer": 0.25,
+      "rebalance_band": 0.2,
+      "oil_cut_deflation": 1.0,
+      "oil_cut_inflation": 1.0,
+      "bond_share_deflation": 0.0,
+      "bond_share_inflation": 0.0,
+      "financing_rate": 0.04
+    },
+    "vkospi_stress_forced_to_zero": true
+  },
+  "alternatives": {
+    "VIX6_Hybrid_Overlay": {
+      "locked_metrics": {
+        "CAGR": 0.20931565241408,
+        "Sharpe": 1.4966955441165115,
+        "MDD": -0.09760421330851332
+      },
+      "delta_minus_existing": {
+        "CAGR": 0.00023741908419139257,
+        "Sharpe": -0.00022310234119227168,
+        "MDD": 2.220446049250313e-16
+      },
+      "all_three_improve": false
+    },
+    "VIX6_Logistic_Input": {
+      "locked_metrics": {
+        "CAGR": 0.19994276342112416,
+        "Sharpe": 1.4619759378841908,
+        "MDD": -0.10152340019359984
+      },
+      "delta_minus_existing": {
+        "CAGR": -0.00913546990876446,
+        "Sharpe": -0.034942708573513004,
+        "MDD": -0.003919186885086301
+      },
+      "all_three_improve": false
+    },
+    "VIX6_Standalone_Overlay": {
+      "locked_metrics": {
+        "CAGR": 0.21483489196398042,
+        "Sharpe": 1.395028620765897,
+        "MDD": -0.09877057163435843
+      },
+      "delta_minus_existing": {
+        "CAGR": 0.005756658634091805,
+        "Sharpe": -0.10189002569180672,
+        "MDD": -0.001166358325844885
+      },
+      "all_three_improve": false
+    }
+  },
+  "lookahead_audit": {
+    "monthly_input_signal_month_strictly_before_target": true,
+    "input_overlay_signal_strictly_before_action_open": true,
+    "standalone_signal_strictly_before_action_open": true,
+    "training_label_embargo_months": 2
+  },
+  "locked_existing": {
+    "CAGR": 0.20907823332988862,
+    "Sharpe": 1.4969186464577038,
+    "MDD": -0.09760421330851354
+  },
+  "comparison": [
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "Existing_Final_RobustVKOSPI",
+      "Months": 69.0,
+      "CAGR": 0.1959390309,
+      "Volatility": 0.1733153452,
+      "Sharpe": 1.1243810202,
+      "Sortino": 2.0895407862,
+      "MDD": -0.1295879977,
+      "Calmar": 1.512015267,
+      "FinalMultiple": 2.7978664409,
+      "PositiveMonths": 0.6666666667,
+      "AvgTurnover": 0.1556235989
+    },
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "VIX6_Hybrid_Overlay",
+      "Months": 69.0,
+      "CAGR": 0.1959576252,
+      "Volatility": 0.1733170841,
+      "Sharpe": 1.124462606,
+      "Sortino": 2.0897085152,
+      "MDD": -0.1295879977,
+      "Calmar": 1.5121587544,
+      "FinalMultiple": 2.7981165793,
+      "PositiveMonths": 0.6666666667,
+      "AvgTurnover": 0.1556100575
+    },
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "VIX6_Logistic_Input",
+      "Months": 69.0,
+      "CAGR": 0.1965787511,
+      "Volatility": 0.1728974653,
+      "Sharpe": 1.1297949683,
+      "Sortino": 2.11006007,
+      "MDD": -0.1295879977,
+      "Calmar": 1.5169518365,
+      "FinalMultiple": 2.8064828749,
+      "PositiveMonths": 0.6666666667,
+      "AvgTurnover": 0.1563780683
+    },
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "VIX6_Standalone_Overlay",
+      "Months": 69.0,
+      "CAGR": 0.1924206793,
+      "Volatility": 0.1733467467,
+      "Sharpe": 1.1070452327,
+      "Sortino": 2.0399417098,
+      "MDD": -0.1296448525,
+      "Calmar": 1.4842138004,
+      "FinalMultiple": 2.7508671662,
+      "PositiveMonths": 0.6666666667,
+      "AvgTurnover": 0.137110275
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "Existing_Final_RobustVKOSPI",
+      "Months": 60.0,
+      "CAGR": 0.0305184176,
+      "Volatility": 0.080535293,
+      "Sharpe": 0.4133043153,
+      "Sortino": 0.6584376214,
+      "MDD": -0.1066314523,
+      "Calmar": 0.286204651,
+      "FinalMultiple": 1.1621944304,
+      "PositiveMonths": 0.5166666667,
+      "AvgTurnover": 0.1341291869
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "VIX6_Hybrid_Overlay",
+      "Months": 60.0,
+      "CAGR": 0.0305300487,
+      "Volatility": 0.0805434414,
+      "Sharpe": 0.4134111116,
+      "Sortino": 0.6585745483,
+      "MDD": -0.1066317281,
+      "Calmar": 0.2863129879,
+      "FinalMultiple": 1.1622600183,
+      "PositiveMonths": 0.5166666667,
+      "AvgTurnover": 0.1339904971
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "VIX6_Logistic_Input",
+      "Months": 60.0,
+      "CAGR": 0.030980346,
+      "Volatility": 0.080695703,
+      "Sharpe": 0.4182152793,
+      "Sortino": 0.6646844614,
+      "MDD": -0.1066314523,
+      "Calmar": 0.2905366604,
+      "FinalMultiple": 1.1648015268,
+      "PositiveMonths": 0.5333333333,
+      "AvgTurnover": 0.138080428
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "VIX6_Standalone_Overlay",
+      "Months": 60.0,
+      "CAGR": 0.0275440316,
+      "Volatility": 0.0811612215,
+      "Sharpe": 0.3750367644,
+      "Sortino": 0.5924172427,
+      "MDD": -0.1071090074,
+      "Calmar": 0.2571588728,
+      "FinalMultiple": 1.1455187579,
+      "PositiveMonths": 0.5166666667,
+      "AvgTurnover": 0.1210019169
+    },
+    {
+      "Period": "prelock_2007_2017",
+      "Strategy": "Existing_Final_RobustVKOSPI",
+      "Months": 129.0,
+      "CAGR": 0.1159320374,
+      "Volatility": 0.1396171724,
+      "Sharpe": 0.8574574651,
+      "Sortino": 1.566441619,
+      "MDD": -0.1295879977,
+      "Calmar": 0.8946201765,
+      "FinalMultiple": 3.2516647945,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.145626198
+    },
+    {
+      "Period": "prelock_2007_2017",
+      "Strategy": "VIX6_Hybrid_Overlay",
+      "Months": 129.0,
+      "CAGR": 0.115947176,
+      "Volatility": 0.1396205855,
+      "Sharpe": 0.857538039,
+      "Sortino": 1.566575876,
+      "MDD": -0.1295879977,
+      "Calmar": 0.8947369975,
+      "FinalMultiple": 3.2521390266,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.145554448
+    },
+    {
+      "Period": "prelock_2007_2017",
+      "Strategy": "VIX6_Logistic_Input",
+      "Months": 129.0,
+      "CAGR": 0.1164839792,
+      "Volatility": 0.1393845102,
+      "Sharpe": 0.8622214139,
+      "Sortino": 1.5803556344,
+      "MDD": -0.1295879977,
+      "Calmar": 0.8988793811,
+      "FinalMultiple": 3.2689955377,
+      "PositiveMonths": 0.6046511628,
+      "AvgTurnover": 0.147867538
+    },
+    {
+      "Period": "prelock_2007_2017",
+      "Strategy": "VIX6_Standalone_Overlay",
+      "Months": 129.0,
+      "CAGR": 0.1126779254,
+      "Volatility": 0.1398018658,
+      "Sharpe": 0.8354898472,
+      "Sortino": 1.5127940831,
+      "MDD": -0.1296818244,
+      "Calmar": 0.8688798596,
+      "FinalMultiple": 3.1511699395,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.1296180154
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "Existing_Final_RobustVKOSPI",
+      "Months": 103.0,
+      "CAGR": 0.2090782333,
+      "Volatility": 0.1335722512,
+      "Sharpe": 1.4969186465,
+      "Sortino": 3.5810102248,
+      "MDD": -0.0976042133,
+      "Calmar": 2.1421025409,
+      "FinalMultiple": 5.101919757,
+      "PositiveMonths": 0.6213592233,
+      "AvgTurnover": 0.1588638247
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "VIX6_Hybrid_Overlay",
+      "Months": 103.0,
+      "CAGR": 0.2093156524,
+      "Volatility": 0.1337386994,
+      "Sharpe": 1.4966955441,
+      "Sortino": 3.584935589,
+      "MDD": -0.0976042133,
+      "Calmar": 2.1445350085,
+      "FinalMultiple": 5.1105252191,
+      "PositiveMonths": 0.6213592233,
+      "AvgTurnover": 0.1587847402
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "VIX6_Logistic_Input",
+      "Months": 103.0,
+      "CAGR": 0.1999427634,
+      "Volatility": 0.1312979833,
+      "Sharpe": 1.4619759379,
+      "Sortino": 3.4574111075,
+      "MDD": -0.1015234002,
+      "Calmar": 1.9694254038,
+      "FinalMultiple": 4.7803668266,
+      "PositiveMonths": 0.6213592233,
+      "AvgTurnover": 0.164196621
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "VIX6_Standalone_Overlay",
+      "Months": 103.0,
+      "CAGR": 0.214834892,
+      "Volatility": 0.1481297364,
+      "Sharpe": 1.3950286208,
+      "Sortino": 3.3208726065,
+      "MDD": -0.0987705716,
+      "Calmar": 2.1750900942,
+      "FinalMultiple": 5.3142231827,
+      "PositiveMonths": 0.6116504854,
+      "AvgTurnover": 0.1420541917
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "Existing_Final_RobustVKOSPI",
+      "Months": 232.0,
+      "CAGR": 0.1563655397,
+      "Volatility": 0.1371581926,
+      "Sharpe": 1.1325286823,
+      "Sortino": 2.2824225469,
+      "MDD": -0.1295879977,
+      "Calmar": 1.2066359734,
+      "FinalMultiple": 16.5897328585,
+      "PositiveMonths": 0.6077586207,
+      "AvgTurnover": 0.1515032477
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "VIX6_Hybrid_Overlay",
+      "Months": 232.0,
+      "CAGR": 0.156475068,
+      "Volatility": 0.1372341989,
+      "Sharpe": 1.1326684047,
+      "Sortino": 2.2839162142,
+      "MDD": -0.1295879977,
+      "Calmar": 1.2074811772,
+      "FinalMultiple": 16.6201385115,
+      "PositiveMonths": 0.6077586207,
+      "AvgTurnover": 0.1514282415
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "VIX6_Logistic_Input",
+      "Months": 232.0,
+      "CAGR": 0.1527952643,
+      "Volatility": 0.1359553348,
+      "Sharpe": 1.1183494336,
+      "Sortino": 2.2456809455,
+      "MDD": -0.1295879977,
+      "Calmar": 1.179085,
+      "FinalMultiple": 15.6269978245,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.1551170878
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "VIX6_Standalone_Overlay",
+      "Months": 232.0,
+      "CAGR": 0.1569265113,
+      "Volatility": 0.1438245903,
+      "Sharpe": 1.0894511857,
+      "Sortino": 2.2084718791,
+      "MDD": -0.1296818244,
+      "Calmar": 1.2100887077,
+      "FinalMultiple": 16.7460203451,
+      "PositiveMonths": 0.6034482759,
+      "AvgTurnover": 0.1351392488
+    }
+  ]
+}

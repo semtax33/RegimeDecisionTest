@@ -1,0 +1,15 @@
+{
+  "baseline_mdd_month": "2013-06",
+  "accelerated_mdd_month": "2013-06",
+  "baseline_avg_turnover": 0.025064471354001278,
+  "accelerated_avg_turnover": 0.060280124121927084,
+  "accelerated_avg_sleeve": 0.039627219553482224,
+  "accelerated_avg_brake": 0.011847551015962887,
+  "accelerated_avg_early_guard": 0.09255001105207682,
+  "bootstrap_probabilities": {
+    "P(Delta CAGR > 0)": 0.9796666666666667,
+    "P(Delta Sharpe > 0)": 0.6526666666666666,
+    "P(Delta MDD >= 0)": 0.77,
+    "P(Delta Calmar > 0)": 0.927
+  }
+}

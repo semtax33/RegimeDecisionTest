@@ -1,0 +1,13 @@
+Model,Period,N,Events,AUC
+none,calibration,129,15,
+none,locked,103,10,
+logit_m_l5_c01,calibration,92,9,0.5234270414993306
+logit_m_l5_c01,locked,103,10,0.7817204301075269
+logit_s_l5_c01,calibration,92,9,0.5997322623828648
+logit_s_l5_c01,locked,103,10,0.7838709677419354
+logit_s_l8_c01,calibration,92,4,0.6363636363636364
+logit_s_l8_c01,locked,103,5,0.7734693877551021
+gbdt_s_l5_d1,calibration,92,9,0.5528781793842035
+gbdt_s_l5_d1,locked,103,10,0.7655913978494624
+gbdt_s_l5_d2,calibration,92,9,0.4444444444444444
+gbdt_s_l5_d2,locked,103,10,0.7720430107526881

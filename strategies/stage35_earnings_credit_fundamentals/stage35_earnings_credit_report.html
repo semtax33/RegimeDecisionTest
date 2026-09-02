@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stage 35 — Earnings·Credit Fundamentals 상세 구현 및 전략 설명서</title>
+<style>
+:root{
+  --bg:#f4f6f8;--paper:#fff;--ink:#172033;--muted:#5f6b7a;--line:#dce2e9;
+  --navy:#14375a;--blue:#1e6ba8;--cyan:#eaf5fb;--green:#14735b;--greenbg:#eaf7f2;
+  --amber:#986008;--amberbg:#fff7e6;--red:#a13a3a;--redbg:#fff0f0;--code:#101827;
+  --shadow:0 12px 36px rgba(24,39,58,.08)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;line-height:1.75}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+header{background:linear-gradient(125deg,#102b49,#185783 65%,#14838b);color:#fff;padding:58px 30px 50px}
+.header-inner{max-width:1240px;margin:auto}
+.eyebrow{font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;opacity:.78;font-weight:800}
+h1{font-size:clamp(2rem,5vw,3.55rem);line-height:1.16;margin:.35rem 0 1rem;letter-spacing:-.045em}
+.subtitle{font-size:1.08rem;max-width:930px;color:#dfeef7;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.pill{border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:5px 12px;font-size:.84rem;background:rgba(255,255,255,.08)}
+.layout{max-width:1320px;margin:28px auto 60px;padding:0 22px;display:grid;grid-template-columns:278px minmax(0,1fr);gap:26px;align-items:start}
+nav{position:sticky;top:18px;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:14px;padding:18px;max-height:calc(100vh - 36px);overflow:auto}
+nav .nav-title{font-weight:850;color:var(--navy);margin:0 0 10px;font-size:.96rem}
+nav ol{padding-left:1.35rem;margin:0;font-size:.83rem;line-height:1.52}
+nav li{margin:.27rem 0}nav a{color:#465468}
+main{min-width:0}
+section{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:30px 32px;margin-bottom:22px;scroll-margin-top:18px}
+h2{font-size:1.56rem;color:var(--navy);letter-spacing:-.025em;margin:0 0 18px;padding-bottom:11px;border-bottom:2px solid #e6edf3}
+h3{font-size:1.12rem;color:#214d70;margin:28px 0 8px}
+h4{font-size:1rem;margin:20px 0 7px;color:#334d66}
+p{margin:.55rem 0 1rem}
+strong{color:#172d45}
+.lead{font-size:1.08rem;color:#354457}
+.note,.good,.warn,.bad{border-left:5px solid;border-radius:8px;padding:14px 17px;margin:16px 0}
+.note{background:var(--cyan);border-color:var(--blue)}
+.good{background:var(--greenbg);border-color:var(--green)}
+.warn{background:var(--amberbg);border-color:#d58a11}
+.bad{background:var(--redbg);border-color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fbfcfd}
+.card .k{font-size:.78rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.card .v{font-size:1.45rem;font-weight:900;color:var(--navy);margin-top:4px}
+.card .d{font-size:.85rem;color:var(--muted);margin-top:3px}
+.formula{font-family:"Cambria Math","Times New Roman",serif;background:#f3f7fb;border:1px solid #d8e4ef;border-radius:10px;padding:14px 18px;margin:14px 0;overflow:auto;font-size:1.03rem;color:#173d5b}
+code{font-family:"Cascadia Code","Consolas",monospace;font-size:.88em;background:#eef2f6;padding:.1em .35em;border-radius:4px}
+pre{background:var(--code);color:#d9e7f5;padding:18px;border-radius:11px;overflow:auto;line-height:1.55;font-size:.82rem;border:1px solid #293850}
+pre code{background:none;padding:0;color:inherit}
+.table-wrap{overflow:auto;margin:14px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.87rem;background:#fff}
+th,td{padding:10px 11px;border-bottom:1px solid #e5e9ee;text-align:right;white-space:nowrap}
+th{background:#edf3f8;color:#27445f;font-weight:850}
+td:first-child,th:first-child{text-align:left}
+tr:last-child td{border-bottom:0}
+tr.best td{background:#edf8f4;font-weight:750}
+tr.fail td{background:#fff4f2}
+.caption{font-size:.82rem;color:var(--muted);margin-top:-10px}
+.figure{margin:18px 0}.figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+.figure figcaption{font-size:.83rem;color:var(--muted);margin-top:8px}
+.flow{display:grid;gap:9px;margin:18px 0}
+.flow .node{background:#f8fafc;border:1px solid #d8e2eb;border-radius:10px;padding:12px 15px}
+.flow .arrow{text-align:center;color:#64809a;font-weight:900;line-height:1}
+.small{font-size:.85rem;color:var(--muted)}
+.tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.77rem;font-weight:800;background:#eaf1f7;color:#31516e}
+.tag.ok{background:#e4f5ee;color:#176148}.tag.no{background:#fdeaea;color:#913737}
+ul,ol{padding-left:1.45rem}li{margin:.38rem 0}
+dl{display:grid;grid-template-columns:180px 1fr;gap:7px 16px}
+dt{font-weight:850;color:#254965}dd{margin:0}
+footer{max-width:1000px;margin:0 auto 45px;padding:0 25px;color:#6a7480;font-size:.8rem;text-align:center}
+@media(max-width:960px){.layout{grid-template-columns:1fr}nav{position:relative;top:auto;max-height:none}.grid,.grid.three{grid-template-columns:1fr}}
+@media print{body{background:#fff}header{padding:32px;color:#111;background:#fff;border-bottom:2px solid #222}.subtitle{color:#333}.pill{border-color:#999}.layout{display:block;margin:0;max-width:none}nav{display:none}section{box-shadow:none;break-inside:avoid;border-radius:0}.figure{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">RegimeDecisionTest · Research Stage 35</div>
+    <h1>Earnings·Credit Fundamentals<br>상세 구현 및 전략 설명서</h1>
+    <p class="subtitle">Stage20의 거시·VKOSPI·기술·SLSQP 골격을 고정한 뒤, 이익추정치 수정과 밸류에이션을 기대수익에, 회사채 스프레드를 위험 확인에만 배치한 비레버리지 월간 자산배분 전략의 완전한 기술 문서</p>
+    <div class="meta">
+      <span class="pill">분석 구간 2007-04 ~ 2026-07</span>
+      <span class="pill">자산 KODEX200 · BOND · GLD · USO</span>
+      <span class="pill">Long-only · No leverage</span>
+      <span class="pill">SLSQP · 거래비용 반영</span>
+      <span class="pill">작성 기준 2026-08-30</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav aria-label="목차">
+  <p class="nav-title">목차</p>
+  <ol>
+    <li><a href="#s0">한눈에 보는 결론</a></li>
+    <li><a href="#s1">Stage35의 연구 질문</a></li>
+    <li><a href="#s2">전략의 전체 구조</a></li>
+    <li><a href="#s3">Stage20에서 상속한 기반</a></li>
+    <li><a href="#s4">원천 데이터와 열 매핑</a></li>
+    <li><a href="#s5">일간 정규화와 파생변수</a></li>
+    <li><a href="#s6">월간 시점 정합성</a></li>
+    <li><a href="#s7">인과적 표준화</a></li>
+    <li><a href="#s8">EPS revision 알파</a></li>
+    <li><a href="#s9">밸류에이션 앵커</a></li>
+    <li><a href="#s10">신용 위험확인</a></li>
+    <li><a href="#s11">탈락한 Credit Alpha</a></li>
+    <li><a href="#s12">기대수익 결합 순서</a></li>
+    <li><a href="#s13">공분산 결합 순서</a></li>
+    <li><a href="#s14">SLSQP 목적함수</a></li>
+    <li><a href="#s15">제약조건과 경제적 의미</a></li>
+    <li><a href="#s16">리밸런싱과 비용</a></li>
+    <li><a href="#s17">월별 실행 흐름</a></li>
+    <li><a href="#s18">함수·코드 지도</a></li>
+    <li><a href="#s19">비교 실험 설계</a></li>
+    <li><a href="#s20">전체 기간 성과</a></li>
+    <li><a href="#s21">하위 기간 성과</a></li>
+    <li><a href="#s22">예측 회귀와 IC</a></li>
+    <li><a href="#s23">부트스트랩 불확실성</a></li>
+    <li><a href="#s24">성과가 나온 이유</a></li>
+    <li><a href="#s25">과최적화 방지 장치</a></li>
+    <li><a href="#s26">데이터·솔버 검증</a></li>
+    <li><a href="#s27">재현 방법</a></li>
+    <li><a href="#s28">산출물 안내</a></li>
+    <li><a href="#s29">한계와 해석 주의사항</a></li>
+    <li><a href="#s30">운용 관점 체크리스트</a></li>
+    <li><a href="#s31">용어집</a></li>
+  </ol>
+</nav>
+
+<main>
+<section id="s0">
+<h2>0. 한눈에 보는 결론</h2>
+<p class="lead">Stage35의 핵심은 신호를 많이 넣는 것이 아니다. 서로 다른 경제적 역할을 가진 세 정보만 기존 Stage20 엔진에 제한적으로 연결했다. <strong>EPS revision과 이익수익률 갭은 KODEX200 기대수익을 보완</strong>하고, <strong>AA− 회사채 스프레드 확대는 기존 VKOSPI 방어 신호와 주식 위험 추정치를 확인</strong>한다.</p>
+<div class="grid three">
+  <div class="card"><div class="k">Stage35 CAGR</div><div class="v">10.608%</div><div class="d">Stage20 대비 +1.210%p</div></div>
+  <div class="card"><div class="k">Stage35 Sharpe</div><div class="v">1.057</div><div class="d">Stage20 대비 +0.071</div></div>
+  <div class="card"><div class="k">Stage35 MDD</div><div class="v">−13.743%</div><div class="d">Stage20 대비 0.271%p 완화</div></div>
+</div>
+<div class="good"><strong>최종 선택 경로:</strong> <code>Stage35_FundamentalDualRole</code>. EPS와 밸류에이션은 기대수익 채널에, 신용은 위험 채널에만 사용한다. 무가중 신용 수익률 알파는 성과가 악화되어 최종 전략에서 제외했다.</div>
+<div class="warn"><strong>숫자를 읽을 때의 핵심:</strong> 전체 표본의 CAGR·Sharpe·MDD는 모두 개선됐지만, 2018년 이후 MDD는 Stage20보다 약 0.565%p 나빠졌다. 부트스트랩에서도 MDD 개선 확률은 57.2%에 그쳤다. 따라서 “MDD가 구조적으로 개선됐다”보다 “전체 표본에서 비슷한 방어력을 유지하며 수익 효율이 좋아졌다”가 더 정확한 결론이다.</div>
+</section>
+
+<section id="s1">
+<h2>1. Stage35의 연구 질문</h2>
+<p>Stage32~33의 옵션 연구는 WingAsym이 수익률 방향 알파라기보다 VIX6와 중복되는 공포 정보라는 결론에 가까웠다. Stage35는 같은 옵션 신호를 더 가공하지 않고, 경제적 원천이 다른 데이터로 이동했다.</p>
+<div class="grid">
+  <div class="card"><div class="k">질문 A · 기대수익</div><p>애널리스트의 12개월 선행 EPS 수정과 주식 이익수익률의 국채 대비 매력도가 향후 주식 기대수익을 보완하는가?</p></div>
+  <div class="card"><div class="k">질문 B · 위험</div><p>AA− 회사채 조달 스프레드 확대가 VKOSPI가 포착한 스트레스의 신뢰도와 주식 위험도를 확인하는가?</p></div>
+</div>
+<p>이 질문은 하나의 복잡한 예측모형으로 합치지 않았다. 기대수익 신호와 위험 신호를 분리하면 설명이 쉬워지고, 같은 위험 정보를 μ와 Σ 양쪽에 무분별하게 중복 반영하는 실수를 줄일 수 있다.</p>
+<div class="note"><strong>Stage35는 “미래 수익률을 맞히는 만능 분류기”가 아니다.</strong> 매월 당시까지 공개된 데이터로 조건부 기대수익과 공분산을 만들고, 제약 안에서 포트폴리오 효용이 가장 높은 가중치를 찾는 자산배분 절차다.</div>
+</section>
+
+<section id="s2">
+<h2>2. 전략의 전체 구조</h2>
+<div class="flow">
+  <div class="node"><strong>① 거시 확률</strong> — GDP·수출·BSI / CPI·PPI·수입물가의 인과적 백분위로 네 국면 확률 생성</div>
+  <div class="arrow">↓</div>
+  <div class="node"><strong>② 조건부 자산 모멘트</strong> — 과거 국면 유사도와 VKOSPI 스트레스·회복으로 μ<sub>macro</sub>, μ<sub>stress</sub>, Σ<sub>macro/stress</sub> 추정</div>
+  <div class="arrow">↓</div>
+  <div class="node"><strong>③ 기술적 신뢰도</strong> — K-ratio·RSI·거래량 RSI로 거시 μ의 확신을 조절하고 ATR로 Σ 확대</div>
+  <div class="arrow">↓</div>
+  <div class="node"><strong>④ Stage35 펀더멘털</strong> — EPS·valuation은 KODEX200 μ에 가산, credit widening은 VKOSPI 스트레스 μ 및 KODEX200 분산을 강화</div>
+  <div class="arrow">↓</div>
+  <div class="node"><strong>⑤ SLSQP</strong> — 기대수익 − 분산 − 하방준분산 − 거래비용을 최대화하되, 합계·롱온리·변동성·CDaR 제약 적용</div>
+  <div class="arrow">↓</div>
+  <div class="node"><strong>⑥ 실현 수익과 다음 달 사전가중치</strong> — 거래비용 차감 후 NAV 갱신, 자산 수익률에 따라 drift된 가중치를 다음 리밸런싱 기준으로 전달</div>
+</div>
+<p>이 구조에서 Stage35가 바꾸는 부분은 ④뿐이다. ①~③과 ⑤의 핵심 규칙은 Stage20을 동결해 사용한다. 따라서 성과 차이는 새 펀더멘털 입력이 기존 엔진의 결정을 어떻게 바꿨는지로 귀속하기 쉽다.</p>
+</section>
+
+<section id="s3">
+<h2>3. Stage20에서 상속한 기반</h2>
+<h3>3.1 거시 국면은 로지스틱 회귀가 아니다</h3>
+<p>현재 Stage35 코드가 호출하는 <code>build_macro_probabilities()</code>는 균형 L2 로지스틱이나 SJM을 쓰지 않는다. 각 거시지표를 <strong>직전까지의 expanding empirical percentile</strong>로 바꾸고, 성장 3개와 물가 3개를 각각 동일가중 평균한다. 별도의 학습 라벨, 85:15 확률 혼합, lookback 선택, sigmoid 계수는 없다.</p>
+<div class="formula">
+p<sub>G</sub> = mean(rank<sub>exp</sub>(GDP YoY), rank<sub>exp</sub>(Export YoY), rank<sub>exp</sub>(BSI))<br>
+p<sub>I</sub> = mean(rank<sub>exp</sub>(CPI YoY), rank<sub>exp</sub>(PPI YoY), rank<sub>exp</sub>(Import Price YoY))
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>국면</th><th>확률 공식</th><th>대표 경제 상태</th></tr></thead>
+<tbody>
+<tr><td>Goldilocks</td><td>p<sub>G</sub>(1−p<sub>I</sub>)</td><td>성장 강함·물가 낮음</td></tr>
+<tr><td>Overheating</td><td>p<sub>G</sub>p<sub>I</sub></td><td>성장 강함·물가 높음</td></tr>
+<tr><td>Slowdown</td><td>(1−p<sub>G</sub>)(1−p<sub>I</sub>)</td><td>성장 약함·물가 낮음</td></tr>
+<tr><td>Stagflation</td><td>(1−p<sub>G</sub>)p<sub>I</sub></td><td>성장 약함·물가 높음</td></tr>
+</tbody></table></div>
+<p>대상 월 <em>t</em>에는 <em>t−1</em>월까지 알려진 거시값만 사용한다. 이 때문에 2007-04부터 별도 분류기 훈련기간 없이도 확률을 만들 수 있다. “학습을 안 했는데 어떻게 예측하는가?”에 대한 답은, 이 버전의 국면 엔진이 감독학습 분류기가 아니라 <strong>과거분포 안에서 현재 거시 수준의 상대 위치를 확률처럼 해석하는 규칙 기반 확률화</strong>이기 때문이다.</p>
+
+<h3>3.2 국면 조건부 평균·공분산</h3>
+<p>네 국면을 hard label로 하나만 고르지 않는다. 과거 각 월도 네 확률을 모두 갖고, 현재 확률로 국면별 평균과 공분산을 혼합한다. 유효표본이 적은 국면은 12개월을 prior sample로 두는 신뢰도 계수로 무조건부 모멘트 쪽으로 수축한다.</p>
+<div class="formula">
+credibility<sub>r</sub> = N<sub>eff,r</sub> / (N<sub>eff,r</sub> + 12)<br>
+μ<sub>r</sub> = credibility<sub>r</sub> μ̂<sub>r</sub> + (1−credibility<sub>r</sub>) μ̂<sub>all</sub><br>
+μ<sub>macro,t</sub> = Σ<sub>r</sub> p<sub>r,t</sub> μ<sub>r</sub>
+</div>
+<p>VKOSPI stress와 recovery는 국면별 중심화 단변량 OLS 기울기로 기대수익을 조정한다. 약한 관계가 과도한 신호를 만들지 않도록 기울기에 자체 R²를 곱한다. KODEX200과 USO의 스트레스 기울기는 0 이하, 회복 기울기는 0 이상이라는 고정된 경제적 부호만 적용한다.</p>
+
+<h3>3.3 Stage20 기술적 신뢰도</h3>
+<ul>
+<li><strong>K-ratio 126거래일:</strong> 가격 추세의 방향과 일관성.</li>
+<li><strong>Wilder ATR 14일:</strong> 최근 가격 범위의 위험도. 자산별 인과적 percentile로 변환.</li>
+<li><strong>가격 RSI 14일:</strong> KODEX200의 방향 강도.</li>
+<li><strong>거래량 RSI 14일:</strong> KODEX200 추세에 거래 참여가 동반되는지 확인.</li>
+</ul>
+<div class="formula">
+confidence<sub>i</sub> = clip{0.5[1 + sign(μ<sub>macro,i</sub>−μ̄<sub>macro</sub>) · technical_direction<sub>i</sub>], 0, 1}<br>
+μ<sub>filtered,i</sub> = μ̄<sub>macro</sub> + confidence<sub>i</sub>(μ<sub>macro,i</sub>−μ̄<sub>macro</sub>)
+</div>
+<p>기술 신호가 거시 상대방향에 동의하면 거시 기대수익 차이를 유지하고, 반대하면 중립 평균 쪽으로 축소한다. 기술 신호가 새로운 독립 알파를 직접 더하는 방식이 아니다.</p>
+<div class="formula">
+D<sub>ATR,i</sub> = √(1 + ATRPercentile<sub>i</sub>), &nbsp; Σ<sub>tech</sub> = D<sub>ATR</sub> Σ D<sub>ATR</sub>
+</div>
+</section>
+
+<section id="s4">
+<h2>4. 원천 데이터와 열 매핑</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>파일</th><th>읽기 규칙</th><th>원본 열</th><th>Stage35 내부명</th><th>사용 역할</th></tr></thead>
+<tbody>
+<tr><td>260829_fwdPE.EPS.rev.xlsx</td><td>header=13, 앞 5열</td><td>날짜</td><td>date</td><td>시점 키</td></tr>
+<tr><td>동일</td><td>동일</td><td>12M Forward P/E</td><td>forward_pe_12m</td><td>earnings yield gap</td></tr>
+<tr><td>동일</td><td>동일</td><td>12M Forward EPS</td><td>forward_eps_12m</td><td>21일 수정률 교차검증</td></tr>
+<tr><td>동일</td><td>동일</td><td>EPS 1주 수정률</td><td>eps_revision_1w_pct</td><td>보존, 최종 비거래</td></tr>
+<tr><td>동일</td><td>동일</td><td>EPS 1개월 수정률</td><td>eps_revision_1m_pct</td><td>최종 EPS 신호</td></tr>
+<tr><td>260829_국고채.회사채.xlsx</td><td>header 없음, 14행 skip, 앞 11열</td><td>국고 1·2·3·5·10·20·30·50년</td><td>ktb_*_pct</td><td>3년 spread, 10년 valuation</td></tr>
+<tr><td>동일</td><td>동일</td><td>회사채 AA− 무보증 3년</td><td>corp_aa_minus_3y_pct</td><td>주 신용 위험 신호</td></tr>
+<tr><td>동일</td><td>동일</td><td>회사채 BBB− 무보증 3년</td><td>corp_bbb_minus_3y_pct</td><td>강건성 진단만</td></tr>
+</tbody></table></div>
+<p>두 파일은 날짜를 datetime으로 변환하고, 숫자가 아닌 셀은 결측치로 처리하며, 중복 날짜는 마지막 행을 남긴다. 데이터는 outer join으로 합쳐 원본의 서로 다른 영업일 범위를 억지로 잘라내지 않는다.</p>
+<div class="note">실행 전후 SHA-256·파일 크기·수정시각을 manifest로 비교한다. 원본 Excel은 읽기만 하며, 정규화된 결과는 <code>outputs/normalized_earnings_credit_daily.csv</code>로 별도 저장한다.</div>
+</section>
+
+<section id="s5">
+<h2>5. 일간 정규화와 파생변수</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>파생변수</th><th>공식</th><th>경제적 해석</th><th>최종 거래 사용</th></tr></thead>
+<tbody>
+<tr><td>computed_eps_revision_21d_pct</td><td>100 × Δ<sub>21</sub> log(Forward EPS)</td><td>EPS level에서 재구성한 1개월 근사 수정률</td><td>아니오, 공급자 필드 검증</td></tr>
+<tr><td>aa_credit_spread_pctpt</td><td>AA− 3Y − KTB 3Y</td><td>우량기업의 국채 대비 조달 프리미엄</td><td>예</td></tr>
+<tr><td>bbb_credit_spread_pctpt</td><td>BBB− 3Y − KTB 3Y</td><td>저신용 기업 조달 프리미엄</td><td>진단만</td></tr>
+<tr><td>quality_spread_pctpt</td><td>BBB− 3Y − AA− 3Y</td><td>신용등급 간 위험가격</td><td>진단만</td></tr>
+<tr><td>aa_spread_widening_20d_pctpt</td><td>Δ<sub>20 obs</sub> AA spread</td><td>최근 약 한 달의 funding stress 변화</td><td>예</td></tr>
+<tr><td>yield_curve_10y_minus_3y_pctpt</td><td>KTB 10Y − KTB 3Y</td><td>국채 곡선 기울기</td><td>진단</td></tr>
+<tr><td>earnings_yield_gap</td><td>1 / Forward PE − KTB10Y / 100</td><td>주식 이익수익률의 장기국채 대비 상대 매력</td><td>예</td></tr>
+</tbody></table></div>
+<p>최종 EPS 신호는 공급자가 제공한 1개월 수정률을 사용한다. Forward EPS level 자체는 79.12%의 관측치가 직전 값과 같아 일별로 직접 매매하면 “새 정보가 없는 날”을 지나치게 반복할 위험이 있다. 그래서 월말 최신 완전관측치만 가져온다. 공급자 수정률과 level에서 재계산한 21일 수정률 상관은 0.458로, 대체 가능하다고 보기 어려워 재계산값은 교차검증에만 남겼다.</p>
+<p>신용 spread의 20은 달력 20일이 아니라 <strong>20개 유효 관측치 차분</strong>이다. 임의의 17일·23일 탐색을 하지 않았고, “약 한 거래월의 자금조달 여건 변화”라는 사전 경제적 의미로 고정했다.</p>
+</section>
+
+<section id="s6">
+<h2>6. 월간 시점 정합성: 미래정보를 어떻게 막았나</h2>
+<p>각 일간 데이터의 <em>signal month</em>에서 EPS 수정률·AA spread 변화·earnings yield gap이 모두 존재하는 마지막 날짜를 선택하고, 그 값을 다음 <em>target month</em>의 투자에 사용한다.</p>
+<div class="formula">
+target_month = fundamental_signal_month + 1 month
+</div>
+<div class="flow">
+  <div class="node">예: 2020년 3월 안에서 세 핵심 열이 모두 유효한 마지막 관측일 선택</div>
+  <div class="arrow">↓</div>
+  <div class="node">그 관측값에 “2020-04 투자용 신호”라는 target_month 부여</div>
+  <div class="arrow">↓</div>
+  <div class="node">2020-04 자산 수익률에는 2020-03까지의 신호와 과거 수익률만 사용</div>
+</div>
+<p>백테스트 루프에서도 <code>returns.index &lt; month</code>, <code>probabilities.index &lt; month</code> 조건으로 과거만 잘라낸다. 현재 월의 실현 수익률은 가중치가 결정된 후에만 읽는다.</p>
+<div class="warn"><strong>공개 지연의 범위:</strong> 코드가 보장하는 것은 파일에 기록된 관측일 기준의 1개월 시차다. 공급자 데이터의 실제 배포 timestamp가 별도로 없다면 장중 공개시각이나 사후 수정 여부까지 증명할 수는 없다. 이 점은 운영 전 별도 point-in-time 검증 대상이다.</div>
+</section>
+
+<section id="s7">
+<h2>7. 인과적 표준화</h2>
+<p>EPS·credit·valuation의 크기는 시대별 단위와 변동폭이 다르다. Stage35는 전체 표본 평균과 표준편차를 쓰지 않고, 현재 관측치를 제외한 과거 60개월 이상으로만 z-score를 계산한다.</p>
+<div class="formula">
+z<sub>t</sub> = [x<sub>t</sub> − mean(x<sub>1:t−1</sub>)] / std(x<sub>1:t−1</sub>), &nbsp; 최소 과거 관측수 = 60
+</div>
+<pre><code>def _causal_zscore(series):
+    prior = series.shift(1)
+    mean = prior.expanding(min_periods=60).mean()
+    std  = prior.expanding(min_periods=60).std(ddof=1)
+    return (series - mean) / std.where(std &gt; 0)</code></pre>
+<p>현재치를 평균·표준편차 계산에서 제외하는 이유는, 이번 달의 극단값이 자기 자신의 기준을 바꾸는 것을 막기 위해서다. 또 60개월 전에는 신호를 0으로 억지 채우지 않고 결측으로 두므로, 충분한 이력이 쌓이기 전 월은 비교 가능한 백테스트 구간에서 제외된다.</p>
+<p>신용 위험 강도는 z-score가 아니라 <strong>causal expanding midrank</strong>도 함께 사용한다. 이는 과거 관측 중 현재 widening의 상대 위치를 0~1로 나타낸다. 분포 꼬리가 두꺼워도 극단 z가 과도한 배율로 이어지지 않는 장점이 있다.</p>
+</section>
+
+<section id="s8">
+<h2>8. EPS revision 알파</h2>
+<h3>8.1 경제적 아이디어</h3>
+<p>12개월 선행 EPS 전망의 상향 수정은 기업 이익 전망이 개선되고 있다는 직접적인 정보다. 가격 모멘텀과 달리 기업가치의 현금흐름 축에서 출발한다. 다만 “EPS가 올랐으니 주식 비중 +10%” 같은 임의 규칙을 두지 않고, 과거에 표준화된 수정률 1단위가 다음 달 KODEX200 수익률과 얼마나 연결됐는지를 expanding 방식으로 추정한다.</p>
+<h3>8.2 계수 추정</h3>
+<div class="formula">
+β̂<sub>EPS,t</sub> = max{ OLS slope[z(EPS revision)<sub>s</sub> → R<sub>K200,s</sub>, s&lt;t], 0 }<br>
+Δμ<sub>EPS,t</sub> = β̂<sub>EPS,t</sub> · z<sub>EPS,t</sub>
+</div>
+<p><code>_nonnegative_univariate_slope()</code>는 과거 feature를 그 과거 구간 안에서 표준화한 후 단변량 slope를 계산하며, 표본이 60개월보다 적거나 분산이 0이면 0을 반환한다. 음의 계수는 0으로 자른다. 이는 “이익 전망 상향은 기대수익에 비음(-)의 기여를 하지 않는다”는 고정 부호 prior이며, 결과를 보고 부호를 뒤집지 않는다.</p>
+<pre><code>history = output.index[output.index &lt; month]
+eps_slope = nonnegative_slope(
+    eps_revision_1m_pct[history],
+    KODEX200_return[history]
+)
+eps_mu = eps_slope * current_eps_revision_z</code></pre>
+<div class="note">상향 수정이면 항상 주식을 사는 hard rule이 아니다. Δμ가 기존 거시·기술·VKOSPI 기대수익에 더해진 뒤, 공분산·변동성·CDaR·거래비용을 함께 고려한 SLSQP가 실제 비중을 정한다.</div>
+</section>
+
+<section id="s9">
+<h2>9. 밸류에이션 앵커</h2>
+<h3>9.1 신호 정의</h3>
+<div class="formula">
+EYGap<sub>t</sub> = 1 / ForwardPE12M<sub>t</sub> − KTB10YYield<sub>t</sub>
+</div>
+<p>Forward P/E의 역수는 주식의 선행 이익수익률이다. 여기서 10년 국고채 수익률을 빼면, 채권 대비 주식이 제공하는 이익수익률 여유를 얻는다. 값이 클수록 장기적인 주식 기대수익 매력이 높다는 가설이다.</p>
+<h3>9.2 왜 12개월 미래수익률을 쓰나</h3>
+<p>밸류에이션은 다음 달 방향을 맞히는 속도 신호보다 느린 기대수익 앵커에 가깝다. 따라서 과거 EYGap과 향후 12개월 KODEX200 복리수익률 사이의 단변량 기울기를 추정한다. 현재 월에 미래 12개월 수익률이 아직 완성되지 않은 표본은 절대 학습에 넣지 않는다.</p>
+<div class="formula">
+history<sub>valuation,t</sub> = {s | s ≤ t−12 and ForwardReturn12M<sub>s</sub> is fully observed}<br>
+β̂<sub>VAL,t</sub> = max{ slope[z(EYGap)<sub>s</sub> → R<sub>s:s+12</sub>], 0 }<br>
+Δμ<sub>VAL,t</sub> = β̂<sub>VAL,t</sub> · z(EYGap)<sub>t</sub> / 12
+</div>
+<p>12개월 누적 기대수익 계수를 월간 최적화 단위와 맞추기 위해 12로 나눈다. 정확한 복리 월환산이 아니라, 장기 기대수익 효과를 월별 μ에 균등 분배하는 단순하고 고정된 근사다.</p>
+<div class="warn">금리가 높아도 성장 기대가 매우 강한 국면, Forward EPS가 낙관적으로 편향된 국면 등에서는 EYGap이 완전한 가치평가 지표가 아니다. Stage35는 이를 단독 매수 신호가 아니라 기존 엔진의 KODEX200 μ를 미세 조정하는 앵커로만 사용한다.</div>
+</section>
+
+<section id="s10">
+<h2>10. 회사채 신용 위험확인</h2>
+<h3>10.1 주 신호</h3>
+<div class="formula">
+CreditSpread<sub>t</sub> = Yield(AA− corporate 3Y)<sub>t</sub> − Yield(KTB 3Y)<sub>t</sub><br>
+Widening<sub>t</sub> = CreditSpread<sub>t</sub> − CreditSpread<sub>t−20obs</sub>
+</div>
+<p>우량 회사채의 국채 대비 spread가 최근 한 달 확대됐다는 것은 기업 자금조달 여건과 유동성 프리미엄이 악화됐다는 뜻이다. VKOSPI가 주식·옵션시장의 공포를 읽는다면, credit widening은 현금채권시장에서 그 공포가 실물 조달 위험으로 번지는지 확인한다.</p>
+<h3>10.2 기대수익 위험확인</h3>
+<div class="formula">
+q<sub>credit,t</sub> = causal rank(Widening<sub>t</sub>) ∈ [0,1]<br>
+m<sub>stress,t</sub> = 2q<sub>credit,t</sub><br>
+μ<sub>stress,K200,t</sub><sup>confirmed</sup> = m<sub>stress,t</sub> · μ<sub>stress,K200,t</sub><sup>VKOSPI</sup>
+</div>
+<p>credit rank가 0.5일 때 배율은 1이므로 기존 VKOSPI 조정을 그대로 둔다. widening이 과거 대비 매우 작으면 배율이 0에 가까워져 VKOSPI 방어의 강도를 낮추고, 매우 크면 최대 약 2배로 강화한다. 새 bearish alpha를 만드는 대신 <strong>기존 stress adjustment의 신뢰도를 조정</strong>한다.</p>
+<h3>10.3 분산 위험확인</h3>
+<div class="formula">
+v<sub>credit,t</sub> = 1 + q<sub>credit,t</sub> ∈ [1,2]<br>
+D<sub>credit</sub>[K200,K200] = √v<sub>credit,t</sub><br>
+Σ<sub>final</sub> = D<sub>credit</sub> Σ<sub>tech</sub> D<sub>credit</sub>
+</div>
+<p>대각 스케일링을 쓰기 때문에 KODEX200 분산은 <em>v</em>배, KODEX200과 다른 자산의 공분산은 √<em>v</em>배가 된다. 단순히 대각원소 하나만 바꾸는 것보다 공분산 행렬의 양의 준정부호 구조를 유지하기 쉽다.</p>
+<div class="note">credit widening은 Stage35 최종 전략에서 직접 KODEX200 μ에 음의 숫자를 더하지 않는다. VKOSPI 스트레스가 이미 가진 방향 정보를 확인하고, 위험모형의 KODEX200 축을 확대하는 두 역할만 수행한다.</div>
+</section>
+
+<section id="s11">
+<h2>11. 탈락한 Credit Alpha: 왜 음의 결과도 남겼나</h2>
+<p>신용 easing을 양의 주식 기대수익 알파로 직접 더하는 실험도 별도 경로로 실행했다.</p>
+<div class="formula">
+CreditEasing<sub>t</sub> = −Widening<sub>t</sub>, &nbsp;
+Δμ<sub>credit,t</sub> = max(β̂<sub>credit,t</sub>,0) · z(CreditEasing)<sub>t</sub>
+</div>
+<p>회귀에서는 3개월과 6개월의 양의 관계가 보였지만, 실제 월간 자산배분에 직접 μ로 연결하자 성과가 악화됐다.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>경로</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>평균 turnover</th><th>판정</th></tr></thead>
+<tbody>
+<tr><td>Stage20</td><td>9.397%</td><td>0.987</td><td>−14.015%</td><td>2.681%</td><td>기준</td></tr>
+<tr class="fail"><td>CreditAlpha</td><td>8.370%</td><td>0.875</td><td>−17.024%</td><td>4.896%</td><td><span class="tag no">탈락</span></td></tr>
+</tbody></table></div>
+<p>가능한 이유는 세 가지다. 첫째, 신용 easing과 다음 달 수익률의 시차가 월간 μ로 쓰기에 불안정할 수 있다. 둘째, VKOSPI stress/recovery가 유사 정보를 이미 반영해 중복될 수 있다. 셋째, 기대수익 변화가 잦아 turnover와 비용을 키웠다. Stage35는 이 결과를 보고 계수·부호·문턱을 다시 찾지 않고, 신용의 역할을 사전에 설명 가능한 위험 확인으로 제한했다.</p>
+</section>
+
+<section id="s12">
+<h2>12. 최종 기대수익 결합 순서</h2>
+<p>계산 순서는 중요하다. 같은 숫자라도 어디에 더하고 어떤 단계에서 필터링하느냐에 따라 의미가 달라진다.</p>
+<ol>
+<li>국면 조건부 <code>macro_expected_return</code>과 VKOSPI <code>stress_return_adjustment</code>를 각각 얻는다.</li>
+<li>기술 방향으로 <strong>macro 부분만</strong> 중립 평균 쪽으로 축소한다.</li>
+<li>최종 모드에서는 KODEX200의 filtered macro μ에 EPS μ와 valuation μ를 더한다.</li>
+<li>KODEX200의 기존 VKOSPI stress μ에는 credit multiplier를 곱한다.</li>
+<li>수정된 filtered macro와 stress adjustment를 합친다.</li>
+</ol>
+<div class="formula">
+μ<sub>final</sub> = μ<sub>macro,technical-filtered</sub>
++ e<sub>K200</sub>(Δμ<sub>EPS</sub> + Δμ<sub>VAL</sub>)
++ μ<sub>stress</sub><sup>credit-confirmed</sup>
+</div>
+<pre><code>filtered_macro[KODEX200] += eps_mu + valuation_mu
+stress_adjustment[KODEX200] *= credit_stress_multiplier
+expected_return = filtered_macro + stress_adjustment</code></pre>
+<p>EPS와 valuation은 기술 필터 뒤에 들어간다. 즉 K-ratio나 RSI가 펀더멘털 신호를 다시 약화시키지 않는다. 이는 기술 신호가 “거시 상대수익률 전망의 현재 가격 확인” 역할이고, EPS·valuation은 별도의 펀더멘털 출처라는 설계다.</p>
+</section>
+
+<section id="s13">
+<h2>13. 최종 공분산 결합 순서</h2>
+<ol>
+<li>국면별 과거 수익률로 macro covariance를 추정한다.</li>
+<li>현재 VKOSPI stress 점수만큼 고스트레스 공분산과 혼합한다.</li>
+<li>Stage20 ATR percentile로 각 자산의 분산·공분산 축을 확대한다.</li>
+<li>Stage35 credit rank로 KODEX200 축을 한 번 더 확대한다.</li>
+<li>수치오차로 생긴 음의 고유값은 매우 작은 양의 floor로 보정한다.</li>
+</ol>
+<div class="formula">
+Σ<sub>VKOSPI</sub> = (1−stress<sub>t</sub>)Σ<sub>macro</sub> + stress<sub>t</sub>Σ<sub>high-stress</sub><br>
+Σ<sub>tech</sub> = D<sub>ATR</sub>Σ<sub>VKOSPI</sub>D<sub>ATR</sub><br>
+Σ<sub>final</sub> = D<sub>credit</sub>Σ<sub>tech</sub>D<sub>credit</sub>
+</div>
+<p>따라서 신용 악화는 단순히 “주식을 팔아라”가 아니라, 동일한 기대수익이어도 KODEX200이 최적화에서 더 많은 위험예산을 소비하도록 만든다. 변동성 13%와 CDaR −16% guard가 가까운 달에는 실제 주식 비중 감소로 이어질 가능성이 크다.</p>
+</section>
+
+<section id="s14">
+<h2>14. SLSQP 목적함수</h2>
+<p>Stage35는 Sharpe 자체를 직접 최대화하지 않는다. 월간 기대수익에서 분산, 과거 하방준분산, 예상 거래비용을 뺀 효용을 최대화한다. 구현상 SciPy의 <code>minimize</code>가 최소화 문제를 풀기 때문에 음의 효용을 목적함수로 넘긴다.</p>
+<div class="formula">
+U(w) = w′μ − 0.5 w′Σw − mean[min(R<sub>hist</sub>w,0)²] − TC(w,w<sub>pre</sub>)<br>
+objective(w) = −U(w)
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>항</th><th>코드 계산</th><th>역할</th></tr></thead>
+<tbody>
+<tr><td>기대 월수익</td><td>w′μ</td><td>수익 기회 보상</td></tr>
+<tr><td>분산 벌점</td><td>0.5 × w′Σw</td><td>양방향 변동성 억제</td></tr>
+<tr><td>하방준분산</td><td>mean(min(Rw,0)²)</td><td>과거 음의 수익만 추가 벌점</td></tr>
+<tr><td>예상 거래비용</td><td>weight change 기반</td><td>작은 기대수익 차이로 잦은 교체 방지</td></tr>
+</tbody></table></div>
+<p><code>expected_annual_log_growth = 12(μ<sub>p</sub>−0.5σ²<sub>p</sub>)</code>도 진단값으로 저장하지만, 별도의 CAGR 계수를 또 목적함수에 중복 추가하지 않는다. 현재 효용의 기대수익과 분산 항은 로그성장 근사의 핵심을 이미 포함한다.</p>
+<div class="warn">백테스트 CAGR은 경로의 실현 복리 결과이고, 최적화 시점의 <code>expected_annual_log_growth</code>는 추정 μ·Σ로 계산한 사전 근사치다. 둘은 같은 값이 아니며 후자를 실제 CAGR 보장으로 해석하면 안 된다.</div>
+</section>
+
+<section id="s15">
+<h2>15. 제약조건과 경제적 의미</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>제약</th><th>수식 / 값</th><th>설명</th></tr></thead>
+<tbody>
+<tr><td>완전투자</td><td>Σw<sub>i</sub> = 1</td><td>현금을 별도 자산으로 두지 않고 네 자산에 전액 배분</td></tr>
+<tr><td>롱온리</td><td>0 ≤ w<sub>i</sub> ≤ 1</td><td>공매도 금지</td></tr>
+<tr><td>무레버리지</td><td>합계 1 + 음수 없음</td><td>총 익스포저 100% 이내</td></tr>
+<tr><td>단일자산 상한</td><td>없음</td><td>“과반 금지” 해제, 경제적·위험 제약이 허용하면 100% 가능</td></tr>
+<tr><td>연환산 변동성 guard</td><td>√(12w′Σw) ≤ 13%</td><td>사전 추정 위험 상한</td></tr>
+<tr><td>역사적 CDaR guard</td><td>CDaR<sub>90%</sub>(R<sub>hist</sub>w) ≥ −16%</td><td>과거 최악 drawdown 10% 평균의 하한</td></tr>
+<tr><td>SLSQP 반복</td><td>maxiter=300</td><td>수렴 반복 상한</td></tr>
+<tr><td>수렴 허용오차</td><td>ftol=1e−9</td><td>목적함수 수렴 정밀도</td></tr>
+</tbody></table></div>
+<p>CDaR는 월수익의 단순 하위분위가 아니라, 해당 고정 가중치를 과거 수익률 경로에 적용해 만든 drawdown 중 최악 10%의 평균이다. 그래서 한 번의 극단 MDD보다 넓은 꼬리 손실 영역을 제약한다.</p>
+<p>본 최적화가 실패하면 동일 제약 아래 최소분산 문제를 fallback으로 푼다. Stage35의 232개월 모든 비교 경로에서 본 솔버가 성공했고 fallback은 0회였다.</p>
+</section>
+
+<section id="s16">
+<h2>16. 리밸런싱, turnover와 거래비용</h2>
+<div class="formula">
+Δw = w<sub>target</sub> − w<sub>pretrade</sub><br>
+DomesticCost = 0.0015 × Σ|Δw<sub>i</sub>|<br>
+FXCost = 0.0005 × |Δw<sub>GLD</sub> + Δw<sub>USO</sub>|
+</div>
+<p>국내 거래비용 이름이지만 구현은 네 자산의 절대 가중치 변화 합 전체에 15bp를 적용한다. GLD·USO에는 두 해외자산의 순비중 변화에 5bp를 추가한다. 첫 달 turnover는 절대변화 합, 이후에는 왕복 계산을 피하기 위해 0.5×절대변화 합으로 기록한다.</p>
+<p>월말 수익이 실현되면 다음 달의 사전가중치는 목표가중치를 그대로 복사하지 않고 자산별 수익률로 drift시킨다.</p>
+<div class="formula">
+w<sub>pre,t+1,i</sub> = w<sub>t,i</sub>(1+r<sub>t,i</sub>) / (1+w<sub>t</sub>′r<sub>t</sub>)
+</div>
+<p>이 처리가 없으면 매월 자산 가격 변동으로 자연스럽게 생긴 가중치 변화가 사라져 turnover와 비용이 잘못 계산된다.</p>
+</section>
+
+<section id="s17">
+<h2>17. 월별 실행 흐름</h2>
+<ol>
+<li>월 <em>t</em> 이전의 자산수익률, 거시확률, VKOSPI stress/recovery를 자른다.</li>
+<li>월 <em>t</em>에 사용할 <em>t−1</em> 거시·기술·펀더멘털 신호를 읽는다.</li>
+<li>과거 국면확률로 네 자산의 조건부 평균과 공분산을 추정한다.</li>
+<li>VKOSPI stress/recovery의 국면별 신뢰도 가중 slope로 μ를 조정한다.</li>
+<li>현재 stress로 macro covariance와 high-stress covariance를 혼합한다.</li>
+<li>기술 방향으로 macro μ의 자산 간 편차를 축소하거나 유지한다.</li>
+<li>ATR percentile로 자산별 위험 축을 확대한다.</li>
+<li>EPS와 valuation μ를 KODEX200에 더한다.</li>
+<li>credit rank로 KODEX200 VKOSPI stress μ와 공분산 축을 확인한다.</li>
+<li>SLSQP로 목표가중치를 구한다.</li>
+<li>사전가중치와 목표가중치 차이로 비용을 계산한다.</li>
+<li>월 <em>t</em> 실현수익률을 적용해 순수익·NAV·drawdown을 기록한다.</li>
+<li>실현수익 후 drift 가중치를 다음 달 사전가중치로 넘긴다.</li>
+</ol>
+<pre><code>for month in months:
+    history = returns[returns.index &lt; month]
+    weights = solve_weights(
+        history, macro_probability[month], vkospi[month],
+        technical[month], fundamentals[month], pretrade
+    )
+    net_return = weights @ asset_return[month] - costs(weights, pretrade)
+    pretrade = drift_after_return(weights, asset_return[month])</code></pre>
+</section>
+
+<section id="s18">
+<h2>18. 함수·코드 지도</h2>
+<p>핵심 실행 파일은 <a href="earnings_credit_fundamentals_slsqp.py"><code>earnings_credit_fundamentals_slsqp.py</code></a> 하나다. 다만 Stage20/13/07의 동결 함수를 import하므로 상속된 로직까지 이해하려면 아래 순서가 가장 빠르다.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>파일 / 함수</th><th>대략적 위치</th><th>읽어야 하는 이유</th></tr></thead>
+<tbody>
+<tr><td>Stage35 · constants/imports</td><td>55–86</td><td>원천파일, 최소이력, 분석종료일, 동결파일 정의</td></tr>
+<tr><td>load_fundamental_daily</td><td>116–235</td><td>Excel 열 매핑, spread·EYGap 계산, 원본 감사</td></tr>
+<tr><td>_causal_zscore</td><td>238–245</td><td>현재치를 배제한 expanding 표준화</td></tr>
+<tr><td>build_monthly_fundamental_signals</td><td>248–317</td><td>월말 최신 완전관측치와 다음 달 매핑</td></tr>
+<tr><td>build_research_frame</td><td>320 이후</td><td>수익률·VKOSPI·거시·펀더멘털 연구용 결합</td></tr>
+<tr><td>return_predictive_regressions</td><td>398 이후</td><td>EPS·credit 수익률 예측 HAC 회귀</td></tr>
+<tr><td>stability_regressions</td><td>455 이후</td><td>2007–2017 / 2018–2026 안정성</td></tr>
+<tr><td>valuation_regressions</td><td>484 이후</td><td>EYGap의 6·12개월 beta와 IC</td></tr>
+<tr><td>credit_risk_regressions</td><td>512 이후</td><td>미래 변동성·MDD·꼬리 위험 진단</td></tr>
+<tr><td>_nonnegative_univariate_slope</td><td>659–675</td><td>최소 60개월·비음 계수 원칙</td></tr>
+<tr><td>add_causal_return_calibration</td><td>678–752</td><td>매월 EPS·credit·valuation 계수 재추정</td></tr>
+<tr><td>_solve_weights</td><td>755–954</td><td>신호 결합, 공분산 수정, 목적함수·제약·SLSQP</td></tr>
+<tr><td>run_backtest</td><td>957–1120</td><td>월별 인과 루프, 비용·NAV·drift 기록</td></tr>
+<tr><td>gate_decision</td><td>1149 이후</td><td>회귀·성과·부트스트랩 통과여부 정리</td></tr>
+<tr><td>run_research / main</td><td>1423 / 1722</td><td>전체 파이프라인 실행과 산출물 저장</td></tr>
+<tr><td>stage07 zero_tune_strategy.py</td><td>build_macro_probabilities</td><td>무튜닝 거시 확률과 비용상수</td></tr>
+<tr><td>stage13 economic_conditional_slsqp.py</td><td>estimate_conditional_moments</td><td>국면·VKOSPI 조건부 μ·Σ와 위험 guard</td></tr>
+<tr><td>stage20 daily_technical_confidence_slsqp.py</td><td>apply_technical_inputs</td><td>K-ratio/RSI 방향 신뢰도와 ATR covariance</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s19">
+<h2>19. 비교 실험 설계: 한 번에 무엇을 바꿨나</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>경로</th><th>EPS μ</th><th>Credit μ</th><th>Valuation μ</th><th>Credit stress μ 확인</th><th>Credit Σ 확인</th></tr></thead>
+<tbody>
+<tr><td>Stage20</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>NoChangeReproduction</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>EPSAlpha</td><td>✓</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>CreditAlpha</td><td>—</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>CreditRiskConfirmation</td><td>—</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+<tr><td>ValuationAnchor</td><td>—</td><td>—</td><td>✓</td><td>—</td><td>—</td></tr>
+<tr class="best"><td>FundamentalDualRole</td><td>✓</td><td>—</td><td>✓</td><td>✓</td><td>✓</td></tr>
+</tbody></table></div>
+<p><code>NoChangeReproduction</code>은 Stage35의 새 백테스트 루프가 새 신호를 끈 상태에서 Stage20과 동일하게 작동하는지 확인하는 통제군이다. 이는 “성과 향상이 단순한 재구현 차이 또는 비용 계산 차이 때문”이라는 가능성을 줄인다.</p>
+</section>
+
+<section id="s20">
+<h2>20. 전체 기간 성과: 2007-04 ~ 2026-07</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>전략</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>평균 turnover</th><th>총 거래비용</th></tr></thead>
+<tbody>
+<tr><td>Stage20</td><td>9.3974%</td><td>0.9865</td><td>−14.0148%</td><td>2.6810%</td><td>1.8603%</td></tr>
+<tr><td>NoChangeReproduction</td><td>9.3974%</td><td>0.9865</td><td>−14.0148%</td><td>—</td><td>—</td></tr>
+<tr><td>EPSAlpha</td><td>9.8640%</td><td>0.9961</td><td>−14.0148%</td><td>2.8742%</td><td>약 2.02%</td></tr>
+<tr class="fail"><td>CreditAlpha</td><td>8.3700%</td><td>0.8753</td><td>−17.0237%</td><td>4.8962%</td><td>약 3.45%</td></tr>
+<tr><td>CreditRiskConfirmation</td><td>9.1344%</td><td>1.0109</td><td>−13.8222%</td><td>2.5644%</td><td>약 1.77%</td></tr>
+<tr><td>ValuationAnchor</td><td>11.0526%</td><td>1.0182</td><td>−13.7989%</td><td>3.1607%</td><td>약 2.24%</td></tr>
+<tr class="best"><td>Stage35 FundamentalDualRole</td><td>10.6076%</td><td>1.0574</td><td>−13.7435%</td><td>3.6617%</td><td>약 2.61%</td></tr>
+</tbody></table></div>
+<p class="caption">CAGR과 MDD는 복리경로 기준, Sharpe는 월수익을 연환산한 무위험수익률 0 기준 값. 총 비용은 월별 차감률 합계로 NAV 손실률과 정확히 같지는 않다.</p>
+<div class="grid three">
+<div class="card"><div class="k">CAGR 변화</div><div class="v">+1.2102%p</div><div class="d">9.3974% → 10.6076%</div></div>
+<div class="card"><div class="k">Sharpe 변화</div><div class="v">+0.0709</div><div class="d">0.9865 → 1.0574</div></div>
+<div class="card"><div class="k">MDD 변화</div><div class="v">+0.2713%p</div><div class="d">덜 음수인 방향</div></div>
+</div>
+<figure class="figure">
+<img src="outputs/performance_comparison.png" alt="Stage35 비교전략 성과 지표 차트">
+<figcaption>모든 비교 경로를 동일한 구간과 비용 규칙으로 평가한 성과 비교.</figcaption>
+</figure>
+<figure class="figure">
+<img src="outputs/nav_comparison.png" alt="Stage20과 Stage35 누적 NAV 비교">
+<figcaption>Stage20과 최종 Stage35의 누적 순자산가치 및 하위 경로 비교. 단일 최종 숫자보다 개선 시점과 drawdown 동행 여부를 함께 봐야 한다.</figcaption>
+</figure>
+</section>
+
+<section id="s21">
+<h2>21. 하위 기간 성과와 안정성</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>기간</th><th>전략</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>Stage35 해석</th></tr></thead>
+<tbody>
+<tr><td>2007-04~2017-12</td><td>Stage20</td><td>6.6493%</td><td>0.7563</td><td>−14.0148%</td><td>—</td></tr>
+<tr class="best"><td>2007-04~2017-12</td><td>Stage35</td><td>8.1067%</td><td>0.8845</td><td>−13.7435%</td><td>세 지표 개선</td></tr>
+<tr><td>2018-01~2026-07</td><td>Stage20</td><td>12.9392%</td><td>1.2503</td><td>−11.4190%</td><td>—</td></tr>
+<tr><td>2018-01~2026-07</td><td>Stage35</td><td>13.8214%</td><td>1.2512</td><td>−11.9836%</td><td>CAGR·Sharpe 소폭 개선, MDD 악화</td></tr>
+</tbody></table></div>
+<p>2018년 이후에도 CAGR 개선은 남았지만 Sharpe 차이는 거의 없고 MDD는 나빠졌다. 이 때문에 “어느 시대에도 지배적인 전략”이라고 말할 수 없다. 오히려 2007~2017 구간에서 펀더멘털 보완 효과가 컸고, 최근 구간에서는 수익률 개선과 꼬리위험 사이에 trade-off가 있었다.</p>
+<div class="note">하위 기간은 모델 선택을 위해 여러 경계연도를 반복 탐색한 결과가 아니라, 기존 연구에서 고정한 2018-01 경계를 사용한다. 그래도 동일 데이터로 전략을 개발하고 평가했다는 연구자 자유도는 완전히 사라지지 않으므로 진정한 외부검증으로 보지는 않는다.</div>
+</section>
+
+<section id="s22">
+<h2>22. 예측 회귀, IC와 메커니즘 증거</h2>
+<h3>22.1 EPS revision</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>향후 수익률</th><th>표준화 beta</th><th>HAC p-value</th><th>해석</th></tr></thead>
+<tbody>
+<tr><td>1개월</td><td>+1.809%p</td><td>0.0268</td><td>양의 단기 관계</td></tr>
+<tr><td>3개월</td><td>+3.156%p</td><td>0.0158</td><td>양의 누적 관계</td></tr>
+<tr><td>6개월</td><td>+3.927%p</td><td>0.0958</td><td>10% 수준, 불확실성 큼</td></tr>
+</tbody></table></div>
+<p>통제변수는 VIX6 stress, 최근 1개월 KODEX200 수익률, 21일 실현변동성, 거시 취약도다. 겹치는 미래수익률 때문에 오차의 자기상관이 생길 수 있어 HAC 표준오차를 사용한다.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>EPS 1개월 beta 안정성</th><th>beta</th><th>p-value</th><th>판정</th></tr></thead>
+<tbody>
+<tr><td>2007-04~2017-12</td><td>+0.466%p</td><td>0.3223</td><td>부호는 양수, 통계적으로 약함</td></tr>
+<tr><td>2018-01~2026-07</td><td>+3.059%p</td><td>0.0222</td><td>양수, 유의</td></tr>
+</tbody></table></div>
+
+<h3>22.2 Credit easing 수익률 관계</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>향후 수익률</th><th>표준화 beta</th><th>HAC p-value</th><th>실전 판정</th></tr></thead>
+<tbody>
+<tr><td>1개월</td><td>+1.120%p</td><td>0.0618</td><td>회귀상 양수</td></tr>
+<tr><td>3개월</td><td>+3.471%p</td><td>0.000083</td><td>회귀상 강함</td></tr>
+<tr><td>6개월</td><td>+2.669%p</td><td>0.00261</td><td>회귀상 강함</td></tr>
+</tbody></table></div>
+<p>그러나 3개월 beta는 초기구간 +3.874%p(p=0.0011), 최근구간 +1.498%p(p=0.2098)로 약해졌고, 직접 μ에 넣은 CreditAlpha 백테스트가 실패했다. <strong>회귀 유의성은 포트폴리오 유용성과 같지 않다.</strong></p>
+
+<h3>22.3 Valuation gap</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>향후 수익률</th><th>표준화 beta</th><th>p-value</th><th>Spearman IC</th><th>IC p-value</th></tr></thead>
+<tbody>
+<tr><td>6개월</td><td>+3.434%p</td><td>0.0831</td><td>+0.0834</td><td>0.2107</td></tr>
+<tr><td>12개월</td><td>+11.460%p</td><td>0.0677</td><td>+0.1613</td><td>0.0164</td></tr>
+</tbody></table></div>
+<p>Valuation은 월별 방향 분류 정확도보다 느린 횡단·시계열 순위 정보가 더 뚜렷했다. 그래서 12개월 slope를 월간 μ로 나누어 넣는 설계가 메커니즘과 맞는다.</p>
+
+<h3>22.4 Credit widening의 미래위험</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>목적변수</th><th>widening beta</th><th>p-value</th><th>해석</th></tr></thead>
+<tbody>
+<tr><td>향후 1개월 실현변동성</td><td>+0.00509</td><td>0.5266</td><td>추가 설명력 약함</td></tr>
+<tr><td>향후 1개월 MDD</td><td>+0.00491</td><td>0.1659</td><td>불확실</td></tr>
+<tr><td>향후 3개월 MDD</td><td>+0.01087</td><td>0.0325</td><td>중기 drawdown 관계</td></tr>
+<tr><td>향후 1개월 left-tail 사건</td><td>+0.1894</td><td>0.4216</td><td>희소사건 설명력 약함</td></tr>
+</tbody></table></div>
+<p>여기서 MDD 목적변수의 부호 정의를 반드시 함께 확인해야 한다. 보고서의 beta 숫자만으로 “낙폭이 커진다/작아진다”를 단정하지 말고 <code>credit_risk_regressions.csv</code>의 target 정의를 함께 읽어야 한다. Stage35의 신용 위험확인 채택은 단일 p-value만이 아니라 경제적 구조, 비교 백테스트, 기존 VKOSPI와의 역할 분리까지 함께 본 결과다.</p>
+<figure class="figure">
+<img src="outputs/mechanism_coefficients.png" alt="EPS Credit Valuation 메커니즘 회귀계수">
+<figcaption>주요 표준화 계수와 불확실성. 서로 다른 horizon의 누적수익 beta는 크기를 직접 일대일 비교하기보다 부호와 안정성을 중심으로 읽는다.</figcaption>
+</figure>
+</section>
+
+<section id="s23">
+<h2>23. 12개월 블록 부트스트랩: 개선의 불확실성</h2>
+<p>월수익을 독립 표본처럼 섞으면 위기와 회복의 군집을 파괴한다. 그래서 Stage20과 Stage35의 월별 차이를 짝지어 유지한 채 12개월 블록을 2,000회 재표집했다.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Stage35−Stage20</th><th>평균</th><th>5%</th><th>중앙값</th><th>95%</th><th>개선 확률</th></tr></thead>
+<tbody>
+<tr><td>CAGR</td><td>+1.242%p</td><td>−0.329%p</td><td>+1.170%p</td><td>+3.025%p</td><td>89.7%</td></tr>
+<tr><td>Sharpe</td><td>+0.0674</td><td>−0.0853</td><td>+0.0675</td><td>+0.2184</td><td>76.35%</td></tr>
+<tr><td>MDD 개선량</td><td>−0.146%p</td><td>−5.071%p</td><td>+0.271%p</td><td>+3.283%p</td><td>57.2%</td></tr>
+</tbody></table></div>
+<p>CAGR의 양의 개선 가능성은 비교적 높지만 5% 분위는 음수다. Sharpe도 개선 가능성이 우세하나 확정적이지 않다. MDD 분포는 거의 동전 던지기에 가까우며 평균이 음수인 이유는 일부 재표집 경로에서 큰 손실구간이 더 불리하게 중복되기 때문이다.</p>
+<div class="warn"><strong>정확한 결론:</strong> Stage35는 “CAGR 10% 이상과 Sharpe 1 이상”이라는 관측 표본 목표를 달성했다. 그러나 미래에도 그 기준을 보장한다는 통계적 증거는 아니다. 특히 MDD 개선은 가장 약한 주장이다.</div>
+</section>
+
+<section id="s24">
+<h2>24. 성과가 나온 이유: 숫자를 메커니즘으로 분해하기</h2>
+<h3>24.1 EPS는 거시 데이터의 느린 반영을 보완했다</h3>
+<p>GDP·물가 같은 거시자료는 넓은 경기 상태를 알려주지만 기업이익 전망의 빠른 변화까지 직접 담지는 못한다. EPS revision은 현금흐름 기대의 변화가 월간 자산배분에 들어가는 통로를 만들었다. 단독 EPS 경로가 CAGR을 약 0.467%p 높인 것은 이 보완효과와 일치한다.</p>
+<h3>24.2 Valuation은 높은 가격을 무조건 추격하지 않도록 장기 기준점을 줬다</h3>
+<p>기술·거시 신호가 좋은 달에도 이익수익률이 장기국채 대비 낮으면 KODEX200 μ 가산이 줄거나 음수가 된다. 반대로 위험회피 이후 주식 이익수익률 갭이 커졌을 때 장기 기대수익을 보완한다. Valuation 단독 경로의 CAGR이 가장 높았지만 Sharpe 개선은 제한적이었고, 최종 결합에서는 credit risk 확인이 그 변동성을 일부 조절했다.</p>
+<h3>24.3 Credit은 방향 예측보다 위험예산 배분에 더 적합했다</h3>
+<p>CreditAlpha는 실패했지만 CreditRiskConfirmation은 CAGR을 낮추면서 Sharpe와 MDD를 개선했다. 이는 신용신호가 “오를지 내릴지”보다 “같은 주식 기대수익을 얼마의 위험으로 취급할지”에 유용했음을 시사한다.</p>
+<h3>24.4 결합효과는 단순 합이 아니다</h3>
+<p>EPSAlpha 개선 + ValuationAnchor 개선 + CreditRisk 개선을 그대로 더하면 최종 성과가 되지 않는다. 모든 신호가 같은 KODEX200 축과 같은 위험 제약을 공유하고, 비중 변화가 거래비용과 다음 달 pretrade weight에 영향을 주기 때문이다. 특히 credit이 분산을 올린 달에는 EPS·valuation의 양의 μ가 있어도 위험 guard 때문에 가중치 증가가 제한된다.</p>
+</section>
+
+<section id="s25">
+<h2>25. 과최적화와 설명불가능성을 줄인 장치</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>위험</th><th>Stage35 대응</th><th>남는 한계</th></tr></thead>
+<tbody>
+<tr><td>look-ahead</td><td>signal month→다음 target month, expanding history, valuation t−12 cutoff</td><td>공급자 실제 배포 timestamp 미확인</td></tr>
+<tr><td>파라미터 탐색</td><td>20관측일·60개월·12개월 horizon을 경제적 의미로 고정, grid 없음</td><td>연구 단계 선택 자체의 자유도</td></tr>
+<tr><td>부호 뒤집기</td><td>EPS·valuation slope는 사전 양의 부호, 음수면 0</td><td>양의 prior가 모든 시대에 맞는지</td></tr>
+<tr><td>극단값 튜닝</td><td>winsorization 없음, 임계 분위 탐색 없음</td><td>원자료 오류에 더 민감</td></tr>
+<tr><td>기존 전략 훼손</td><td>Stage20 및 원천 파일 hash manifest</td><td>import된 코드가 향후 바뀌면 재현성 관리 필요</td></tr>
+<tr><td>한 번에 여러 변화</td><td>EPS / Credit Alpha / Credit Risk / Valuation 분리 ablation</td><td>최종 조합 선택은 동일 표본 결과를 참고</td></tr>
+<tr><td>성과 숫자만 선택</td><td>회귀·subperiod·bootstrap·solver audit 병행</td><td>완전한 외부시장 검증은 아님</td></tr>
+</tbody></table></div>
+<p>또한 BBB spread와 quality spread는 강건성 표에만 남기고 최종 거래에는 사용하지 않는다. 신호 후보를 많이 만들고 가장 좋은 조합을 고르는 방식보다, AA− 3년 spread를 기업 funding stress의 대표값으로 고정했다.</p>
+<div class="good"><strong>좋은 음의 결과를 보존했다.</strong> CreditAlpha가 실패했을 때 lookback, threshold, 부호, 비선형 변환을 반복 탐색하지 않고 최종 전략에서 제외한 점은 Stage35의 설명가능성에 중요하다.</div>
+</section>
+
+<section id="s26">
+<h2>26. 데이터·솔버·재현성 검증 결과</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>검증 항목</th><th>결과</th><th>의미</th></tr></thead>
+<tbody>
+<tr><td>정규화 일간 행 수</td><td>9,564</td><td>1990-01-02 ~ 2026-08-28 outer-joined frame</td></tr>
+<tr><td>EPS revision 최초 유효일</td><td>2000-02-25</td><td>2007 시작 전 충분한 기반</td></tr>
+<tr><td>Credit widening 최초 유효일</td><td>1995-05-30</td><td>초기 백테스트 전 60개월 이상</td></tr>
+<tr><td>2007-04 최초 calibration</td><td>75개월</td><td>최소 60개월 통과</td></tr>
+<tr><td>EPS level stale share</td><td>79.12%</td><td>일간 직접매매 대신 월간 latest 사용 근거</td></tr>
+<tr><td>vendor vs computed revision 상관</td><td>0.4581</td><td>computed 값은 대체재가 아닌 감사용</td></tr>
+<tr><td>NoChange 수익률 최대오차</td><td>2.12×10⁻⁷</td><td>Stage20 재현</td></tr>
+<tr><td>NoChange 가중치 최대오차</td><td>2.58×10⁻⁶</td><td>신호를 끄면 실질 동일</td></tr>
+<tr><td>솔버 성공</td><td>6경로 × 232개월 모두 성공</td><td>fallback 0회</td></tr>
+<tr><td>최종 가중치 합 최대오차</td><td>2.22×10⁻¹⁶</td><td>완전투자 제약 충족</td></tr>
+<tr><td>변동성 guard 근접/활성</td><td>101개월</td><td>13% 제약이 실질적으로 작동</td></tr>
+<tr><td>CDaR guard 근접/활성</td><td>18개월</td><td>꼬리위험 제약이 일부 달에서 작동</td></tr>
+<tr><td>Stage35 전용 테스트</td><td>8개 통과</td><td>입출력·인과성·솔버 등 검증</td></tr>
+<tr><td>전체 프로젝트 테스트</td><td>287개 통과</td><td>기존 코드 회귀오류 없음</td></tr>
+</tbody></table></div>
+<p>원천 파일과 동결 파일의 hash·크기·mtime은 <code>validation_report.json</code>에 기록된다. Excel 읽기 과정에서 발생한 기존 openpyxl 경고 4건 외에 테스트 실패는 없었다.</p>
+</section>
+
+<section id="s27">
+<h2>27. 재현 방법</h2>
+<h3>27.1 필요한 파일</h3>
+<ul>
+<li><code>raw_data/260829_fwdPE.EPS.rev.xlsx</code></li>
+<li><code>raw_data/260829_국고채.회사채.xlsx</code></li>
+<li>Stage20이 사용하는 기존 자산수익률·거시·VKOSPI·기술 원천 데이터</li>
+</ul>
+<h3>27.2 프로젝트 루트에서 실행</h3>
+<pre><code>python -m strategies.stage35_earnings_credit_fundamentals.earnings_credit_fundamentals_slsqp</code></pre>
+<p>프로젝트 전용 Python 환경이 필요하면 현재 PC의 안내에 따라 PowerShell에서 다음 환경을 활성화한 뒤 실행할 수 있다.</p>
+<pre><code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+&amp; d:\Programming\python_example\Arcana\.venv-llama\Scripts\Activate.ps1</code></pre>
+<h3>27.3 테스트</h3>
+<pre><code>python -m pytest tests/test_stage35_earnings_credit_fundamentals.py -q</code></pre>
+<h3>27.4 결과를 다시 읽는 순서</h3>
+<ol>
+<li><code>validation_report.json</code>에서 데이터·solver·gate 상태를 확인한다.</li>
+<li><code>performance_comparison.csv</code>에서 full/early/locked 성과를 비교한다.</li>
+<li><code>stage35_fundamentaldualrole_monthly.csv</code>에서 월별 신호·μ 조정·가중치·비용·constraint slack을 추적한다.</li>
+<li>회귀 CSV에서 각 경제 메커니즘과 하위기간 안정성을 확인한다.</li>
+</ol>
+</section>
+
+<section id="s28">
+<h2>28. 산출물 안내</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>산출물</th><th>내용</th><th>주요 확인 열/용도</th></tr></thead>
+<tbody>
+<tr><td>normalized_earnings_credit_daily.csv</td><td>정규화 일간 원천과 파생변수</td><td>EPS revision, spreads, EYGap</td></tr>
+<tr><td>monthly_earnings_credit_signals.csv</td><td>다음 달용 월간 신호</td><td>signal_month/date, z, rank, multipliers</td></tr>
+<tr><td>monthly_stage35_research_frame.csv</td><td>회귀 연구 결합 프레임</td><td>forward returns, controls, future risk</td></tr>
+<tr><td>return_predictive_regressions.csv</td><td>EPS·credit 수익률 회귀</td><td>beta, HAC p-value</td></tr>
+<tr><td>valuation_gap_diagnostic.csv</td><td>EYGap 6·12개월 진단</td><td>beta, IC, p-value</td></tr>
+<tr><td>credit_risk_regressions.csv</td><td>credit 미래 위험 회귀</td><td>vol, MDD, left tail</td></tr>
+<tr><td>subperiod_stability_regressions.csv</td><td>초기/최근 안정성</td><td>period별 beta/p</td></tr>
+<tr><td>credit_measure_robustness.csv</td><td>AA·BBB·quality 비교</td><td>최종 비거래 보조진단</td></tr>
+<tr><td>stage35_*_monthly.csv</td><td>각 ablation 월별 경로</td><td>weights, μ, vol, CDaR, costs</td></tr>
+<tr><td>performance_comparison.csv</td><td>전략×기간 성과표</td><td>CAGR, Sharpe, MDD, turnover</td></tr>
+<tr><td>paired_block_bootstrap_vs_stage20.csv</td><td>2,000회 paired bootstrap</td><td>성과차 분포</td></tr>
+<tr><td>validation_report.json</td><td>전체 감사·gate·hash</td><td>재현성 핵심 보고서</td></tr>
+</tbody></table></div>
+<p>최종 월별 CSV에는 결과 가중치뿐 아니라 <code>eps_mu_adjustment_KODEX200</code>, <code>valuation_mu_adjustment_KODEX200</code>, <code>credit_stress_confirmation_multiplier</code>, <code>credit_equity_variance_multiplier</code>, <code>volatility_slack</code>, <code>cdar_slack</code>가 남는다. 특정 월의 결정이 왜 달라졌는지 역추적할 수 있다.</p>
+</section>
+
+<section id="s29">
+<h2>29. 한계와 해석 주의사항</h2>
+<ul>
+<li><strong>진정한 out-of-sample이 아니다.</strong> 2018년 이후 구간을 따로 보고 bootstrap을 했지만 Stage35 아이디어와 최종 조합은 전체 연구 맥락 안에서 결정됐다.</li>
+<li><strong>공급자 데이터 revision 가능성:</strong> 과거 시점에 실제로 보였던 vintage가 아니라 현재 파일에 정리된 역사가 사후 수정됐을 가능성을 추가 점검해야 한다.</li>
+<li><strong>거래 가능성 단순화:</strong> 월말 신호 이후 다음 달 수익률을 적용하지만 체결 가격, 세금, 호가충격, 상품 추적오차를 완전하게 모형화하지 않았다.</li>
+<li><strong>Sharpe의 무위험수익률:</strong> 성과표 Sharpe는 월수익과 0% 기준이다. 현금금리를 차감한 excess-return Sharpe와 다를 수 있다.</li>
+<li><strong>Credit risk 증거의 혼합:</strong> 향후 3개월 MDD 이외의 위험 회귀는 약하다. 채택 근거는 단일 회귀가 아니라 기존 VKOSPI와의 역할 적합성 및 포트폴리오 ablation이다.</li>
+<li><strong>MDD 개선의 불확실성:</strong> 최근 구간과 bootstrap에서 강하지 않다. 목표는 “완전히 같은 MDD”가 아니라 비슷한 방어 범위 안의 수익효율 개선으로 해석해야 한다.</li>
+<li><strong>자산군 제약:</strong> 네 자산만 사용하며 현금·단기채·해외주식·신용자산 자체는 투자대상에 없다. 결과는 이 투자 universe에 종속된다.</li>
+</ul>
+<div class="bad"><strong>실전 투자 보증이 아니다.</strong> 본 문서는 연구 코드의 구조와 관측 결과를 설명한다. 미래 CAGR 10%, Sharpe 1, MDD −14% 이내를 보장하지 않으며, 실제 운용 전 point-in-time 데이터·상품비용·세금·유동성·체결지연을 다시 검증해야 한다.</div>
+</section>
+
+<section id="s30">
+<h2>30. 운용 관점 체크리스트</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>매월 점검</th><th>질문</th><th>이상 시 조치</th></tr></thead>
+<tbody>
+<tr><td>데이터 최신성</td><td>세 펀더멘털 핵심 열의 마지막 유효일이 예상 월말인가?</td><td>신호 보류, 이전값 자동 대체 금지</td></tr>
+<tr><td>Point-in-time</td><td>EPS revision 값이 사후 수정되지 않았는가?</td><td>vintage 저장 및 원본 hash 비교</td></tr>
+<tr><td>Calibration</td><td>과거 관측수와 slope가 정상 범위인가?</td><td>급변 원인을 원자료와 함께 확인</td></tr>
+<tr><td>Credit multiplier</td><td>0~2 범위이며 rank가 60개월 이후 계산됐는가?</td><td>범위 위반 시 실행 중단</td></tr>
+<tr><td>가중치</td><td>모두 0~1, 합계 1인가?</td><td>solver 결과 폐기</td></tr>
+<tr><td>위험 guard</td><td>연환산 vol≤13%, CDaR≥−16%인가?</td><td>fallback/데이터 상태 점검</td></tr>
+<tr><td>비용</td><td>가중치 변화 대비 비용이 일관적인가?</td><td>pretrade drift와 해외순변화 확인</td></tr>
+<tr><td>성과 귀속</td><td>Stage20 대비 차이가 EPS·VAL·credit 중 어디서 왔는가?</td><td>월별 detail 열로 설명 기록</td></tr>
+</tbody></table></div>
+<p>운영에서는 성과가 나쁜 달보다 <strong>설명할 수 없는 달</strong>을 더 먼저 조사하는 편이 좋다. Stage35는 각 신호가 μ 또는 Σ의 어느 항을 얼마나 바꿨는지 저장하므로, 가중치만 남기는 블랙박스보다 감사가 쉽다.</p>
+</section>
+
+<section id="s31">
+<h2>31. 용어집</h2>
+<dl>
+<dt>μ (mu)</dt><dd>최적화에 들어가는 자산별 월간 기대수익 벡터.</dd>
+<dt>Σ (Sigma)</dt><dd>자산 수익률의 조건부 공분산 행렬.</dd>
+<dt>SLSQP</dt><dd>등식·부등식·상하한 제약을 함께 처리하는 순차 최소제곱 이차계획 최적화법.</dd>
+<dt>CAGR</dt><dd>시작 NAV에서 종료 NAV까지의 연복리 성장률.</dd>
+<dt>Sharpe</dt><dd>평균수익을 변동성으로 나눈 위험조정 성과. 여기서는 월간 기준을 √12로 연환산.</dd>
+<dt>MDD</dt><dd>누적 NAV가 이전 고점에서 가장 크게 하락한 비율.</dd>
+<dt>CDaR</dt><dd>drawdown 분포의 꼬리 평균. 이 전략은 최악 10% drawdown의 평균을 사용.</dd>
+<dt>HAC</dt><dd>겹치는 미래수익률 때문에 생기는 이분산·자기상관에 강건한 표준오차.</dd>
+<dt>IC</dt><dd>신호와 미래수익률 순위의 Spearman 상관계수.</dd>
+<dt>Expanding</dt><dd>고정창이 아니라 시작점부터 직전 시점까지의 모든 과거를 누적 사용.</dd>
+<dt>Causal</dt><dd>현재 판단 시점 이후의 데이터를 계산에 포함하지 않는다는 뜻.</dd>
+<dt>Ablation</dt><dd>구성요소를 하나씩 켜거나 꺼 성과 기여를 분리하는 비교실험.</dd>
+<dt>Stress confirmation</dt><dd>새로운 방향 알파를 더하지 않고 기존 VKOSPI 위험 신호의 강도를 독립 시장정보로 조절하는 것.</dd>
+</dl>
+</section>
+</main>
+</div>
+
+<footer>
+<p>Stage35 Earnings·Credit Fundamentals 상세 설명서 · 생성 근거: 로컬 실행 코드, 저장된 월별 경로, 회귀·부트스트랩·검증 산출물. 수치는 2007-04~2026-07 백테스트 기준이며 투자 자문이 아니다.</p>
+</footer>
+</body>
+</html>

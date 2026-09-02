@@ -1,0 +1,200 @@
+{
+  "requested_test_period": "2007-2026",
+  "actual_common_test_period": {
+    "start": "2007-04",
+    "end": "2026-07",
+    "months": 232
+  },
+  "evaluation_status": "Full-period exploratory walk-forward backtest. Each monthly prediction uses only prior training rows with a two-month label embargo, but the 2007-2026 period is used to compare candidates and is not an untouched holdout.",
+  "existing_strategy_reproduction_max_return_error": 9.8879238130678e-17,
+  "existing_strategy": {
+    "CAGR": 0.15636553973863565,
+    "Sharpe": 1.1325286822772858,
+    "MDD": -0.12958799769553853,
+    "logistic_first_prediction_month": "2010-06",
+    "fit_stats": {
+      "fit_count": 194.0,
+      "convergence_warning_count": 0.0
+    }
+  },
+  "decomposition_components": [
+    "sticky_strike",
+    "parallel_shift",
+    "put_skew",
+    "call_skew",
+    "downside_convexity",
+    "upside_convexity"
+  ],
+  "tested_transforms": {
+    "raw": "unprocessed component level/control",
+    "ma5": "5-observation trailing moving average",
+    "ma21": "21-observation trailing moving average",
+    "delta5": "5-observation change",
+    "delta21": "21-observation change",
+    "z63": "63-observation trailing z-score, clipped to [-6, 6]",
+    "z126": "126-observation trailing z-score, clipped to [-6, 6]"
+  },
+  "candidate_sets": {
+    "raw6_control": [
+      "sticky_strike_raw_last",
+      "parallel_shift_raw_last",
+      "put_skew_raw_last",
+      "call_skew_raw_last",
+      "downside_convexity_raw_last",
+      "upside_convexity_raw_last"
+    ],
+    "ma5_6": [
+      "sticky_strike_ma5_last",
+      "parallel_shift_ma5_last",
+      "put_skew_ma5_last",
+      "call_skew_ma5_last",
+      "downside_convexity_ma5_last",
+      "upside_convexity_ma5_last"
+    ],
+    "ma21_6": [
+      "sticky_strike_ma21_last",
+      "parallel_shift_ma21_last",
+      "put_skew_ma21_last",
+      "call_skew_ma21_last",
+      "downside_convexity_ma21_last",
+      "upside_convexity_ma21_last"
+    ],
+    "delta5_6": [
+      "sticky_strike_delta5_last",
+      "parallel_shift_delta5_last",
+      "put_skew_delta5_last",
+      "call_skew_delta5_last",
+      "downside_convexity_delta5_last",
+      "upside_convexity_delta5_last"
+    ],
+    "delta21_6": [
+      "sticky_strike_delta21_last",
+      "parallel_shift_delta21_last",
+      "put_skew_delta21_last",
+      "call_skew_delta21_last",
+      "downside_convexity_delta21_last",
+      "upside_convexity_delta21_last"
+    ],
+    "z63_6": [
+      "sticky_strike_z63_last",
+      "parallel_shift_z63_last",
+      "put_skew_z63_last",
+      "call_skew_z63_last",
+      "downside_convexity_z63_last",
+      "upside_convexity_z63_last"
+    ],
+    "z126_6": [
+      "sticky_strike_z126_last",
+      "parallel_shift_z126_last",
+      "put_skew_z126_last",
+      "call_skew_z126_last",
+      "downside_convexity_z126_last",
+      "upside_convexity_z126_last"
+    ],
+    "short_ma_delta_z18": [
+      "sticky_strike_ma5_last",
+      "parallel_shift_ma5_last",
+      "put_skew_ma5_last",
+      "call_skew_ma5_last",
+      "downside_convexity_ma5_last",
+      "upside_convexity_ma5_last",
+      "sticky_strike_delta5_last",
+      "parallel_shift_delta5_last",
+      "put_skew_delta5_last",
+      "call_skew_delta5_last",
+      "downside_convexity_delta5_last",
+      "upside_convexity_delta5_last",
+      "sticky_strike_z63_last",
+      "parallel_shift_z63_last",
+      "put_skew_z63_last",
+      "call_skew_z63_last",
+      "downside_convexity_z63_last",
+      "upside_convexity_z63_last"
+    ],
+    "medium_ma_delta_z18": [
+      "sticky_strike_ma21_last",
+      "parallel_shift_ma21_last",
+      "put_skew_ma21_last",
+      "call_skew_ma21_last",
+      "downside_convexity_ma21_last",
+      "upside_convexity_ma21_last",
+      "sticky_strike_delta21_last",
+      "parallel_shift_delta21_last",
+      "put_skew_delta21_last",
+      "call_skew_delta21_last",
+      "downside_convexity_delta21_last",
+      "upside_convexity_delta21_last",
+      "sticky_strike_z126_last",
+      "parallel_shift_z126_last",
+      "put_skew_z126_last",
+      "call_skew_z126_last",
+      "downside_convexity_z126_last",
+      "upside_convexity_z126_last"
+    ],
+    "multiscale_ma_z24": [
+      "sticky_strike_ma5_last",
+      "parallel_shift_ma5_last",
+      "put_skew_ma5_last",
+      "call_skew_ma5_last",
+      "downside_convexity_ma5_last",
+      "upside_convexity_ma5_last",
+      "sticky_strike_ma21_last",
+      "parallel_shift_ma21_last",
+      "put_skew_ma21_last",
+      "call_skew_ma21_last",
+      "downside_convexity_ma21_last",
+      "upside_convexity_ma21_last",
+      "sticky_strike_z63_last",
+      "parallel_shift_z63_last",
+      "put_skew_z63_last",
+      "call_skew_z63_last",
+      "downside_convexity_z63_last",
+      "upside_convexity_z63_last",
+      "sticky_strike_z126_last",
+      "parallel_shift_z126_last",
+      "put_skew_z126_last",
+      "call_skew_z126_last",
+      "downside_convexity_z126_last",
+      "upside_convexity_z126_last"
+    ]
+  },
+  "candidate_count_excluding_baseline": 40,
+  "monthly_signal_lag": {
+    "months": 1,
+    "all_signal_months_strictly_before_target": true
+  },
+  "training_label_embargo_months": 2,
+  "best_processed_candidate": {
+    "candidate": "ma21_6",
+    "C": 0.1,
+    "added_features": [
+      "sticky_strike_ma21_last",
+      "parallel_shift_ma21_last",
+      "put_skew_ma21_last",
+      "call_skew_ma21_last",
+      "downside_convexity_ma21_last",
+      "upside_convexity_ma21_last"
+    ],
+    "fit_stats": {
+      "fit_count": 194.0,
+      "convergence_warning_count": 0.0
+    },
+    "CAGR": 0.1550964764164049,
+    "Sharpe": 1.125763667507867,
+    "MDD": -0.12958799769553853,
+    "CAGR_delta": -0.0012690633222307568,
+    "Sharpe_delta": -0.006765014769418709,
+    "MDD_delta": 0.0,
+    "all_three_improve": false
+  },
+  "deployment_decision": "Existing_Final_RobustVKOSPI",
+  "deployment_reason": "No processed VIX6 logistic-input candidate improved full-period CAGR, Sharpe and MDD simultaneously; keep the existing Robust VKOSPI strategy.",
+  "artifacts": {
+    "monthly_features": "results\\vix6_processed_input_features_monthly.csv",
+    "comparison": "results\\vix6_processed_input_comparison_2007_2026.csv",
+    "best_importance": "results\\vix6_processed_input_best_importance.csv",
+    "best_factor": "results\\vix6_processed_input_best_factor.csv",
+    "best_medium": "results\\vix6_processed_input_best_medium.csv",
+    "best_final": "results\\vix6_processed_input_best_reconciled.csv"
+  }
+}

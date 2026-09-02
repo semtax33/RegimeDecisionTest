@@ -1,0 +1,1136 @@
+{
+  "strategy": "Stage30_PureODS_QualityCausal",
+  "base_strategy": "Stage20_VIX6",
+  "decision": "retain_stage20",
+  "design": "Stage20 VIX6/VKOSPI remains the risk engine. Strictly causal abnormal 5d/20d put-skew and IVA changes form pure direction. Observable data quality shrinks the score, and an expanding signal-return slope maps it to KODEX200 monthly mu. ERP is diagnostic only and option order flow is excluded.",
+  "directional_formula": {
+    "fast_bear": "mean(Z[abnormal 5d put-skew change], Z[abnormal 5d IVA change])",
+    "slow_bear": "mean(Z[abnormal 20d put-skew change], Z[abnormal 20d IVA change])",
+    "pure_direction": "-mean(fast_bear, slow_bear)",
+    "quality": "q_dte*q_coverage*q_parity*q_arbitrage*q_roll",
+    "bounded_score": "quality*pure_direction/(1+abs(quality*pure_direction))",
+    "equity_mu_adjustment": "expanding past-only slope(KODEX200 return ~ score) * current score",
+    "implied_erp": "diagnostic only; excluded from direction and mu",
+    "order_flow": "excluded",
+    "searched_parameters": null
+  },
+  "residual_model": {
+    "method": "four expanding one-step-ahead OLS models",
+    "minimum_history": 252,
+    "targets": [
+      "5d put-skew change",
+      "5d IVA change",
+      "20d put-skew change",
+      "20d IVA change"
+    ],
+    "predictors": "same-horizon KOSPI return and VKOSPI change, DTE distance, roll flag, prior-month growth and inflation ranks",
+    "training_cutoff": "strictly t-1",
+    "macro_cutoff": "prior calendar month-end"
+  },
+  "causal_mu_calibration": {
+    "minimum_months": 12,
+    "method": "expanding one-slope nonnegative least squares through prior realized month; negative raw slope shrinks alpha to zero",
+    "intercept_applied_to_mu": false,
+    "signal_sign_reversal_allowed": false
+  },
+  "data_audit": {
+    "technical": {
+      "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+      "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+      "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+      "foreign_prices_converted_to_krw": true,
+      "bond_atr_uses_close_to_close_proxy": true,
+      "kodex_volume_segments_normalized_separately": true,
+      "assets": {
+        "KODEX200": {
+          "rows": 6535,
+          "start": "2000-01-04",
+          "end": "2026-08-25",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0,
+          "feature_start": "2000-07-07",
+          "feature_end": "2026-08-25",
+          "feature_rows": 6410
+        },
+        "BOND": {
+          "rows": 7469,
+          "start": "2006-03-02",
+          "end": "2026-08-12",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 7469,
+          "feature_start": "2006-07-05",
+          "feature_end": "2026-08-12",
+          "feature_rows": 7344
+        },
+        "GLD": {
+          "rows": 5474,
+          "start": "2004-11-18",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0,
+          "feature_start": "2005-05-19",
+          "feature_end": "2026-08-24",
+          "feature_rows": 5349
+        },
+        "USO": {
+          "rows": 5125,
+          "start": "2006-04-10",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0,
+          "feature_start": "2006-10-06",
+          "feature_end": "2026-08-24",
+          "feature_rows": 5000
+        }
+      },
+      "k_ratio_days": 126,
+      "wilder_days": 14
+    },
+    "option": {
+      "source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice.csv",
+      "raw_rows": 708922,
+      "regular_session_rows_with_parsed_contract_and_7_60_dte": 542448,
+      "first_date": "2000-01-04",
+      "last_date": "2026-08-27",
+      "target_maturity_days": 30,
+      "maturity_range_days": [
+        7,
+        60
+      ],
+      "legacy_call_put_from_issue_code": true,
+      "night_session_excluded": true,
+      "daily_surface_rows": 4995,
+      "first_surface_date": "2000-01-05",
+      "last_surface_date": "2026-08-27",
+      "maturity_methods": {
+        "nearest_listed_proxy": 4892,
+        "exact_30d": 103
+      },
+      "order_flow_columns_discarded_before_surface": [
+        "volume",
+        "trading_value",
+        "open_interest"
+      ],
+      "order_flow_used": false,
+      "erp_measure": "Martin-style SVIX-squared proxy using a cross-sectionally estimated discount factor/forward and truncated listed-strike option-price integrals",
+      "complete_direction_rows": 3937,
+      "first_complete_direction_date": "2005-10-21",
+      "last_complete_direction_date": "2026-08-27",
+      "minimum_residual_training_observations": 252,
+      "residual_model": "four expanding one-step-ahead OLS models for 5d/20d changes in put skew and IVA; each prediction uses rows through t-1",
+      "residual_predictors": "same-horizon KOSPI return, VKOSPI change, 30d maturity distance, roll flag, prior-month growth rank, prior-month inflation rank",
+      "pure_direction_components": [
+        "abnormal_bear_pressure_fast",
+        "abnormal_bear_pressure_slow"
+      ],
+      "erp_used_for_allocation": false,
+      "quality_formula": "q_dte*q_coverage*q_parity*q_arbitrage*q_roll",
+      "score_bound": "x/(1+abs(x))",
+      "searched_parameters": null,
+      "asset_data": {
+        "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+        "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+        "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+        "foreign_prices_converted_to_krw": true,
+        "bond_atr_uses_close_to_close_proxy": true,
+        "kodex_volume_segments_normalized_separately": true,
+        "assets": {
+          "KODEX200": {
+            "rows": 6535,
+            "start": "2000-01-04",
+            "end": "2026-08-25",
+            "missing_close": 0,
+            "missing_high": 0,
+            "missing_low": 0,
+            "missing_volume": 0
+          },
+          "BOND": {
+            "rows": 7469,
+            "start": "2006-03-02",
+            "end": "2026-08-12",
+            "missing_close": 0,
+            "missing_high": 0,
+            "missing_low": 0,
+            "missing_volume": 7469
+          },
+          "GLD": {
+            "rows": 5474,
+            "start": "2004-11-18",
+            "end": "2026-08-24",
+            "missing_close": 0,
+            "missing_high": 0,
+            "missing_low": 0,
+            "missing_volume": 0
+          },
+          "USO": {
+            "rows": 5125,
+            "start": "2006-04-10",
+            "end": "2026-08-24",
+            "missing_close": 0,
+            "missing_high": 0,
+            "missing_low": 0,
+            "missing_volume": 0
+          }
+        }
+      }
+    }
+  },
+  "performance": [
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0939740153,
+      "Volatility": 0.0959808832,
+      "Sharpe": 0.9865029238,
+      "Sortino": 1.8566616292,
+      "MDD": -0.1401480684,
+      "Calmar": 0.6705337891,
+      "FinalMultiple": 5.6772165405,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0268096176,
+      "TotalCost": 0.0186033023
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0894510574,
+      "Volatility": 0.1010970977,
+      "Sharpe": 0.8999324214,
+      "Sortino": 1.7299208027,
+      "MDD": -0.1690954207,
+      "Calmar": 0.5289975153,
+      "FinalMultiple": 5.2402178835,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0513461223,
+      "TotalCost": 0.0358793966
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0978195045,
+      "Volatility": 0.1007183842,
+      "Sharpe": 0.979567329,
+      "Sortino": 1.8953497433,
+      "MDD": -0.1359901134,
+      "Calmar": 0.7193133539,
+      "FinalMultiple": 6.0757265719,
+      "PositiveMonths": 0.599137931,
+      "AvgTurnover": 0.0299226522,
+      "TotalCost": 0.0208122873
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0664933375,
+      "Volatility": 0.0907117841,
+      "Sharpe": 0.7562604472,
+      "Sortino": 1.3107717092,
+      "MDD": -0.1401480684,
+      "Calmar": 0.4744506168,
+      "FinalMultiple": 1.997791114,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0438158722,
+      "TotalCost": 0.0166792906
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0508195176,
+      "Volatility": 0.0913885503,
+      "Sharpe": 0.5885813808,
+      "Sortino": 0.9910870638,
+      "MDD": -0.1690954207,
+      "Calmar": 0.3005375155,
+      "FinalMultiple": 1.7038344871,
+      "PositiveMonths": 0.5736434109,
+      "AvgTurnover": 0.0811376231,
+      "TotalCost": 0.0312861759
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0652130027,
+      "Volatility": 0.0910607586,
+      "Sharpe": 0.7404305236,
+      "Sortino": 1.2863595009,
+      "MDD": -0.1359901134,
+      "Calmar": 0.4795422337,
+      "FinalMultiple": 1.9721590431,
+      "PositiveMonths": 0.5891472868,
+      "AvgTurnover": 0.0477266245,
+      "TotalCost": 0.0182496084
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1293924988,
+      "Volatility": 0.1018606281,
+      "Sharpe": 1.2502705269,
+      "Sortino": 2.5848541994,
+      "MDD": -0.1141902445,
+      "Calmar": 1.1331309376,
+      "FinalMultiple": 2.8417468176,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0055105221,
+      "TotalCost": 0.0019240117
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.139843625,
+      "Volatility": 0.111074675,
+      "Sharpe": 1.238441807,
+      "Sortino": 2.7289238421,
+      "MDD": -0.1150988006,
+      "Calmar": 1.2149876824,
+      "FinalMultiple": 3.0755439705,
+      "PositiveMonths": 0.6601941748,
+      "AvgTurnover": 0.0140344368,
+      "TotalCost": 0.0045932207
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1400681931,
+      "Volatility": 0.1110687538,
+      "Sharpe": 1.240507271,
+      "Sortino": 2.6702605365,
+      "MDD": -0.1155359156,
+      "Calmar": 1.2123346435,
+      "FinalMultiple": 3.080748783,
+      "PositiveMonths": 0.6116504854,
+      "AvgTurnover": 0.0076244732,
+      "TotalCost": 0.0025626789
+    }
+  ],
+  "full_changes_vs_stage20": {
+    "cagr": 0.0038454892139065944,
+    "sharpe": -0.006935594721777183,
+    "mdd": 0.00415795501618188,
+    "volatility": 0.00473750105586522
+  },
+  "factor_diagnostics": [
+    {
+      "Frequency": "daily",
+      "Feature": "pure_direction_raw",
+      "Target": "KOSPI200_forward_5d",
+      "SpearmanIC": -0.0169967647,
+      "Observations": 3931
+    },
+    {
+      "Frequency": "daily",
+      "Feature": "pure_direction_raw",
+      "Target": "KOSPI200_forward_20d",
+      "SpearmanIC": 0.0068647014,
+      "Observations": 3916
+    },
+    {
+      "Frequency": "daily",
+      "Feature": "option_direction_score",
+      "Target": "KOSPI200_forward_5d",
+      "SpearmanIC": -0.0203924525,
+      "Observations": 3931
+    },
+    {
+      "Frequency": "daily",
+      "Feature": "option_direction_score",
+      "Target": "KOSPI200_forward_20d",
+      "SpearmanIC": -0.0051526634,
+      "Observations": 3916
+    },
+    {
+      "Frequency": "daily",
+      "Feature": "z_option_erp_proxy",
+      "Target": "KOSPI200_forward_5d",
+      "SpearmanIC": 0.0861682655,
+      "Observations": 4736
+    },
+    {
+      "Frequency": "daily",
+      "Feature": "z_option_erp_proxy",
+      "Target": "KOSPI200_forward_20d",
+      "SpearmanIC": 0.1331751793,
+      "Observations": 4721
+    },
+    {
+      "Frequency": "monthly",
+      "Feature": "pure_direction_raw",
+      "Target": "KODEX200_target_month_return",
+      "SpearmanIC": 0.0337558703,
+      "Observations": 244
+    },
+    {
+      "Frequency": "monthly",
+      "Feature": "option_direction_score",
+      "Target": "KODEX200_target_month_return",
+      "SpearmanIC": 0.0261031188,
+      "Observations": 244
+    },
+    {
+      "Frequency": "monthly",
+      "Feature": "z_option_erp_proxy",
+      "Target": "KODEX200_target_month_return",
+      "SpearmanIC": 0.1504818078,
+      "Observations": 244
+    },
+    {
+      "Frequency": "monthly",
+      "Feature": "pure_direction_raw",
+      "Target": "VIX6_VKOSPI_stress_score_correlation",
+      "SpearmanIC": 0.2148780539,
+      "Observations": 244
+    },
+    {
+      "Frequency": "monthly",
+      "Feature": "option_direction_score",
+      "Target": "VIX6_VKOSPI_stress_score_correlation",
+      "SpearmanIC": 0.1918165355,
+      "Observations": 244
+    },
+    {
+      "Frequency": "monthly",
+      "Feature": "z_option_erp_proxy",
+      "Target": "VIX6_VKOSPI_stress_score_correlation",
+      "SpearmanIC": 0.8523476724,
+      "Observations": 244
+    }
+  ],
+  "option_construction_diagnostics": [
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "07_14",
+      "Feature": "pure_direction_raw",
+      "Horizon": "5d",
+      "Value": 0.0398289262,
+      "Observations": 1361
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "07_14",
+      "Feature": "pure_direction_raw",
+      "Horizon": "20d",
+      "Value": 0.0542496345,
+      "Observations": 1355
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "07_14",
+      "Feature": "option_direction_score",
+      "Horizon": "5d",
+      "Value": 0.0350407405,
+      "Observations": 1361
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "07_14",
+      "Feature": "option_direction_score",
+      "Horizon": "20d",
+      "Value": 0.0478517537,
+      "Observations": 1355
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "15_30",
+      "Feature": "pure_direction_raw",
+      "Horizon": "5d",
+      "Value": -0.0547692012,
+      "Observations": 2405
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "15_30",
+      "Feature": "pure_direction_raw",
+      "Horizon": "20d",
+      "Value": -0.0338424201,
+      "Observations": 2396
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "15_30",
+      "Feature": "option_direction_score",
+      "Horizon": "5d",
+      "Value": -0.0612521332,
+      "Observations": 2405
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "15_30",
+      "Feature": "option_direction_score",
+      "Horizon": "20d",
+      "Value": -0.0480775345,
+      "Observations": 2396
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "31_45",
+      "Feature": "pure_direction_raw",
+      "Horizon": "5d",
+      "Value": -0.0361232068,
+      "Observations": 165
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "31_45",
+      "Feature": "pure_direction_raw",
+      "Horizon": "20d",
+      "Value": 0.1726711725,
+      "Observations": 165
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "31_45",
+      "Feature": "option_direction_score",
+      "Horizon": "5d",
+      "Value": null,
+      "Observations": 165
+    },
+    {
+      "Audit": "DTE_bucket_IC",
+      "Group": "31_45",
+      "Feature": "option_direction_score",
+      "Horizon": "20d",
+      "Value": null,
+      "Observations": 165
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "no_roll_within_5d",
+      "Feature": "pure_direction_raw",
+      "Horizon": "5d",
+      "Value": -0.0237652984,
+      "Observations": 2684
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "no_roll_within_5d",
+      "Feature": "pure_direction_raw",
+      "Horizon": "20d",
+      "Value": 0.0015088581,
+      "Observations": 2673
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "no_roll_within_5d",
+      "Feature": "option_direction_score",
+      "Horizon": "5d",
+      "Value": -0.0272175912,
+      "Observations": 2684
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "no_roll_within_5d",
+      "Feature": "option_direction_score",
+      "Horizon": "20d",
+      "Value": -0.001148895,
+      "Observations": 2673
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "roll_within_5d",
+      "Feature": "pure_direction_raw",
+      "Horizon": "5d",
+      "Value": -0.0028573794,
+      "Observations": 1247
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "roll_within_5d",
+      "Feature": "pure_direction_raw",
+      "Horizon": "20d",
+      "Value": 0.019532599,
+      "Observations": 1243
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "roll_within_5d",
+      "Feature": "option_direction_score",
+      "Horizon": "5d",
+      "Value": null,
+      "Observations": 1247
+    },
+    {
+      "Audit": "recent_roll_IC",
+      "Group": "roll_within_5d",
+      "Feature": "option_direction_score",
+      "Horizon": "20d",
+      "Value": null,
+      "Observations": 1243
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "dte",
+      "Value": 17.9831892411,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "listed_contracts",
+      "Value": 61.0144092219,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "coverage_log_width",
+      "Value": 0.3162015232,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "parity_nrmse",
+      "Value": 0.0241448659,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "monotone_quality",
+      "Value": 0.9942030916,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "convexity_quality",
+      "Value": 0.7721836349,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "zero_or_missing_close_share",
+      "Value": 0.0801006389,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "invalid_iv_share",
+      "Value": 0.0831540662,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "put25_nearest_strike_distance",
+      "Value": 0.0026971438,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2007_2017",
+      "Feature": "measurement",
+      "Horizon": "data_quality_confidence",
+      "Value": 0.1494422658,
+      "Observations": 2082
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "dte",
+      "Value": 18.0128913444,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "listed_contracts",
+      "Value": 226.817679558,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "coverage_log_width",
+      "Value": 0.7048609407,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "parity_nrmse",
+      "Value": 0.0388604119,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "monotone_quality",
+      "Value": 0.9721854249,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "convexity_quality",
+      "Value": 0.7803630983,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "zero_or_missing_close_share",
+      "Value": 0.483967878,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "invalid_iv_share",
+      "Value": 0.0499212089,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "put25_nearest_strike_distance",
+      "Value": 0.0018237767,
+      "Observations": 1629
+    },
+    {
+      "Audit": "data_quality_period_mean",
+      "Group": "2018_2026",
+      "Feature": "measurement",
+      "Horizon": "data_quality_confidence",
+      "Value": 0.224961142,
+      "Observations": 1629
+    }
+  ],
+  "paired_block_bootstrap": [
+    {
+      "Metric": "delta_CAGR",
+      "Mean": 0.0040161918,
+      "P05": -0.0013689521,
+      "P50": 0.0035386757,
+      "P95": 0.011493945,
+      "ProbabilityPositive": 0.842,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0080524376,
+      "P05": -0.0393362044,
+      "P50": -0.0078494996,
+      "P95": 0.0210377062,
+      "ProbabilityPositive": 0.3385,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Metric": "delta_MDD",
+      "Mean": 0.0015832531,
+      "P05": -0.0047688677,
+      "P50": 0.0001381109,
+      "P95": 0.0105084674,
+      "ProbabilityPositive": 0.524,
+      "Replications": 2000,
+      "BlockMonths": 12
+    }
+  ],
+  "concentration": {
+    "Stage20_VIX6": {
+      "months": 232,
+      "months_above_50_percent": 34,
+      "months_above_90_percent": 0,
+      "months_at_effective_100_percent": 0,
+      "maximum_single_asset_weight": 0.8787214702265292,
+      "average_largest_weight": 0.4538544060129919,
+      "average_weights": {
+        "KODEX200": 0.25386849289017865,
+        "BOND": 0.36496735207255865,
+        "GLD": 0.3783491934571567,
+        "USO": 0.0028149615801060838
+      }
+    },
+    "Stage30_PureODS_NoQuality": {
+      "months": 232,
+      "months_above_50_percent": 110,
+      "months_above_90_percent": 0,
+      "months_at_effective_100_percent": 0,
+      "maximum_single_asset_weight": 0.8787214702265292,
+      "average_largest_weight": 0.5266740697542164,
+      "average_weights": {
+        "KODEX200": 0.21776249844878243,
+        "BOND": 0.43924213688104174,
+        "GLD": 0.34021857360129315,
+        "USO": 0.0027767910688827626
+      }
+    },
+    "Stage30_PureODS_QualityCausal": {
+      "months": 232,
+      "months_above_50_percent": 52,
+      "months_above_90_percent": 0,
+      "months_at_effective_100_percent": 0,
+      "maximum_single_asset_weight": 0.8787214702265292,
+      "average_largest_weight": 0.4595420761532309,
+      "average_weights": {
+        "KODEX200": 0.25723191464163714,
+        "BOND": 0.35907987311875594,
+        "GLD": 0.38091144328718535,
+        "USO": 0.0027767689524215012
+      }
+    }
+  },
+  "top_drawdown_episodes": [
+    {
+      "Strategy": "Stage20_VIX6",
+      "UnderwaterStart": "2012-10",
+      "Trough": "2013-06",
+      "Recovery": "2017-05",
+      "EpisodeMDD": -0.1401480684,
+      "MonthsToTrough": 9,
+      "NetReturnToTrough": -0.1401480684,
+      "TotalCostToTrough": 0.0005095755,
+      "KODEX200_Contribution": -0.029181563,
+      "BOND_Contribution": 0.0029959709,
+      "GLD_Contribution": -0.1210918246,
+      "USO_Contribution": 1.035560254e-18,
+      "StockBondCorrelation": 0.152688776,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "UnderwaterStart": "2026-06",
+      "Trough": "2026-07",
+      "Recovery": "ongoing",
+      "EpisodeMDD": -0.1141902445,
+      "MonthsToTrough": 2,
+      "NetReturnToTrough": -0.1141902445,
+      "TotalCostToTrough": 0.0002499789,
+      "KODEX200_Contribution": -0.0588635252,
+      "BOND_Contribution": -0.0013468003,
+      "GLD_Contribution": -0.0550377689,
+      "USO_Contribution": -0.0007353573,
+      "StockBondCorrelation": -1.0,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "UnderwaterStart": "2008-07",
+      "Trough": "2008-10",
+      "Recovery": "2008-12",
+      "EpisodeMDD": -0.1061244273,
+      "MonthsToTrough": 4,
+      "NetReturnToTrough": -0.1061244273,
+      "TotalCostToTrough": 0.0022625654,
+      "KODEX200_Contribution": -0.0201220925,
+      "BOND_Contribution": 0.0110846096,
+      "GLD_Contribution": -0.0458716978,
+      "USO_Contribution": -0.05049811,
+      "StockBondCorrelation": -0.6504373098,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "UnderwaterStart": "2009-03",
+      "Trough": "2009-04",
+      "Recovery": "2009-11",
+      "EpisodeMDD": -0.0752369834,
+      "MonthsToTrough": 2,
+      "NetReturnToTrough": -0.0752369834,
+      "TotalCostToTrough": 0.0001617147,
+      "KODEX200_Contribution": 3.362422477e-19,
+      "BOND_Contribution": 0.0134963957,
+      "GLD_Contribution": -0.0899946134,
+      "USO_Contribution": -4.509422234e-19,
+      "StockBondCorrelation": -1.0,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "UnderwaterStart": "2026-03",
+      "Trough": "2026-03",
+      "Recovery": "2026-05",
+      "EpisodeMDD": -0.066594223,
+      "MonthsToTrough": 1,
+      "NetReturnToTrough": -0.066594223,
+      "TotalCostToTrough": 0.000207016,
+      "KODEX200_Contribution": -0.0329641245,
+      "BOND_Contribution": -0.0029076813,
+      "GLD_Contribution": -0.0305154012,
+      "USO_Contribution": 7.190701507e-18,
+      "StockBondCorrelation": null,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "UnderwaterStart": "2012-10",
+      "Trough": "2013-06",
+      "Recovery": "2019-08",
+      "EpisodeMDD": -0.1690954207,
+      "MonthsToTrough": 9,
+      "NetReturnToTrough": -0.1690954207,
+      "TotalCostToTrough": 0.0056198759,
+      "KODEX200_Contribution": -0.0725617678,
+      "BOND_Contribution": 0.0056989781,
+      "GLD_Contribution": -0.1080958819,
+      "USO_Contribution": 2.240846627e-19,
+      "StockBondCorrelation": 0.152688776,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "UnderwaterStart": "2026-06",
+      "Trough": "2026-07",
+      "Recovery": "ongoing",
+      "EpisodeMDD": -0.1150988006,
+      "MonthsToTrough": 2,
+      "NetReturnToTrough": -0.1150988006,
+      "TotalCostToTrough": 0.0003064503,
+      "KODEX200_Contribution": -0.0731154359,
+      "BOND_Contribution": -0.0014387377,
+      "GLD_Contribution": -0.0416226896,
+      "USO_Contribution": -5.452e-07,
+      "StockBondCorrelation": -1.0,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "UnderwaterStart": "2008-07",
+      "Trough": "2008-10",
+      "Recovery": "2008-12",
+      "EpisodeMDD": -0.1061244273,
+      "MonthsToTrough": 4,
+      "NetReturnToTrough": -0.1061244273,
+      "TotalCostToTrough": 0.0022625654,
+      "KODEX200_Contribution": -0.0201220925,
+      "BOND_Contribution": 0.0110846096,
+      "GLD_Contribution": -0.0458716978,
+      "USO_Contribution": -0.05049811,
+      "StockBondCorrelation": -0.6504373098,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "UnderwaterStart": "2009-03",
+      "Trough": "2009-04",
+      "Recovery": "2010-04",
+      "EpisodeMDD": -0.0752369837,
+      "MonthsToTrough": 2,
+      "NetReturnToTrough": -0.0752369837,
+      "TotalCostToTrough": 0.0001617147,
+      "KODEX200_Contribution": 2.758866338e-19,
+      "BOND_Contribution": 0.0134963957,
+      "GLD_Contribution": -0.0899946137,
+      "USO_Contribution": -6.233943866e-20,
+      "StockBondCorrelation": -1.0,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_NoQuality",
+      "UnderwaterStart": "2026-03",
+      "Trough": "2026-03",
+      "Recovery": "2026-05",
+      "EpisodeMDD": -0.0697154102,
+      "MonthsToTrough": 1,
+      "NetReturnToTrough": -0.0697154102,
+      "TotalCostToTrough": 0.000214433,
+      "KODEX200_Contribution": -0.0387479904,
+      "BOND_Contribution": -0.00283568,
+      "GLD_Contribution": -0.0279173068,
+      "USO_Contribution": 1.788215359e-18,
+      "StockBondCorrelation": null,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "UnderwaterStart": "2012-10",
+      "Trough": "2013-06",
+      "Recovery": "2017-04",
+      "EpisodeMDD": -0.1359901134,
+      "MonthsToTrough": 9,
+      "NetReturnToTrough": -0.1359901134,
+      "TotalCostToTrough": 0.0007718019,
+      "KODEX200_Contribution": -0.0350035268,
+      "BOND_Contribution": 0.0031788614,
+      "GLD_Contribution": -0.1104657431,
+      "USO_Contribution": 9.660886454e-20,
+      "StockBondCorrelation": 0.152688776,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "UnderwaterStart": "2026-06",
+      "Trough": "2026-07",
+      "Recovery": "ongoing",
+      "EpisodeMDD": -0.1155359156,
+      "MonthsToTrough": 2,
+      "NetReturnToTrough": -0.1155359156,
+      "TotalCostToTrough": 0.0002705955,
+      "KODEX200_Contribution": -0.0709291416,
+      "BOND_Contribution": -0.0014170272,
+      "GLD_Contribution": -0.0444330766,
+      "USO_Contribution": -1.271e-07,
+      "StockBondCorrelation": -1.0,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "UnderwaterStart": "2008-07",
+      "Trough": "2008-10",
+      "Recovery": "2008-12",
+      "EpisodeMDD": -0.1061244273,
+      "MonthsToTrough": 4,
+      "NetReturnToTrough": -0.1061244273,
+      "TotalCostToTrough": 0.0022625654,
+      "KODEX200_Contribution": -0.0201220925,
+      "BOND_Contribution": 0.0110846096,
+      "GLD_Contribution": -0.0458716978,
+      "USO_Contribution": -0.05049811,
+      "StockBondCorrelation": -0.6504373098,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "UnderwaterStart": "2009-03",
+      "Trough": "2009-04",
+      "Recovery": "2010-04",
+      "EpisodeMDD": -0.0752369835,
+      "MonthsToTrough": 2,
+      "NetReturnToTrough": -0.0752369835,
+      "TotalCostToTrough": 0.0001617147,
+      "KODEX200_Contribution": 3.467466336e-18,
+      "BOND_Contribution": 0.0134963957,
+      "GLD_Contribution": -0.0899946134,
+      "USO_Contribution": -3.674827885e-19,
+      "StockBondCorrelation": -1.0,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    },
+    {
+      "Strategy": "Stage30_PureODS_QualityCausal",
+      "UnderwaterStart": "2026-03",
+      "Trough": "2026-03",
+      "Recovery": "2026-05",
+      "EpisodeMDD": -0.0697487088,
+      "MonthsToTrough": 1,
+      "NetReturnToTrough": -0.0697487088,
+      "TotalCostToTrough": 0.0002151307,
+      "KODEX200_Contribution": -0.038816969,
+      "BOND_Contribution": -0.0028354538,
+      "GLD_Contribution": -0.0278811554,
+      "USO_Contribution": 1.357912097e-17,
+      "StockBondCorrelation": null,
+      "AverageCrashPressure": null,
+      "AveragePortfolioPressure": null
+    }
+  ],
+  "solver": {
+    "months": 232,
+    "successes": 232,
+    "fallbacks": 0,
+    "maximum_weight_sum_error": 2.220446049250313e-16,
+    "minimum_volatility_slack": -7.198550366904755e-10,
+    "minimum_cdar_slack": -9.812759771410384e-10,
+    "volatility_guard_binding_months": 61,
+    "cdar_guard_binding_months": 29
+  },
+  "unchanged_controls": {
+    "risk_engine": "Stage20 VKOSPI/VIX6 decomposition",
+    "downside_risk_aversion_lambda": 1.0,
+    "annual_volatility_guard": 0.13,
+    "cdar_guard": 0.16,
+    "asset_bounds": [
+      0.0,
+      1.0
+    ],
+    "weight_sum": 1.0,
+    "leverage": 1.0,
+    "stage20_daily_k_ratio_atr_rsi": true
+  },
+  "checks": {
+    "macro_signal_precedes_target": true,
+    "vix6_stress_signal_precedes_target": true,
+    "technical_signal_precedes_target": true,
+    "option_signal_precedes_target": true,
+    "macro_context_precedes_option_signal": true,
+    "expanding_ols_uses_t_minus_1_only": true,
+    "option_order_flow_excluded": true,
+    "erp_is_diagnostic_not_allocation_input": true,
+    "original_vix6_risk_engine_retained": true,
+    "rate_aware_parity_discount_factor_estimated": true,
+    "quality_confidence_matches_product": true,
+    "causal_mu_adjustment_matches_slope_times_score": true,
+    "candidate_changes_only_equity_expected_mu": true,
+    "weights_sum_to_one": true,
+    "weights_are_long_only": true,
+    "no_leverage": true,
+    "static_lambda_equals_one": true,
+    "all_solvers_succeeded": true,
+    "no_hard_asset_cap": true,
+    "no_hard_regime_weights": true,
+    "no_post_optimizer_overlay": true,
+    "no_hyperparameter_or_candidate_search": true,
+    "ablations_are_attribution_not_candidate_selection": true
+  }
+}

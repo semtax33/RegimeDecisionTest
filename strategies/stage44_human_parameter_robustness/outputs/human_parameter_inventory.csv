@@ -1,0 +1,7 @@
+Element,Classification,Test,Reason
+variance coefficient 0.5,mathematically derived,retained,second-order expansion of expected log growth
+downside semivariance coefficient 1,human risk preference,removed in every Stage44 path,clean objective ablation against frozen Stage36
+annual volatility cap 13%,risk-governance choice,remove and 10%-15% sensitivity,not used for model selection
+CDaR limit -16%,risk-governance choice,remove and -12% to -20% sensitivity,not used for model selection
+CDaR confidence 90%,tail-definition choice,"80%, 85%, 90%, 95% sensitivity",not used for model selection
+transaction costs 15bp + 5bp,implementation assumption,retained,"actual return deduction, not a fitted utility weight"

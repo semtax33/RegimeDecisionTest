@@ -1,0 +1,31 @@
+{
+  "name": "ZeroTune_VKOSPI",
+  "purpose": "Measure performance when all performance-selectable hyperparameters are removed.",
+  "selection_procedure": "One predeclared deterministic specification; no candidate grid or parameter search.",
+  "tunable_hyperparameters": [],
+  "removed_layers": [
+    "rolling z-score windows",
+    "three-month macro momentum",
+    "sigmoid scale",
+    "probability smoothing weight",
+    "regime anchor weights",
+    "SLSQP objective and constraints",
+    "logistic tail model and regularization",
+    "tail horizon and loss threshold",
+    "volatility target and leverage",
+    "VKOSPI rolling windows and shock thresholds",
+    "VKOSPI feature mixture",
+    "maximum risk transfer",
+    "defensive destination share",
+    "rebalance band"
+  ],
+  "non_tunable_execution_assumptions": {
+    "asset_universe": ["KODEX200", "BOND", "GLD", "USO"],
+    "macro_frequency": "monthly",
+    "vkospi_frequency": "daily",
+    "signal_timing": "macro target month minus one; VKOSPI through action date minus one day",
+    "domestic_trade_cost": 0.0015,
+    "foreign_weight_change_cost": 0.0005,
+    "leverage": false
+  }
+}

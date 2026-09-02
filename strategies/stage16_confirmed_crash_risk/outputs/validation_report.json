@@ -1,0 +1,352 @@
+{
+  "strategy": "Stage16_ConfirmedCrashLambda",
+  "change": "Replace lambda=1+stress with an economically confirmed crash pressure. Stage14 conditional moments and constraints are unchanged.",
+  "formula": {
+    "financial_confirmation": "min(shock rank, persistence rank)",
+    "timing_confirmation": "mean(5-day rising-direction rank, left-tail rank)",
+    "macro_vulnerability": "P(Slowdown)+P(Stagflation)",
+    "crash_evidence": "equal mean of the three economic blocks",
+    "crash_pressure": "2*max(crash_evidence-0.5, 0)",
+    "lambda": "1+crash_pressure"
+  },
+  "parameter_policy": {
+    "searched_parameters": null,
+    "dead_zone_0_5": "median of a causal percentile and probability majority boundary",
+    "five_days": "one trading week",
+    "persistence": "existing Stage14 one trading month block",
+    "block_weights": "equal; no fitted coefficients"
+  },
+  "performance": [
+    {
+      "Strategy": "Stage14_StaticLambda",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1100410657,
+      "Volatility": 0.1334170745,
+      "Sharpe": 0.8511910492,
+      "Sortino": 1.5712637016,
+      "MDD": -0.2319208295,
+      "Calmar": 0.4744768546,
+      "FinalMultiple": 7.5258383129,
+      "PositiveMonths": 0.6034482759,
+      "AvgTurnover": 0.0298087271,
+      "TotalCost": 0.0209189607
+    },
+    {
+      "Strategy": "Stage14_StressLambda",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1075839965,
+      "Volatility": 0.1312895734,
+      "Sharpe": 0.8459647613,
+      "Sortino": 1.5471846247,
+      "MDD": -0.229737604,
+      "Calmar": 0.468290757,
+      "FinalMultiple": 7.2102278918,
+      "PositiveMonths": 0.6034482759,
+      "AvgTurnover": 0.0290005243,
+      "TotalCost": 0.0203259723
+    },
+    {
+      "Strategy": "Stage16_ConfirmedCrashLambda",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.109318308,
+      "Volatility": 0.1326348442,
+      "Sharpe": 0.8505466723,
+      "Sortino": 1.5625760955,
+      "MDD": -0.2319414269,
+      "Calmar": 0.4713185973,
+      "FinalMultiple": 7.4316655653,
+      "PositiveMonths": 0.6034482759,
+      "AvgTurnover": 0.0296144562,
+      "TotalCost": 0.0207716098
+    },
+    {
+      "Strategy": "Stage14_StaticLambda",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1612760895,
+      "Volatility": 0.1427407304,
+      "Sharpe": 1.1229490811,
+      "Sortino": 2.3289883656,
+      "MDD": -0.1589795003,
+      "Calmar": 1.0144458196,
+      "FinalMultiple": 3.6088007538,
+      "PositiveMonths": 0.6116504854,
+      "AvgTurnover": 0.0128259938,
+      "TotalCost": 0.0043787212
+    },
+    {
+      "Strategy": "Stage14_StressLambda",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1577959613,
+      "Volatility": 0.138740436,
+      "Sharpe": 1.1296785419,
+      "Sortino": 2.3127517467,
+      "MDD": -0.1589795002,
+      "Calmar": 0.9925553988,
+      "FinalMultiple": 3.517020718,
+      "PositiveMonths": 0.6213592233,
+      "AvgTurnover": 0.0117111478,
+      "TotalCost": 0.0040133445
+    },
+    {
+      "Strategy": "Stage16_ConfirmedCrashLambda",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1596227349,
+      "Volatility": 0.1411299373,
+      "Sharpe": 1.1240826716,
+      "Sortino": 2.310946204,
+      "MDD": -0.1589795003,
+      "Calmar": 1.0040460224,
+      "FinalMultiple": 3.5649369869,
+      "PositiveMonths": 0.6116504854,
+      "AvgTurnover": 0.0124258614,
+      "TotalCost": 0.0042435597
+    }
+  ],
+  "stage16_minus_stage14": [
+    {
+      "Period": "full_2007_2026",
+      "CAGR_Delta": 0.0017343115,
+      "Volatility_Delta": 0.0013452708,
+      "Sharpe_Delta": 0.004581911,
+      "Sortino_Delta": 0.0153914708,
+      "MDD_Delta": -0.0022038229,
+      "Calmar_Delta": 0.0030278404,
+      "FinalMultiple_Delta": 0.2214376735
+    },
+    {
+      "Period": "locked_2018_2026",
+      "CAGR_Delta": 0.0018267736,
+      "Volatility_Delta": 0.0023895013,
+      "Sharpe_Delta": -0.0055958702,
+      "Sortino_Delta": -0.0018055427,
+      "MDD_Delta": -0.0,
+      "Calmar_Delta": 0.0114906235,
+      "FinalMultiple_Delta": 0.0479162689
+    }
+  ],
+  "attribution": [
+    {
+      "Strategy": "Stage14_StressLambda",
+      "Period": "full_2007_2026",
+      "risk_off_months": 192,
+      "risk_off_rate": 0.8275862069,
+      "false_positive_months": 110,
+      "false_positive_share_of_actions": 0.5729166667,
+      "non_false_positive_action_precision": 0.4270833333,
+      "crash_months": 24,
+      "caught_crash_months": 18,
+      "missed_crash_months": 6
+    },
+    {
+      "Strategy": "Stage16_ConfirmedCrashLambda",
+      "Period": "full_2007_2026",
+      "risk_off_months": 151,
+      "risk_off_rate": 0.650862069,
+      "false_positive_months": 87,
+      "false_positive_share_of_actions": 0.5761589404,
+      "non_false_positive_action_precision": 0.4238410596,
+      "crash_months": 24,
+      "caught_crash_months": 9,
+      "missed_crash_months": 15
+    },
+    {
+      "Strategy": "Stage14_StressLambda",
+      "Period": "locked_2018_2026",
+      "risk_off_months": 89,
+      "risk_off_rate": 0.8640776699,
+      "false_positive_months": 48,
+      "false_positive_share_of_actions": 0.5393258427,
+      "non_false_positive_action_precision": 0.4606741573,
+      "crash_months": 11,
+      "caught_crash_months": 8,
+      "missed_crash_months": 3
+    },
+    {
+      "Strategy": "Stage16_ConfirmedCrashLambda",
+      "Period": "locked_2018_2026",
+      "risk_off_months": 85,
+      "risk_off_rate": 0.8252427184,
+      "false_positive_months": 49,
+      "false_positive_share_of_actions": 0.5764705882,
+      "non_false_positive_action_precision": 0.4235294118,
+      "crash_months": 11,
+      "caught_crash_months": 7,
+      "missed_crash_months": 4
+    }
+  ],
+  "original_overlay_summary": {
+    "full": {
+      "months": 232,
+      "overlay_cumulative_return": -0.04738609665342719,
+      "average_monthly_overlay_alpha": -0.00020808891560260907,
+      "cagr_change": -0.0024570692326237875,
+      "sharpe_change": -0.005226287902843629,
+      "mdd_change": 0.0021832255228402264,
+      "risk_off_months": 192,
+      "false_positive_months": 110,
+      "crash_months": 24,
+      "caught_crash_months": 18,
+      "missed_crash_months": 6,
+      "diagnostic_crash_threshold": -0.05889576637190068
+    },
+    "locked": {
+      "months": 103,
+      "overlay_cumulative_return": -0.030253854560530535,
+      "average_monthly_overlay_alpha": -0.00029653988540378557,
+      "cagr_change": -0.0034801281756802194,
+      "sharpe_change": 0.0067294607589512,
+      "mdd_change": 2.5112911750113653e-11,
+      "risk_off_months": 89,
+      "false_positive_months": 48,
+      "crash_months": 11,
+      "caught_crash_months": 8,
+      "missed_crash_months": 3,
+      "diagnostic_crash_threshold": -0.058838245089130804
+    }
+  },
+  "confirmed_overlay_summary": {
+    "full": {
+      "months": 232,
+      "overlay_cumulative_return": -0.014459517225475893,
+      "average_monthly_overlay_alpha": -6.260784983577512e-05,
+      "cagr_change": -0.0007227577114397032,
+      "sharpe_change": -0.0006443768568402675,
+      "mdd_change": -2.0597410348210943e-05,
+      "risk_off_months": 151,
+      "false_positive_months": 87,
+      "crash_months": 24,
+      "caught_crash_months": 9,
+      "missed_crash_months": 15,
+      "diagnostic_crash_threshold": -0.05889576637190068
+    },
+    "locked": {
+      "months": 103,
+      "overlay_cumulative_return": -0.014092148717390729,
+      "average_monthly_overlay_alpha": -0.000137404588502796,
+      "cagr_change": -0.0016533545641703729,
+      "sharpe_change": 0.0011335905499507692,
+      "mdd_change": -2.290390099801698e-13,
+      "risk_off_months": 85,
+      "false_positive_months": 49,
+      "crash_months": 11,
+      "caught_crash_months": 7,
+      "missed_crash_months": 4,
+      "diagnostic_crash_threshold": -0.058838245089130804
+    }
+  },
+  "confirmed_direct_signal": {
+    "full": {
+      "months": 232,
+      "lambda_activation_months": 119,
+      "lambda_activation_rate": 0.5129310344827587,
+      "signal_false_positive_months": 66,
+      "signal_false_positive_share": 0.5546218487394958,
+      "signal_caught_crash_months": 7,
+      "crash_months": 24,
+      "maximum_lambda": 1.661995406787363,
+      "average_crash_pressure": 0.12435542565055518
+    },
+    "locked": {
+      "months": 103,
+      "lambda_activation_months": 55,
+      "lambda_activation_rate": 0.5339805825242718,
+      "signal_false_positive_months": 27,
+      "signal_false_positive_share": 0.4909090909090909,
+      "signal_caught_crash_months": 4,
+      "crash_months": 11,
+      "maximum_lambda": 1.6162254858815526,
+      "average_crash_pressure": 0.1476864613760782
+    }
+  },
+  "original_false_positive_context": {
+    "false_positive_months": 110,
+    "normalization_state_false_positives": 22,
+    "false_positives_after_negative_equity_month": 42,
+    "average_false_positive_features": {
+      "level_component": 0.4103105609955656,
+      "shock_component": 0.5217410294999025,
+      "tail_component": 0.48385519728687665,
+      "persistence_component": 0.4700986029338615,
+      "stress_direction_rank": 0.482988316911037,
+      "macro_vulnerability": 0.6965159581049551,
+      "crash_pressure": 0.11317357138431464,
+      "prior_equity_return": 0.013302990081567012,
+      "KODEX200_return": 0.047430043643196605
+    }
+  },
+  "confirmed_false_positive_context": {
+    "false_positive_months": 87,
+    "normalization_state_false_positives": 15,
+    "false_positives_after_negative_equity_month": 32,
+    "average_false_positive_features": {
+      "level_component": 0.4168075953841805,
+      "shock_component": 0.5160170274769801,
+      "tail_component": 0.519270172372192,
+      "persistence_component": 0.4729989848652038,
+      "stress_direction_rank": 0.5056091948245962,
+      "macro_vulnerability": 0.7588032238901256,
+      "crash_pressure": 0.1409457605751844,
+      "prior_equity_return": 0.012561158001416267,
+      "KODEX200_return": 0.0492317615461693
+    }
+  },
+  "concentration": {
+    "months": 232,
+    "months_above_50_percent": 128,
+    "months_above_90_percent": 2,
+    "months_at_effective_100_percent": 0,
+    "maximum_single_asset_weight": 0.9958174002358985,
+    "average_largest_weight": 0.5189666615744136,
+    "average_weights": {
+      "KODEX200": 0.3583539614122469,
+      "BOND": 0.1797605872352496,
+      "GLD": 0.45884017434758717,
+      "USO": 0.0030452770049163884
+    }
+  },
+  "solver": {
+    "months": 232,
+    "successes": 232,
+    "fallbacks": 0,
+    "maximum_weight_sum_error": 2.220446049250313e-16,
+    "minimum_volatility_slack": -9.782401555469278e-10,
+    "minimum_cdar_slack": -9.239524423332313e-10,
+    "volatility_guard_binding_months": 72,
+    "cdar_guard_binding_months": 81
+  },
+  "checks": {
+    "macro_signal_precedes_target": true,
+    "stress_signal_precedes_target": true,
+    "weights_sum_to_one": true,
+    "weights_are_long_only": true,
+    "weights_do_not_exceed_one": true,
+    "no_cash": true,
+    "no_leverage": true,
+    "lambda_is_one_inside_dead_zone": true,
+    "lambda_never_exceeds_two": true,
+    "volatility_guard_respected": true,
+    "cdar_guard_respected": true,
+    "all_slsqp_solves_succeeded": true,
+    "no_fitted_crash_classifier": true,
+    "no_future_return_label_in_signal": true,
+    "no_hyperparameter_search": true
+  }
+}

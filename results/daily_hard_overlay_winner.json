@@ -1,0 +1,12 @@
+{
+  "target_vol": 0.18,
+  "fast_window": 20,
+  "slow_window": 60,
+  "trend_cut": 0.0,
+  "vix_threshold": 35.0,
+  "vix_cut": 0.75,
+  "dd_floor": -0.1,
+  "dd_strength": 1.0,
+  "rebalance_band": 0.05,
+  "fallback": "bond"
+}

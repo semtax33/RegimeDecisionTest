@@ -1,0 +1,824 @@
+{
+  "study": "Stage33_WingAsymIncrementalRiskAndVIX6Context",
+  "decision": "close_wingasym_branch_move_to_independent_information_source",
+  "direct_risk_sensor_pass": false,
+  "vix6_context_reentry_pass": false,
+  "scope": "Final WingAsym branch diagnostic. No trading rule, expected-return adjustment, risk-aversion adjustment, or overlay is implemented.",
+  "fixed_design": {
+    "signal": "near-month OTM2 put IV minus call IV",
+    "risk_targets": [
+      "future_realized_vol_1m",
+      "future_max_drawdown_1m",
+      "future_max_drawdown_3m",
+      "future_left_tail_1m"
+    ],
+    "return_horizons_months": [
+      1,
+      3,
+      6
+    ],
+    "controls": [
+      "vix6_stress_score",
+      "recent_1m_return",
+      "realized_vol_21d",
+      "macro_fragility"
+    ],
+    "interaction": "z(VIX6 stress) multiplied by z(WingAsym)",
+    "left_tail_quantile": 0.05,
+    "minimum_causal_history_months": 60,
+    "significance_level": 0.1,
+    "searched_parameters": null
+  },
+  "gate_rules": {
+    "direct_risk": "Full-control WingAsym coefficient must be positive for at least 3 of 4 targets, positive with p<10% for at least 2, and significant for at least one drawdown or tail target.",
+    "context_reentry": "Full-control VIX6×WingAsym return interaction must be positive at both 3m and 6m and p<10% at either; the causal high-high state must have positive Stage20 defense opportunity cost at both horizons and at least 15 months."
+  },
+  "gate_results": {
+    "direct_risk_sensor": {
+      "positive_sign_at_least_three_of_four_targets": false,
+      "positive_and_significant_at_least_two_targets": false,
+      "at_least_one_significant_drawdown_or_tail_target": false
+    },
+    "vix6_context_reentry": {
+      "positive_return_interaction_at_3m_and_6m": false,
+      "return_interaction_significant_at_3m_or_6m": false,
+      "high_high_opportunity_cost_positive_at_3m_and_6m": true,
+      "high_high_has_at_least_15_causal_months": true
+    },
+    "significant_direct_targets": []
+  },
+  "source_audit": {
+    "stage32": {
+      "iv": {
+        "source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_옵션내재변동성.xlsx",
+        "sheets": [
+          "최근월물",
+          "차근월물"
+        ],
+        "fixed_primary_formula": "near_put_otm2 - near_call_otm2",
+        "first_any_iv_date": "1997-07-07",
+        "last_any_iv_date": "2026-08-28",
+        "daily_rows": 9459,
+        "near_primary_observations": 7158,
+        "next_primary_observations": 7157,
+        "near_primary_missing_share": 0.2432603869330796,
+        "next_primary_missing_share": 0.24336610635373718,
+        "transformations": [
+          "fixed OTM2 put-minus-call difference",
+          "sign reversal only for alignment with bullish-positive Stage30 ODS"
+        ],
+        "winsorization": false,
+        "parameter_search": false
+      },
+      "futures": {
+        "source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_K200선물데이터.xlsx",
+        "sheet": "최근월물",
+        "field": "종가 (P100400)",
+        "first_close_date": "1996-05-03",
+        "last_close_date": "2026-08-28",
+        "observations": 7598,
+        "nonpositive_close_excluded": 0
+      },
+      "first_target_month": "1997-08",
+      "last_target_month": "2026-07",
+      "monthly_rows": 348,
+      "primary_signal": "wing_asym_near = near_put_otm2 - near_call_otm2",
+      "only_secondary_signal": "fear_term_slope = wing_asym_near - wing_asym_next",
+      "horizons_months": [
+        1,
+        3,
+        6
+      ],
+      "deciles": 10,
+      "realized_volatility": "annualized standard deviation of the prior 21 daily log returns; minimum 15 observations",
+      "vix6_control": "frozen Stage20 VIX6/VKOSPI stress_score",
+      "crisis_years": [
+        1998,
+        2008,
+        2020
+      ],
+      "winsorization": false,
+      "parameter_or_bucket_search": false
+    },
+    "daily_equity": {
+      "rows": 6535,
+      "start": "2000-01-04",
+      "end": "2026-08-25",
+      "missing_close": 0,
+      "missing_high": 0,
+      "missing_low": 0,
+      "missing_volume": 0
+    },
+    "risk_price_series": "Stage20 KODEX200 daily close, extended backward with the same KOSPI200 proxy used by the strategy",
+    "risk_target_sign_convention": "realized volatility and maximum drawdown are positive loss/risk magnitudes; left-tail event is one",
+    "left_tail_definition": "target-month KODEX200 return at or below the 5th percentile of returns observed strictly before that month; minimum 60 months",
+    "state_definition": "high/low uses each signal's median estimated strictly from the prior 60 or more observations",
+    "defense_definition": "Stage20 KODEX200 weight below the saved Stage14 comparator weight",
+    "opportunity_cost_definition": "saved Stage14 forward compound return minus saved Stage20 forward compound return; positive means Stage20 defense cost",
+    "parameter_search": false,
+    "study_period": "2007-04 to 2026-07",
+    "residual_wingasym": false,
+    "fear_term_slope": false
+  },
+  "incremental_risk_regressions": [
+    {
+      "Target": "future_realized_vol_1m",
+      "Model": "VIX6PlusWing",
+      "ModelFamily": "OLS",
+      "Observations": 231,
+      "Events": null,
+      "WingStandardizedBeta": 0.0224281906,
+      "WingHACStandardError": 0.0129859271,
+      "WingHACPValue": 0.0841469958,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.3387422612,
+      "NestedWithoutWingFitScore": 0.3168677753,
+      "IncrementalFitScore": 0.021874486,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_realized_vol_1m",
+      "Model": "FullControls",
+      "ModelFamily": "OLS",
+      "Observations": 231,
+      "Events": null,
+      "WingStandardizedBeta": -0.0010844073,
+      "WingHACStandardError": 0.0147198781,
+      "WingHACPValue": 0.941273301,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.5907613794,
+      "NestedWithoutWingFitScore": 0.5925306302,
+      "IncrementalFitScore": -0.0017692508,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_max_drawdown_1m",
+      "Model": "VIX6PlusWing",
+      "ModelFamily": "OLS",
+      "Observations": 231,
+      "Events": null,
+      "WingStandardizedBeta": 0.00722972,
+      "WingHACStandardError": 0.00632341,
+      "WingHACPValue": 0.2529032074,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1268155243,
+      "NestedWithoutWingFitScore": 0.1107738305,
+      "IncrementalFitScore": 0.0160416938,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_max_drawdown_1m",
+      "Model": "FullControls",
+      "ModelFamily": "OLS",
+      "Observations": 231,
+      "Events": null,
+      "WingStandardizedBeta": 0.0003574251,
+      "WingHACStandardError": 0.0074611798,
+      "WingHACPValue": 0.9617922491,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.2379565649,
+      "NestedWithoutWingFitScore": 0.2412936153,
+      "IncrementalFitScore": -0.0033370504,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_max_drawdown_3m",
+      "Model": "VIX6PlusWing",
+      "ModelFamily": "OLS",
+      "Observations": 231,
+      "Events": null,
+      "WingStandardizedBeta": 0.004980645,
+      "WingHACStandardError": 0.0058735097,
+      "WingHACPValue": 0.3964466186,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0884310251,
+      "NestedWithoutWingFitScore": 0.0878397394,
+      "IncrementalFitScore": 0.0005912857,
+      "HACLags": 3
+    },
+    {
+      "Target": "future_max_drawdown_3m",
+      "Model": "FullControls",
+      "ModelFamily": "OLS",
+      "Observations": 231,
+      "Events": null,
+      "WingStandardizedBeta": -0.0010974685,
+      "WingHACStandardError": 0.0052534532,
+      "WingHACPValue": 0.8345230149,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1899814321,
+      "NestedWithoutWingFitScore": 0.1934191204,
+      "IncrementalFitScore": -0.0034376883,
+      "HACLags": 3
+    },
+    {
+      "Target": "future_left_tail_1m",
+      "Model": "VIX6PlusWing",
+      "ModelFamily": "BinomialLogit",
+      "Observations": 232,
+      "Events": 8.0,
+      "WingStandardizedBeta": 0.0565201335,
+      "WingHACStandardError": 0.3050895475,
+      "WingHACPValue": 0.853027054,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "McFaddenPseudoR2",
+      "FitScore": 0.0636091484,
+      "NestedWithoutWingFitScore": 0.062997601,
+      "IncrementalFitScore": 0.0006115474,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_left_tail_1m",
+      "Model": "FullControls",
+      "ModelFamily": "BinomialLogit",
+      "Observations": 232,
+      "Events": 8.0,
+      "WingStandardizedBeta": -0.0681823928,
+      "WingHACStandardError": 0.3426452827,
+      "WingHACPValue": 0.8422719185,
+      "ExpectedDirectRiskSign": "positive",
+      "FitScoreName": "McFaddenPseudoR2",
+      "FitScore": 0.1325914599,
+      "NestedWithoutWingFitScore": 0.131932369,
+      "IncrementalFitScore": 0.0006590909,
+      "HACLags": 1
+    }
+  ],
+  "tail_oos_scores": [
+    {
+      "Model": "HistoricalBaseRate",
+      "OOSMonths": 93,
+      "OOSEvents": 5,
+      "AUC": 0.4022727273,
+      "BrierScore": 0.0517623907,
+      "LogLoss": 0.2239235747,
+      "FirstOOSMonth": "2018-11",
+      "LastOOSMonth": "2026-07"
+    },
+    {
+      "Model": "VIX6Only",
+      "OOSMonths": 93,
+      "OOSEvents": 5,
+      "AUC": 0.5704545455,
+      "BrierScore": 0.0509602833,
+      "LogLoss": 0.2127706806,
+      "FirstOOSMonth": "2018-11",
+      "LastOOSMonth": "2026-07"
+    },
+    {
+      "Model": "VIX6PlusWing",
+      "OOSMonths": 93,
+      "OOSEvents": 5,
+      "AUC": 0.4295454545,
+      "BrierScore": 0.0523090409,
+      "LogLoss": 0.2513961864,
+      "FirstOOSMonth": "2018-11",
+      "LastOOSMonth": "2026-07"
+    },
+    {
+      "Model": "FullControls",
+      "OOSMonths": 93,
+      "OOSEvents": 5,
+      "AUC": 0.4522727273,
+      "BrierScore": 0.0540482908,
+      "LogLoss": 0.2829181493,
+      "FirstOOSMonth": "2018-11",
+      "LastOOSMonth": "2026-07"
+    }
+  ],
+  "context_interaction_regressions": [
+    {
+      "TestFamily": "K200ForwardReturn",
+      "Target": "future_1m_return",
+      "HorizonMonths": 1,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 232,
+      "Events": null,
+      "InteractionStandardizedBeta": 0.0006789252,
+      "InteractionHACStandardError": 0.0043842639,
+      "InteractionHACPValue": 0.8769356196,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0130387439,
+      "NestedWithoutInteractionFitScore": 0.0172006252,
+      "IncrementalFitScore": -0.0041618813,
+      "HACLags": 1
+    },
+    {
+      "TestFamily": "K200ForwardReturn",
+      "Target": "future_1m_return",
+      "HorizonMonths": 1,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 232,
+      "Events": null,
+      "InteractionStandardizedBeta": 0.0008789179,
+      "InteractionHACStandardError": 0.0046122431,
+      "InteractionHACPValue": 0.8488688323,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0106405179,
+      "NestedWithoutInteractionFitScore": 0.0147889462,
+      "IncrementalFitScore": -0.0041484283,
+      "HACLags": 1
+    },
+    {
+      "TestFamily": "K200ForwardReturn",
+      "Target": "future_3m_return",
+      "HorizonMonths": 3,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 230,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.0046877071,
+      "InteractionHACStandardError": 0.0043427055,
+      "InteractionHACPValue": 0.2803898812,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1025886569,
+      "NestedWithoutInteractionFitScore": 0.1042725619,
+      "IncrementalFitScore": -0.001683905,
+      "HACLags": 3
+    },
+    {
+      "TestFamily": "K200ForwardReturn",
+      "Target": "future_3m_return",
+      "HorizonMonths": 3,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 230,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.0121114532,
+      "InteractionHACStandardError": 0.0052958754,
+      "InteractionHACPValue": 0.0221981787,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1683235555,
+      "NestedWithoutInteractionFitScore": 0.1583322206,
+      "IncrementalFitScore": 0.0099913349,
+      "HACLags": 3
+    },
+    {
+      "TestFamily": "K200ForwardReturn",
+      "Target": "future_6m_return",
+      "HorizonMonths": 6,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 227,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.0033190008,
+      "InteractionHACStandardError": 0.0059177259,
+      "InteractionHACPValue": 0.5748946977,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0930953468,
+      "NestedWithoutInteractionFitScore": 0.0967601377,
+      "IncrementalFitScore": -0.003664791,
+      "HACLags": 6
+    },
+    {
+      "TestFamily": "K200ForwardReturn",
+      "Target": "future_6m_return",
+      "HorizonMonths": 6,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 227,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.0134927395,
+      "InteractionHACStandardError": 0.0076739181,
+      "InteractionHACPValue": 0.0787033647,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1741015752,
+      "NestedWithoutInteractionFitScore": 0.1721735386,
+      "IncrementalFitScore": 0.0019280366,
+      "HACLags": 6
+    },
+    {
+      "TestFamily": "Stage20DefenseOpportunityCost",
+      "Target": "stage20_defense_opportunity_cost_1m",
+      "HorizonMonths": 1,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 232,
+      "Events": null,
+      "InteractionStandardizedBeta": 0.0012483521,
+      "InteractionHACStandardError": 0.0007267632,
+      "InteractionHACPValue": 0.085853636,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0347385187,
+      "NestedWithoutInteractionFitScore": 0.025835439,
+      "IncrementalFitScore": 0.0089030797,
+      "HACLags": 1
+    },
+    {
+      "TestFamily": "Stage20DefenseOpportunityCost",
+      "Target": "stage20_defense_opportunity_cost_1m",
+      "HorizonMonths": 1,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 232,
+      "Events": null,
+      "InteractionStandardizedBeta": 0.0014842491,
+      "InteractionHACStandardError": 0.0007230866,
+      "InteractionHACPValue": 0.0401058008,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0332341075,
+      "NestedWithoutInteractionFitScore": 0.0203697478,
+      "IncrementalFitScore": 0.0128643597,
+      "HACLags": 1
+    },
+    {
+      "TestFamily": "Stage20DefenseOpportunityCost",
+      "Target": "stage20_defense_opportunity_cost_3m",
+      "HorizonMonths": 3,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 230,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.0011050091,
+      "InteractionHACStandardError": 0.0014082779,
+      "InteractionHACPValue": 0.4326572107,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1232670443,
+      "NestedWithoutInteractionFitScore": 0.1236729915,
+      "IncrementalFitScore": -0.0004059472,
+      "HACLags": 3
+    },
+    {
+      "TestFamily": "Stage20DefenseOpportunityCost",
+      "Target": "stage20_defense_opportunity_cost_3m",
+      "HorizonMonths": 3,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 230,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.0020827514,
+      "InteractionHACStandardError": 0.0016134874,
+      "InteractionHACPValue": 0.1967597506,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1754950325,
+      "NestedWithoutInteractionFitScore": 0.1680683384,
+      "IncrementalFitScore": 0.0074266941,
+      "HACLags": 3
+    },
+    {
+      "TestFamily": "Stage20DefenseOpportunityCost",
+      "Target": "stage20_defense_opportunity_cost_6m",
+      "HorizonMonths": 6,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 227,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.002840032,
+      "InteractionHACStandardError": 0.0014084356,
+      "InteractionHACPValue": 0.043753528,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.0952198106,
+      "NestedWithoutInteractionFitScore": 0.0914603877,
+      "IncrementalFitScore": 0.0037594229,
+      "HACLags": 6
+    },
+    {
+      "TestFamily": "Stage20DefenseOpportunityCost",
+      "Target": "stage20_defense_opportunity_cost_6m",
+      "HorizonMonths": 6,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 227,
+      "Events": null,
+      "InteractionStandardizedBeta": -0.00309977,
+      "InteractionHACStandardError": 0.0018040444,
+      "InteractionHACPValue": 0.0857539834,
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.1169808647,
+      "NestedWithoutInteractionFitScore": 0.1126808332,
+      "IncrementalFitScore": 0.0043000316,
+      "HACLags": 6
+    },
+    {
+      "TestFamily": "Stage20FalsePositive",
+      "Target": "stage20_false_positive_1m",
+      "HorizonMonths": 1,
+      "Model": "BasicContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 204,
+      "Events": 106.0,
+      "InteractionStandardizedBeta": 0.0685000135,
+      "InteractionHACStandardError": 0.1327665347,
+      "InteractionHACPValue": 0.6058939613,
+      "FitScoreName": "McFaddenPseudoR2",
+      "FitScore": 0.0038004311,
+      "NestedWithoutInteractionFitScore": 0.0028279218,
+      "IncrementalFitScore": 0.0009725093,
+      "HACLags": 1
+    },
+    {
+      "TestFamily": "Stage20FalsePositive",
+      "Target": "stage20_false_positive_1m",
+      "HorizonMonths": 1,
+      "Model": "FullControlsContext",
+      "ExpectedContextSign": "positive",
+      "Observations": 204,
+      "Events": 106.0,
+      "InteractionStandardizedBeta": 0.1104574086,
+      "InteractionHACStandardError": 0.1474925463,
+      "InteractionHACPValue": 0.4539164967,
+      "FitScoreName": "McFaddenPseudoR2",
+      "FitScore": 0.0235087431,
+      "NestedWithoutInteractionFitScore": 0.0211913124,
+      "IncrementalFitScore": 0.0023174307,
+      "HACLags": 1
+    }
+  ],
+  "causal_state_table": [
+    {
+      "State": "VIX6 Low / Wing Low",
+      "Months": 72,
+      "FirstMonth": "2008-05",
+      "LastMonth": "2024-03",
+      "MeanVIX6": 0.3940352362,
+      "MeanWingAsym": 0.0084027778,
+      "MeanFutureRealizedVol1M": 0.1252545672,
+      "MeanFutureMaxDrawdown1M": 0.0336656791,
+      "MeanFutureMaxDrawdown3M": 0.0723312596,
+      "FutureLeftTailRate1M": 0.0138888889,
+      "MeanStage20KODEXWeight": 0.2863415006,
+      "DefenseMonthsVsStage14": 66,
+      "FalsePositiveRateAmongDefense1M": 0.5151515152,
+      "MeanFutureK200Return1M": 0.0044728549,
+      "MeanStage20DefenseOpportunityCost1M": -0.0002007564,
+      "MeanFutureK200Return3M": 0.0015692574,
+      "MeanStage20DefenseOpportunityCost3M": -0.0035030952,
+      "MeanFutureK200Return6M": -0.0026076602,
+      "MeanStage20DefenseOpportunityCost6M": -0.005311405
+    },
+    {
+      "State": "VIX6 High / Wing Low",
+      "Months": 64,
+      "FirstMonth": "2008-07",
+      "LastMonth": "2026-07",
+      "MeanVIX6": 0.5837034585,
+      "MeanWingAsym": 0.011265625,
+      "MeanFutureRealizedVol1M": 0.2222877162,
+      "MeanFutureMaxDrawdown1M": 0.0583511908,
+      "MeanFutureMaxDrawdown3M": 0.1015149155,
+      "FutureLeftTailRate1M": 0.046875,
+      "MeanStage20KODEXWeight": 0.2254471851,
+      "DefenseMonthsVsStage14": 55,
+      "FalsePositiveRateAmongDefense1M": 0.4545454545,
+      "MeanFutureK200Return1M": 0.0104253976,
+      "MeanStage20DefenseOpportunityCost1M": 0.0017111157,
+      "MeanFutureK200Return3M": 0.0391433792,
+      "MeanStage20DefenseOpportunityCost3M": 0.0091196958,
+      "MeanFutureK200Return6M": 0.0867829036,
+      "MeanStage20DefenseOpportunityCost6M": 0.0160001419
+    },
+    {
+      "State": "VIX6 Low / Wing High",
+      "Months": 28,
+      "FirstMonth": "2009-09",
+      "LastMonth": "2024-07",
+      "MeanVIX6": 0.404953054,
+      "MeanWingAsym": 0.0432142857,
+      "MeanFutureRealizedVol1M": 0.1569209857,
+      "MeanFutureMaxDrawdown1M": 0.0502690175,
+      "MeanFutureMaxDrawdown3M": 0.0887414402,
+      "FutureLeftTailRate1M": 0.0357142857,
+      "MeanStage20KODEXWeight": 0.2533542608,
+      "DefenseMonthsVsStage14": 28,
+      "FalsePositiveRateAmongDefense1M": 0.4642857143,
+      "MeanFutureK200Return1M": -0.0080547297,
+      "MeanStage20DefenseOpportunityCost1M": -0.0004525126,
+      "MeanFutureK200Return3M": -0.003443647,
+      "MeanStage20DefenseOpportunityCost3M": 0.0008837216,
+      "MeanFutureK200Return6M": 0.0053465993,
+      "MeanStage20DefenseOpportunityCost6M": -0.0012159998
+    },
+    {
+      "State": "VIX6 High / Wing High",
+      "Months": 58,
+      "FirstMonth": "2008-02",
+      "LastMonth": "2026-06",
+      "MeanVIX6": 0.6187861545,
+      "MeanWingAsym": 0.0561551724,
+      "MeanFutureRealizedVol1M": 0.2505371587,
+      "MeanFutureMaxDrawdown1M": 0.0616874666,
+      "MeanFutureMaxDrawdown3M": 0.1094640704,
+      "FutureLeftTailRate1M": 0.0344827586,
+      "MeanStage20KODEXWeight": 0.1866406067,
+      "DefenseMonthsVsStage14": 45,
+      "FalsePositiveRateAmongDefense1M": 0.6,
+      "MeanFutureK200Return1M": 0.0239149266,
+      "MeanStage20DefenseOpportunityCost1M": 0.0041520153,
+      "MeanFutureK200Return3M": 0.0769120601,
+      "MeanStage20DefenseOpportunityCost3M": 0.0122739723,
+      "MeanFutureK200Return6M": 0.1503503142,
+      "MeanStage20DefenseOpportunityCost6M": 0.0264333693
+    }
+  ],
+  "frozen_stage20_performance": [
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0939740153,
+      "Volatility": 0.0959808832,
+      "Sharpe": 0.9865029238,
+      "Sortino": 1.8566616292,
+      "MDD": -0.1401480684,
+      "Calmar": 0.6705337891,
+      "FinalMultiple": 5.6772165405,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0268096176,
+      "TotalCost": 0.0186033023
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0664933375,
+      "Volatility": 0.0907117841,
+      "Sharpe": 0.7562604472,
+      "Sortino": 1.3107717092,
+      "MDD": -0.1401480684,
+      "Calmar": 0.4744506168,
+      "FinalMultiple": 1.997791114,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0438158722,
+      "TotalCost": 0.0166792906
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1293924988,
+      "Volatility": 0.1018606281,
+      "Sharpe": 1.2502705269,
+      "Sortino": 2.5848541994,
+      "MDD": -0.1141902445,
+      "Calmar": 1.1331309376,
+      "FinalMultiple": 2.8417468176,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0055105221,
+      "TotalCost": 0.0019240117
+    }
+  ],
+  "checks": {
+    "source_files_unchanged": true,
+    "stage20_to_stage32_code_and_results_unchanged": true,
+    "signals_strictly_precede_target_month": true,
+    "tail_threshold_uses_only_prior_returns": true,
+    "state_cutoffs_use_only_prior_signal_history": true,
+    "fixed_5_percent_tail_and_60_month_history": true,
+    "no_threshold_window_bucket_or_sign_search": true,
+    "no_residual_wingasym": true,
+    "fear_term_slope_retired": true,
+    "no_strategy_weights_or_expected_returns_changed": true
+  },
+  "source_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_옵션내재변동성.xlsx": {
+      "sha256": "967f0a612eb8ccde36e47a5ad870e1a27c58bd43685dc9234ac4f7b46e403d6c",
+      "bytes": 1575666,
+      "last_write_time_ns": 1787984271153603300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_K200선물데이터.xlsx": {
+      "sha256": "4d37798c636a4716b7a7d03b71549d7195067e35718635da0db2420f019d0818",
+      "bytes": 5070236,
+      "last_write_time_ns": 1787983521685350100
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv": {
+      "sha256": "756ff16b888178004050a1d5d6d2077d07fe6212c3fdb5afb3528a9f05fdb657",
+      "bytes": 7698389,
+      "last_write_time_ns": 1787655015268568000
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db": {
+      "sha256": "e21ac5fcf6694738fecb87d92b6acee4095687b8c12d24e7b529f26913b9f94a",
+      "bytes": 10903552,
+      "last_write_time_ns": 1787125530000000000
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice.csv": {
+      "sha256": "8687e09198e4951716fa87e301db7f98567fc681dd33c86c8c24d4ec6de0d497",
+      "bytes": 113611559,
+      "last_write_time_ns": 1787869403560228800
+    }
+  },
+  "source_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_옵션내재변동성.xlsx": {
+      "sha256": "967f0a612eb8ccde36e47a5ad870e1a27c58bd43685dc9234ac4f7b46e403d6c",
+      "bytes": 1575666,
+      "last_write_time_ns": 1787984271153603300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_K200선물데이터.xlsx": {
+      "sha256": "4d37798c636a4716b7a7d03b71549d7195067e35718635da0db2420f019d0818",
+      "bytes": 5070236,
+      "last_write_time_ns": 1787983521685350100
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv": {
+      "sha256": "756ff16b888178004050a1d5d6d2077d07fe6212c3fdb5afb3528a9f05fdb657",
+      "bytes": 7698389,
+      "last_write_time_ns": 1787655015268568000
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db": {
+      "sha256": "e21ac5fcf6694738fecb87d92b6acee4095687b8c12d24e7b529f26913b9f94a",
+      "bytes": 10903552,
+      "last_write_time_ns": 1787125530000000000
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice.csv": {
+      "sha256": "8687e09198e4951716fa87e301db7f98567fc681dd33c86c8c24d4ec6de0d497",
+      "bytes": 113611559,
+      "last_write_time_ns": 1787869403560228800
+    }
+  },
+  "frozen_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\daily_technical_confidence_slsqp.py": {
+      "sha256": "fd24ae62eeba1abd1e5ba13f96bd7cbdca3cb4d2b2d7bac13ece7cf3d6f92736",
+      "bytes": 40129,
+      "last_write_time_ns": 1787999468405997800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage30_abnormal_surface_erp\\abnormal_surface_erp_slsqp.py": {
+      "sha256": "01d5ba3937f7f58c3cf3b982a2e8fb608ad3187b779222a272190ecd288bf948",
+      "bytes": 60167,
+      "last_write_time_ns": 1788005000321902100
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage31_long_iv_state_dependence\\long_iv_state_dependence_slsqp.py": {
+      "sha256": "39e2eaa1fb8e31850bebae86ae02da2ce4004b8ce3b9765418d4bd77f20f484e",
+      "bytes": 39177,
+      "last_write_time_ns": 1788009081203624600
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage32_fear_premium_validation\\fear_premium_validation.py": {
+      "sha256": "fb2d1aab914ebf4b59b52d9df1ebef9a269a10526a7026bd29f184c02edc12cb",
+      "bytes": 34561,
+      "last_write_time_ns": 1788010024320307700
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\daily_technical_confidence_monthly.csv": {
+      "sha256": "183fbd4b7b91fc43fa111e78c0fd10b84bc668638efebe35a4a31bb7b9755463",
+      "bytes": 445768,
+      "last_write_time_ns": 1787999495298758300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\stage14_static_recomputed_monthly.csv": {
+      "sha256": "6bba1f2a31d080dfe6184dbb996dbd6057771ea9abc7e0f40645245c784eebf4",
+      "bytes": 216251,
+      "last_write_time_ns": 1787999495258948800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage32_fear_premium_validation\\outputs\\monthly_fear_premium_research_frame.csv": {
+      "sha256": "f2e82ff4c728bed71506358e543ea7584eda8ed275a5f17cb2414ef0efb71107",
+      "bytes": 102926,
+      "last_write_time_ns": 1788010132242771500
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage32_fear_premium_validation\\outputs\\validation_report.json": {
+      "sha256": "61a35346affb3229c0db91abe63bff366fc31d7584bffbc8f70d2f9683a0c41e",
+      "bytes": 47421,
+      "last_write_time_ns": 1788010133276849400
+    }
+  },
+  "frozen_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\daily_technical_confidence_slsqp.py": {
+      "sha256": "fd24ae62eeba1abd1e5ba13f96bd7cbdca3cb4d2b2d7bac13ece7cf3d6f92736",
+      "bytes": 40129,
+      "last_write_time_ns": 1787999468405997800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage30_abnormal_surface_erp\\abnormal_surface_erp_slsqp.py": {
+      "sha256": "01d5ba3937f7f58c3cf3b982a2e8fb608ad3187b779222a272190ecd288bf948",
+      "bytes": 60167,
+      "last_write_time_ns": 1788005000321902100
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage31_long_iv_state_dependence\\long_iv_state_dependence_slsqp.py": {
+      "sha256": "39e2eaa1fb8e31850bebae86ae02da2ce4004b8ce3b9765418d4bd77f20f484e",
+      "bytes": 39177,
+      "last_write_time_ns": 1788009081203624600
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage32_fear_premium_validation\\fear_premium_validation.py": {
+      "sha256": "fb2d1aab914ebf4b59b52d9df1ebef9a269a10526a7026bd29f184c02edc12cb",
+      "bytes": 34561,
+      "last_write_time_ns": 1788010024320307700
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\daily_technical_confidence_monthly.csv": {
+      "sha256": "183fbd4b7b91fc43fa111e78c0fd10b84bc668638efebe35a4a31bb7b9755463",
+      "bytes": 445768,
+      "last_write_time_ns": 1787999495298758300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\stage14_static_recomputed_monthly.csv": {
+      "sha256": "6bba1f2a31d080dfe6184dbb996dbd6057771ea9abc7e0f40645245c784eebf4",
+      "bytes": 216251,
+      "last_write_time_ns": 1787999495258948800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage32_fear_premium_validation\\outputs\\monthly_fear_premium_research_frame.csv": {
+      "sha256": "f2e82ff4c728bed71506358e543ea7584eda8ed275a5f17cb2414ef0efb71107",
+      "bytes": 102926,
+      "last_write_time_ns": 1788010132242771500
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage32_fear_premium_validation\\outputs\\validation_report.json": {
+      "sha256": "61a35346affb3229c0db91abe63bff366fc31d7584bffbc8f70d2f9683a0c41e",
+      "bytes": 47421,
+      "last_write_time_ns": 1788010133276849400
+    }
+  }
+}

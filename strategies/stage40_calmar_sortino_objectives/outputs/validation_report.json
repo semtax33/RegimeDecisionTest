@@ -1,0 +1,319 @@
+{
+  "stage": 40,
+  "base": "Stage36_GVZ_OVXAssetRisk",
+  "change_scope": "SLSQP objective only",
+  "objective_definitions": {
+    "calmar": "expected causal CAGR after estimated transaction cost divided by absolute MDD of the strictly prior fixed-weight return path",
+    "sortino": "expected annual arithmetic return after estimated transaction cost divided by annualized downside deviation of the strictly prior fixed-weight return path"
+  },
+  "preserved": {
+    "stage36_mu_sigma_and_gvz_ovx": true,
+    "long_only_unlevered_sum_one": true,
+    "annual_volatility_guard": 0.13,
+    "historical_cdar_guard": 0.16,
+    "cdar_confidence": 0.9,
+    "cost_model": "Stage36 unchanged",
+    "single_asset_majority_cap": false
+  },
+  "anti_overfit": {
+    "objective_candidates_prespecified": [
+      "calmar",
+      "sortino"
+    ],
+    "ratio_hyperparameter_grid_search": false,
+    "future_returns_in_objective": false,
+    "realized_sharpe_used_only_as_post_backtest_gate": true
+  },
+  "stage36_frozen_files_unchanged": true,
+  "checks": {
+    "Stage40_CausalCalmar": {
+      "months": 232,
+      "all_solver_success": true,
+      "objective_restart_months": 3,
+      "fallback_months": 4,
+      "max_sum_error": 2.220446049250313e-16,
+      "minimum_weight": 0.0,
+      "maximum_weight": 0.9945964828479681,
+      "minimum_volatility_slack": 0.020437457460723757,
+      "minimum_cdar_slack": 0.10421324844626469,
+      "all_signal_months_precede_target": true
+    },
+    "Stage40_CausalSortino": {
+      "months": 232,
+      "all_solver_success": true,
+      "objective_restart_months": 3,
+      "fallback_months": 5,
+      "max_sum_error": 3.3306690738754696e-16,
+      "minimum_weight": 0.0,
+      "maximum_weight": 0.9993675513855751,
+      "minimum_volatility_slack": 0.028071679717368125,
+      "minimum_cdar_slack": 0.08907849263138493,
+      "all_signal_months_precede_target": true
+    }
+  },
+  "sharpe_gates": {
+    "Stage40_CausalCalmar": {
+      "sharpe_floor": 1.0,
+      "period_sharpes": {
+        "full_2007_2026": 1.2215186469258696,
+        "common_2010_2026": 1.1049096877231022,
+        "locked_2018_2026": 0.9448971106395906
+      },
+      "full_sharpe_at_least_one": true,
+      "all_reported_periods_sharpe_at_least_one": false,
+      "constraints_and_solver_pass": true,
+      "optimized_realized_metric": "Calmar",
+      "full_realized_metric": 0.6435444312417715,
+      "stage36_full_realized_metric": 0.8462412301175328,
+      "optimized_realized_metric_improves_vs_stage36": false,
+      "meets_user_full_sharpe_requirement": true,
+      "promote_over_stage36": false
+    },
+    "Stage40_CausalSortino": {
+      "sharpe_floor": 1.0,
+      "period_sharpes": {
+        "full_2007_2026": 1.0474003920988488,
+        "common_2010_2026": 0.9098963853909773,
+        "locked_2018_2026": 0.5711608473709658
+      },
+      "full_sharpe_at_least_one": true,
+      "all_reported_periods_sharpe_at_least_one": false,
+      "constraints_and_solver_pass": true,
+      "optimized_realized_metric": "Sortino",
+      "full_realized_metric": 1.7481227494035068,
+      "stage36_full_realized_metric": 2.2018564576729873,
+      "optimized_realized_metric_improves_vs_stage36": false,
+      "meets_user_full_sharpe_requirement": true,
+      "promote_over_stage36": false
+    }
+  },
+  "full_sharpe_requirement_eligible_strategies": [
+    "Stage40_CausalCalmar",
+    "Stage40_CausalSortino"
+  ],
+  "promoted_strategies": [],
+  "selected_strategy": "Stage36_Frozen",
+  "performance": [
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1049938875,
+      "Volatility": 0.0947174638,
+      "Sharpe": 1.1049112901,
+      "Sortino": 2.2018564577,
+      "MDD": -0.1240708722,
+      "Calmar": 0.8462412301,
+      "FinalMultiple": 6.8911377181,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0369775517,
+      "TotalCost": 0.0265354519
+    },
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0923177929,
+      "Volatility": 0.087193443,
+      "Sharpe": 1.0592360313,
+      "Sortino": 2.0494518521,
+      "MDD": -0.1240708722,
+      "Calmar": 0.7440730548,
+      "FinalMultiple": 4.3246840303,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0279465684,
+      "TotalCost": 0.0180913888
+    },
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1262562043,
+      "Volatility": 0.1017821984,
+      "Sharpe": 1.2235051573,
+      "Sortino": 2.5377845953,
+      "MDD": -0.119311114,
+      "Calmar": 1.0582099189,
+      "FinalMultiple": 2.7747206697,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0261551454,
+      "TotalCost": 0.0086887009
+    },
+    {
+      "Strategy": "Stage40_CausalCalmar",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0440409926,
+      "Volatility": 0.0358700517,
+      "Sharpe": 1.2215186469,
+      "Sortino": 2.1566436578,
+      "MDD": -0.0684350458,
+      "Calmar": 0.6435444312,
+      "FinalMultiple": 2.3007670587,
+      "PositiveMonths": 0.6982758621,
+      "AvgTurnover": 0.0126027576,
+      "TotalCost": 0.0078430873
+    },
+    {
+      "Strategy": "Stage40_CausalCalmar",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0394122978,
+      "Volatility": 0.0356132818,
+      "Sharpe": 1.1049096877,
+      "Sortino": 1.8168486539,
+      "MDD": -0.0684350458,
+      "Calmar": 0.5759081089,
+      "FinalMultiple": 1.8984472181,
+      "PositiveMonths": 0.7035175879,
+      "AvgTurnover": 0.0076222404,
+      "TotalCost": 0.0049597021
+    },
+    {
+      "Strategy": "Stage40_CausalCalmar",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.0424487906,
+      "Volatility": 0.0451434368,
+      "Sharpe": 0.9448971106,
+      "Sortino": 1.4959574312,
+      "MDD": -0.0684350458,
+      "Calmar": 0.6202785441,
+      "FinalMultiple": 1.4287944821,
+      "PositiveMonths": 0.6893203883,
+      "AvgTurnover": 0.0109030354,
+      "TotalCost": 0.0036329278
+    },
+    {
+      "Strategy": "Stage40_CausalSortino",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0372955642,
+      "Volatility": 0.0356165435,
+      "Sharpe": 1.0474003921,
+      "Sortino": 1.7481227494,
+      "MDD": -0.0913714921,
+      "Calmar": 0.408175059,
+      "FinalMultiple": 2.0297789006,
+      "PositiveMonths": 0.6810344828,
+      "AvgTurnover": 0.00998561,
+      "TotalCost": 0.005789872
+    },
+    {
+      "Strategy": "Stage40_CausalSortino",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0322393324,
+      "Volatility": 0.0356145655,
+      "Sharpe": 0.9098963854,
+      "Sortino": 1.4221382751,
+      "MDD": -0.0913714921,
+      "Calmar": 0.3528379773,
+      "FinalMultiple": 1.6924857592,
+      "PositiveMonths": 0.6834170854,
+      "AvgTurnover": 0.0031161657,
+      "TotalCost": 0.0019550563
+    },
+    {
+      "Strategy": "Stage40_CausalSortino",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.0251983826,
+      "Volatility": 0.04541102,
+      "Sharpe": 0.5711608474,
+      "Sortino": 0.8567530434,
+      "MDD": -0.0913714921,
+      "Calmar": 0.2757794808,
+      "FinalMultiple": 1.2381347547,
+      "PositiveMonths": 0.6019417476,
+      "AvgTurnover": 0.004562032,
+      "TotalCost": 0.001461132
+    }
+  ],
+  "input_audits": {
+    "asset_vol": {
+      "gvz_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\GVZCLS.csv",
+      "ovx_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\OVXCLS.csv",
+      "daily_union_rows": 5036,
+      "first_union_date": "2007-05-10",
+      "last_union_date": "2026-08-27",
+      "gvz_first_valid": "2008-06-03",
+      "gvz_last_valid": "2026-08-27",
+      "gvz_valid_observations": 4590,
+      "ovx_first_valid": "2007-05-10",
+      "ovx_last_valid": "2026-08-27",
+      "ovx_valid_observations": 4858,
+      "minimum_prior_observations": 252,
+      "prehistory_policy": "neutral variance multiplier 1.0; no backfill",
+      "directional_mu_effect": false,
+      "winsorization": false,
+      "parameter_grid": false
+    },
+    "returns": "              KODEX200    BOND            GLD            USO\nmonth                                                       \n2000-01    9692.569130     NaN            NaN            NaN\n2000-02    8977.250375     NaN            NaN            NaN\n2000-03    8149.417941     NaN            NaN            NaN\n2000-04    8112.161756     NaN            NaN            NaN\n2000-05    6865.569800     NaN            NaN            NaN\n...                ...     ...            ...            ...\n2026-04   79418.443045  198.97  653948.530884  187705.779231\n2026-05  102320.600161  197.78  621162.563613  211564.654902\n2026-06  134724.294640  195.38  617593.406318  204402.832167\n2026-07  139384.758222  194.27  574859.499430  161907.178694\n2026-08  101980.000000  194.62  531352.560692  173432.558483\n\n[320 rows x 4 columns]",
+    "macro": "             GDP_YoY  Export_YoY       BSI   CPI_YoY   PPI_YoY  ImportPrice_YoY\n1960-07-31       NaN         NaN       NaN       NaN       NaN              NaN\n1960-08-31       NaN         NaN       NaN       NaN       NaN              NaN\n1960-09-30       NaN         NaN       NaN       NaN       NaN              NaN\n1960-10-31       NaN         NaN       NaN       NaN       NaN              NaN\n1960-11-30       NaN         NaN       NaN       NaN       NaN              NaN\n...              ...         ...       ...       ...       ...              ...\n2026-04-30  0.281050    0.995066  0.202509  0.242739  0.587828         0.857143\n2026-05-31  0.281330    0.998361  0.325000  0.318370  0.718232         0.858129\n2026-06-30  0.281609    0.998366  0.519573  0.385517  0.771034         0.887443\n2026-07-31  0.272321    0.995114  0.464539  0.396006  0.770661         0.860092\n2026-08-31       NaN         NaN  0.554770  0.350757       NaN         0.843511\n\n[794 rows x 6 columns]",
+    "market": {
+      "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+      "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+      "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+      "foreign_prices_converted_to_krw": true,
+      "bond_atr_uses_close_to_close_proxy": true,
+      "kodex_volume_segments_normalized_separately": true,
+      "assets": {
+        "KODEX200": {
+          "rows": 6535,
+          "start": "2000-01-04",
+          "end": "2026-08-25",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        },
+        "BOND": {
+          "rows": 7469,
+          "start": "2006-03-02",
+          "end": "2026-08-12",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 7469
+        },
+        "GLD": {
+          "rows": 5474,
+          "start": "2004-11-18",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        },
+        "USO": {
+          "rows": 5125,
+          "start": "2006-04-10",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,98 @@
+D:\Programming\python_example\Arcana\.venv-llama\Lib\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+                           Strategy           Period   Start     End  Months     CAGR  Volatility   Sharpe  Sortino       MDD   Calmar  FinalMultiple  PositiveMonths  AvgTurnover
+              StrictHard100_Monthly   full_2007_2026 2007-04 2026-07   232.0 0.116596    0.177788 0.708636 1.348363 -0.256578 0.454427       8.433149        0.637931     0.129310
+       StrictHard100_ZeroTuneVKOSPI   full_2007_2026 2007-04 2026-07   232.0 0.079348    0.136090 0.628269 1.184552 -0.257815 0.307769       4.376425        0.629310     0.251149
+       StrictHard40_SLSQP60_Monthly   full_2007_2026 2007-04 2026-07   232.0 0.096000    0.091669 1.048898 1.926833 -0.114486 0.838527       5.883930        0.685345     0.062969
+StrictHard40_SLSQP60_ZeroTuneVKOSPI   full_2007_2026 2007-04 2026-07   232.0 0.073517    0.079532 0.933405 1.831272 -0.127216 0.577888       3.941280        0.646552     0.201125
+                    ZeroTune_VKOSPI   full_2007_2026 2007-04 2026-07   232.0 0.071369    0.086113 0.844699 1.617149 -0.140129 0.509306       3.791578        0.655172     0.285057
+              Current_Robust_VKOSPI   full_2007_2026 2007-04 2026-07   232.0 0.156366    0.137158 1.132529 2.282423 -0.129588 1.206636      16.589733        0.607759     0.151503
+              StrictHard100_Monthly locked_2018_2026 2018-01 2026-07   103.0 0.112885    0.176216 0.693974 1.332278 -0.218197 0.517354       2.504374        0.553398     0.087379
+       StrictHard100_ZeroTuneVKOSPI locked_2018_2026 2018-01 2026-07   103.0 0.051124    0.079244 0.669198 1.254727 -0.135872 0.376263       1.534131        0.543689     0.184121
+       StrictHard40_SLSQP60_Monthly locked_2018_2026 2018-01 2026-07   103.0 0.101868    0.083888 1.202389 2.146870 -0.107422 0.948299       2.299384        0.728155     0.046487
+StrictHard40_SLSQP60_ZeroTuneVKOSPI locked_2018_2026 2018-01 2026-07   103.0 0.062424    0.052310 1.186261 2.252442 -0.115035 0.542647       1.681598        0.679612     0.175334
+                    ZeroTune_VKOSPI locked_2018_2026 2018-01 2026-07   103.0 0.070386    0.061835 1.133647 2.027987 -0.140129 0.502294       1.792898        0.689320     0.278653
+              Current_Robust_VKOSPI locked_2018_2026 2018-01 2026-07   103.0 0.209078    0.133572 1.496919 3.581010 -0.097604 2.142103       5.101920        0.621359     0.158864
+{
+  "strategy": "StrictHard40_SLSQP60_Monthly",
+  "definition": {
+    "macro": "Zero-Tune expanding empirical macro ranks",
+    "hard_mapping": {
+      "Goldilocks": {
+        "KODEX200": 1.0,
+        "BOND": 0.0,
+        "GLD": 0.0,
+        "USO": 0.0
+      },
+      "Overheating": {
+        "KODEX200": 0.0,
+        "BOND": 0.0,
+        "GLD": 0.0,
+        "USO": 1.0
+      },
+      "Slowdown": {
+        "KODEX200": 0.0,
+        "BOND": 1.0,
+        "GLD": 0.0,
+        "USO": 0.0
+      },
+      "Stagflation": {
+        "KODEX200": 0.0,
+        "BOND": 0.0,
+        "GLD": 1.0,
+        "USO": 0.0
+      }
+    },
+    "base": {
+      "strict_hard_share": 0.4,
+      "slsqp_share": 0.6
+    },
+    "later_current_layers": {
+      "tail_logistic": false,
+      "vol_target": false,
+      "leverage": false,
+      "robust_vkospi_features": false,
+      "current_overlay_policy": false,
+      "frequency_reconciliation": false
+    },
+    "vkospi": "Original Zero-Tune expanding percentile and proportional equal bond/gold transfer"
+  },
+  "full_period": {
+    "Months": 232.0,
+    "CAGR": 0.09599958285278087,
+    "Sharpe": 1.04889762675527,
+    "MDD": -0.11448602277520559,
+    "Calmar": 0.8385266648774845
+  },
+  "locked_period": {
+    "Months": 103.0,
+    "CAGR": 0.10186783034738922,
+    "Sharpe": 1.2023889742182223,
+    "MDD": -0.10742166318247648,
+    "Calmar": 0.9482987632983023
+  },
+  "zero_tune_vkospi_overlay_variant": {
+    "full_period": {
+      "Months": 232.0,
+      "CAGR": 0.07351675575924244,
+      "Sharpe": 0.9334052390017522,
+      "MDD": -0.1272163382188587,
+      "Calmar": 0.5778876894944633
+    },
+    "locked_period": {
+      "Months": 103.0,
+      "CAGR": 0.06242363646755433,
+      "Sharpe": 1.1862613603350023,
+      "MDD": -0.11503536054093266,
+      "Calmar": 0.5426473753289306
+    }
+  },
+  "checks": {
+    "hard_weights_are_binary": true,
+    "one_asset_has_100_percent_each_month": true,
+    "macro_signal_precedes_target_month": true,
+    "vkospi_signal_precedes_action_date": true,
+    "asset_weights_unlevered_before_daily_overlay": true
+  }
+}
+saved D:\Programming\python_example\RegimeDecisionTest\strategies\stage09_strict_hard_slsqp\outputs

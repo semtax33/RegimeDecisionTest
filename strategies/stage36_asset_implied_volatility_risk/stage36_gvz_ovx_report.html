@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stage36 GVZ·OVX 자산별 위험 오버레이</title>
+<style>
+body{margin:0;background:#f3f6f8;color:#182534;font:16px/1.72 "Malgun Gothic",sans-serif}
+header{padding:48px 7%;background:linear-gradient(120deg,#15344f,#176f69);color:white}
+main{max-width:1120px;margin:24px auto;padding:0 20px}section{background:white;border:1px solid #dce3e8;border-radius:14px;padding:27px;margin:18px 0}
+h1{font-size:2.5rem;margin:.2rem 0}h2{color:#173f5d;border-bottom:2px solid #e5edf2;padding-bottom:8px}
+.note{padding:14px 17px;background:#edf7f4;border-left:5px solid #177b6d}.warn{padding:14px 17px;background:#fff6e5;border-left:5px solid #c98918}
+table{border-collapse:collapse;width:100%;font-size:.86rem;display:block;overflow:auto}th,td{padding:9px;border-bottom:1px solid #e2e7eb;text-align:right;white-space:nowrap}th{background:#edf3f6}td:first-child,th:first-child{text-align:left}
+code{background:#edf1f4;padding:2px 5px;border-radius:4px}pre{background:#12202d;color:#e5eef5;padding:16px;border-radius:9px;overflow:auto}
+img{width:100%;border:1px solid #dce3e8;border-radius:10px}.metric{font-size:1.35rem;font-weight:bold;color:#176f69}
+</style></head><body>
+<header><div>RegimeDecisionTest · Stage36</div><h1>GVZ·OVX 자산별 변동성 위험 오버레이</h1>
+<p>Stage35를 동결하고 GVZ는 GLD, OVX는 USO 공분산 축에만 연결한 비레버리지 인과적 월간 전략</p></header><main>
+<section><h2>1. 최종 판정</h2><p class="metric">Stage36 결합전략 승격</p>
+<p>promote_stage36_gvz_ovx_asset_risk</p><div class="note">방향성 기대수익 μ는 전혀 수정하지 않았다. 252개 과거 유효관측 전에는 multiplier=1로 Stage35와 동일하며, 활성화 이후에만 해당 자산의 variance와 공분산 축을 1+causal rank만큼 확대한다.</div></section>
+<section><h2>2. 핵심 성과 차이</h2>
+<ul><li>전체 구간: CAGR 10.608% → 10.499%, Sharpe 1.057 → 1.105, MDD -13.743% → -12.407%</li>
+<li>2010 공통구간: CAGR 9.653% → 9.232%, Sharpe 1.033 → 1.059, MDD -13.743% → -12.407%</li>
+<li>2018 잠금구간: CAGR 13.821% → 12.626%, Sharpe 1.251 → 1.224, MDD -11.984% → -11.931%</li></ul>
+<p class="warn">전체·2010 공통구간에서는 위험효율이 개선됐지만, 2018 이후에는 MDD가 0.052%p 완화된 대신 CAGR과 Sharpe가 낮아졌다. 모든 시기에서 Stage35를 지배한다고 해석하면 안 된다.</p></section>
+<section><h2>3. 데이터와 활성화</h2>
+<ul><li>GVZ: 2008-06-03 ~ 2026-08-27, 4,590개</li>
+<li>OVX: 2007-05-10 ~ 2026-08-27, 4,858개</li>
+<li>GVZ 최초 활성 target: 2009-07</li>
+<li>OVX 최초 활성 target: 2008-06</li></ul>
+<p>출시 전 값은 0이나 평균으로 채우지 않았고, 실현변동성으로 역산하지도 않았다.</p>
+<img src="outputs/sensor_history.png" alt="GVZ OVX history"></section>
+<section><h2>4. 정확한 위험 매핑</h2>
+<pre>q_GVZ,t = causal expanding rank(GVZ_t), after 252 prior observations
+Var_GLD* = Var_GLD × (1 + q_GVZ,t)
+
+q_OVX,t = causal expanding rank(OVX_t), after 252 prior observations
+Var_USO* = Var_USO × (1 + q_OVX,t)
+
+μ_GLD adjustment = 0
+μ_USO adjustment = 0</pre>
+<p>공분산 행렬에는 대각행렬 D의 GLD·USO 위치에 각각 sqrt(1+q)를 넣고 DΣD를 계산한다. 따라서 해당 자산의 분산뿐 아니라 다른 자산과의 공분산도 일관되게 조정된다.</p></section>
+<section><h2>5. 비교 실험</h2>
+<p>Stage35, GVZ-only, OVX-only, GVZ+OVX를 동일 비용·동일 SLSQP 제약으로 비교했다. 최종 후보는 사전에 정한 결합 경로이며 가장 좋은 사후 조합을 선택하지 않았다.</p>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Strategy</th>
+      <th>Period</th>
+      <th>CAGR</th>
+      <th>Volatility</th>
+      <th>Sharpe</th>
+      <th>MDD</th>
+      <th>AvgTurnover</th>
+      <th>TotalCost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Stage35_Frozen</td>
+      <td>full_2007_2026</td>
+      <td>10.608%</td>
+      <td>10.043%</td>
+      <td>1.057364</td>
+      <td>-13.743%</td>
+      <td>3.662%</td>
+      <td>2.614%</td>
+    </tr>
+    <tr>
+      <td>Stage35_Frozen</td>
+      <td>common_2010_2026</td>
+      <td>9.653%</td>
+      <td>9.371%</td>
+      <td>1.033059</td>
+      <td>-13.743%</td>
+      <td>2.632%</td>
+      <td>1.699%</td>
+    </tr>
+    <tr>
+      <td>Stage35_Frozen</td>
+      <td>locked_2018_2026</td>
+      <td>13.821%</td>
+      <td>10.861%</td>
+      <td>1.251158</td>
+      <td>-11.984%</td>
+      <td>2.616%</td>
+      <td>0.873%</td>
+    </tr>
+    <tr>
+      <td>Stage36_GVZGoldRisk</td>
+      <td>full_2007_2026</td>
+      <td>10.262%</td>
+      <td>9.511%</td>
+      <td>1.077935</td>
+      <td>-12.407%</td>
+      <td>3.799%</td>
+      <td>2.723%</td>
+    </tr>
+    <tr>
+      <td>Stage36_GVZGoldRisk</td>
+      <td>common_2010_2026</td>
+      <td>9.232%</td>
+      <td>8.719%</td>
+      <td>1.059237</td>
+      <td>-12.407%</td>
+      <td>2.795%</td>
+      <td>1.809%</td>
+    </tr>
+    <tr>
+      <td>Stage36_GVZGoldRisk</td>
+      <td>locked_2018_2026</td>
+      <td>12.626%</td>
+      <td>10.178%</td>
+      <td>1.223506</td>
+      <td>-11.931%</td>
+      <td>2.616%</td>
+      <td>0.869%</td>
+    </tr>
+    <tr>
+      <td>Stage36_OVXOilRisk</td>
+      <td>full_2007_2026</td>
+      <td>10.846%</td>
+      <td>10.005%</td>
+      <td>1.082672</td>
+      <td>-13.743%</td>
+      <td>3.561%</td>
+      <td>2.545%</td>
+    </tr>
+    <tr>
+      <td>Stage36_OVXOilRisk</td>
+      <td>common_2010_2026</td>
+      <td>9.653%</td>
+      <td>9.371%</td>
+      <td>1.033061</td>
+      <td>-13.743%</td>
+      <td>2.632%</td>
+      <td>1.699%</td>
+    </tr>
+    <tr>
+      <td>Stage36_OVXOilRisk</td>
+      <td>locked_2018_2026</td>
+      <td>13.822%</td>
+      <td>10.861%</td>
+      <td>1.251162</td>
+      <td>-11.984%</td>
+      <td>2.616%</td>
+      <td>0.873%</td>
+    </tr>
+    <tr>
+      <td>Stage36_GVZ_OVXAssetRisk</td>
+      <td>full_2007_2026</td>
+      <td>10.499%</td>
+      <td>9.472%</td>
+      <td>1.104911</td>
+      <td>-12.407%</td>
+      <td>3.698%</td>
+      <td>2.654%</td>
+    </tr>
+    <tr>
+      <td>Stage36_GVZ_OVXAssetRisk</td>
+      <td>common_2010_2026</td>
+      <td>9.232%</td>
+      <td>8.719%</td>
+      <td>1.059236</td>
+      <td>-12.407%</td>
+      <td>2.795%</td>
+      <td>1.809%</td>
+    </tr>
+    <tr>
+      <td>Stage36_GVZ_OVXAssetRisk</td>
+      <td>locked_2018_2026</td>
+      <td>12.626%</td>
+      <td>10.178%</td>
+      <td>1.223505</td>
+      <td>-11.931%</td>
+      <td>2.616%</td>
+      <td>0.869%</td>
+    </tr>
+  </tbody>
+</table>
+<img src="outputs/performance_comparison.png" alt="performance comparison"></section>
+<section><h2>6. 미래 위험 예측 진단</h2>
+<p>센서 rank가 자기 자산의 향후 1개월 실현변동성, 1·3개월 최대낙폭, 왼쪽꼬리를 설명하는지 검사했다. 통제변수는 자기자산 최근 1개월 수익률·21일 실현변동성, VIX6 stress, 거시 취약도이며 HAC 표준오차를 사용했다.</p>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Sensor</th>
+      <th>Asset</th>
+      <th>Target</th>
+      <th>Observations</th>
+      <th>SensorStandardizedBeta</th>
+      <th>SensorHACPValue</th>
+      <th>SensorSpearmanIC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GVZ</td>
+      <td>GLD</td>
+      <td>future_realized_vol_1m</td>
+      <td>199</td>
+      <td>0.019550</td>
+      <td>0.002925</td>
+      <td>0.492009</td>
+    </tr>
+    <tr>
+      <td>GVZ</td>
+      <td>GLD</td>
+      <td>future_max_drawdown_1m</td>
+      <td>199</td>
+      <td>0.007331</td>
+      <td>0.001428</td>
+      <td>0.411290</td>
+    </tr>
+    <tr>
+      <td>GVZ</td>
+      <td>GLD</td>
+      <td>future_max_drawdown_3m</td>
+      <td>198</td>
+      <td>0.009310</td>
+      <td>0.087147</td>
+      <td>0.397641</td>
+    </tr>
+    <tr>
+      <td>GVZ</td>
+      <td>GLD</td>
+      <td>future_left_tail_1m</td>
+      <td>199</td>
+      <td>0.032949</td>
+      <td>0.061851</td>
+      <td>0.175770</td>
+    </tr>
+    <tr>
+      <td>OVX</td>
+      <td>USO</td>
+      <td>future_realized_vol_1m</td>
+      <td>199</td>
+      <td>0.049836</td>
+      <td>0.000965</td>
+      <td>0.588031</td>
+    </tr>
+    <tr>
+      <td>OVX</td>
+      <td>USO</td>
+      <td>future_max_drawdown_1m</td>
+      <td>199</td>
+      <td>0.012808</td>
+      <td>0.097665</td>
+      <td>0.260504</td>
+    </tr>
+    <tr>
+      <td>OVX</td>
+      <td>USO</td>
+      <td>future_max_drawdown_3m</td>
+      <td>198</td>
+      <td>0.023224</td>
+      <td>0.036854</td>
+      <td>0.170057</td>
+    </tr>
+    <tr>
+      <td>OVX</td>
+      <td>USO</td>
+      <td>future_left_tail_1m</td>
+      <td>183</td>
+      <td>-0.001010</td>
+      <td>0.965907</td>
+      <td>0.056140</td>
+    </tr>
+  </tbody>
+</table>
+<p class="warn">높은 GVZ/OVX는 방향성 하락을 뜻하지 않는다. beta가 약하더라도 부호를 뒤집어 수익률 알파로 전환하지 않는다.</p></section>
+<section><h2>7. 블록 부트스트랩</h2>
+<p>Stage35와 월을 짝지은 12개월 circular block을 2,000회 재표집했다. 양의 확률은 Stage36−Stage35가 0보다 클 확률이다.</p>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Period</th>
+      <th>Metric</th>
+      <th>Mean</th>
+      <th>P05</th>
+      <th>P50</th>
+      <th>P95</th>
+      <th>ProbabilityPositive</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>delta_CAGR</td>
+      <td>-0.001216</td>
+      <td>-0.008164</td>
+      <td>-0.001044</td>
+      <td>0.005346</td>
+      <td>0.392000</td>
+    </tr>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>delta_Sharpe</td>
+      <td>0.048043</td>
+      <td>0.005573</td>
+      <td>0.047873</td>
+      <td>0.091556</td>
+      <td>0.971500</td>
+    </tr>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>delta_MDD</td>
+      <td>0.010735</td>
+      <td>0.000000</td>
+      <td>0.010202</td>
+      <td>0.024605</td>
+      <td>0.951000</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>delta_CAGR</td>
+      <td>-0.004326</td>
+      <td>-0.011270</td>
+      <td>-0.004060</td>
+      <td>0.001409</td>
+      <td>0.121000</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>delta_Sharpe</td>
+      <td>0.028798</td>
+      <td>-0.013297</td>
+      <td>0.029877</td>
+      <td>0.069055</td>
+      <td>0.868500</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>delta_MDD</td>
+      <td>0.009206</td>
+      <td>-0.001377</td>
+      <td>0.009277</td>
+      <td>0.022132</td>
+      <td>0.933000</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>8. NAV</h2><img src="outputs/nav_comparison.png" alt="NAV comparison"></section>
+<section><h2>9. SLSQP와 비용</h2>
+<p>목적함수와 제약은 Stage35와 동일하다.</p>
+<pre>maximize w'μ - 0.5 w'Σw - mean(min(R_hist w, 0)^2) - transaction_cost
+subject to sum(w)=1, 0&lt;=w&lt;=1,
+annualized volatility &lt;=13%, historical CDaR(90%) &gt;=-16%</pre>
+<p>국내 회전비용 15bp와 GLD·USO 순비중 변화의 추가 5bp를 월별 수익에서 차감한다.</p></section>
+<section><h2>10. 인과성·과최적화 방지</h2>
+<ul><li>target month에는 직전 월말까지 공개된 마지막 값만 사용</li><li>현재 관측 전 252개 유효 일간 이력이 없으면 완전 중립</li><li>전체표본 평균·분산, backfill, splice, realized-vol 대체 없음</li><li>rank→variance multiplier는 1+rank 한 가지, grid search 없음</li><li>GVZ·OVX 독립 ablation과 2010 공통표본을 함께 공개</li><li>Stage35 파일과 원천 CSV의 실행 전후 hash 비교</li></ul></section>
+<section><h2>11. 코드 위치</h2>
+<p><code>asset_implied_volatility_risk_slsqp.py</code>의 <code>load_asset_implied_volatility_daily</code>, <code>build_monthly_asset_volatility_signals</code>, <code>_solve_weights</code>, <code>run_backtest</code>, <code>run_research</code> 순서로 읽으면 된다.</p></section>
+<section><h2>12. 재현</h2>
+<pre>python -m strategies.stage36_asset_implied_volatility_risk.asset_implied_volatility_risk_slsqp
+python -m pytest tests/test_stage36_asset_implied_volatility_risk.py -q</pre></section>
+<section><h2>13. 한계</h2>
+<p>GLD·USO 가격은 기존 전략과 일관되게 원화 환산 수익률이므로 GVZ·OVX가 직접 측정하는 달러표시 기초자산 위험과 환율효과가 섞인다. 또한 FRED 관측일은 확인했지만 실시간 vintage·장중 배포시각까지 보장하지 않는다. 백테스트 개선은 미래 성과 보장이 아니다.</p></section>
+</main></body></html>

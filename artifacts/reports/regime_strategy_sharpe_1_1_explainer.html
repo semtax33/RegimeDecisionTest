@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="regime_research.py에 구현된 Sharpe 1.144 경제 국면 기반 멀티에셋 전략의 신호, 비중, 위험제어, 비용, 검증 구조 설명서">
+  <title>Sharpe 1.1 전략 해설 | regime_research.py</title>
+  <style>
+    :root {
+      --ink: #13251f;
+      --ink-soft: #40534b;
+      --paper: #f4f0e6;
+      --paper-2: #ebe5d8;
+      --card: #fffdf7;
+      --line: #d9d1c1;
+      --forest: #123c32;
+      --forest-2: #1d5949;
+      --mint: #a7ddc6;
+      --lime: #d8ef9a;
+      --orange: #e77b4c;
+      --orange-soft: #f8d6c4;
+      --gold: #d8ae51;
+      --blue: #4382a8;
+      --shadow: 0 18px 48px rgba(31, 48, 40, .10);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 88% 4%, rgba(167, 221, 198, .35), transparent 24rem),
+        linear-gradient(180deg, #f8f5ed 0, var(--paper) 32rem, #f1ecdf 100%);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      line-height: 1.72;
+      word-break: keep-all;
+    }
+
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    code, pre, .mono, .source-ref, .eyebrow, .metric-label {
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+
+    .progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      z-index: 100;
+      width: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--orange), var(--lime));
+      box-shadow: 0 0 18px rgba(231, 123, 76, .45);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 680px;
+      padding: 34px clamp(24px, 5vw, 84px) 72px;
+      color: #f7f3e8;
+      background:
+        linear-gradient(118deg, rgba(18, 60, 50, .97), rgba(13, 40, 34, .98)),
+        var(--forest);
+    }
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+    .hero::before {
+      width: 440px;
+      height: 440px;
+      right: -150px;
+      top: -210px;
+      border: 78px solid rgba(216, 239, 154, .12);
+    }
+    .hero::after {
+      width: 310px;
+      height: 310px;
+      right: 13%;
+      bottom: -225px;
+      border: 1px solid rgba(167, 221, 198, .26);
+      box-shadow: 0 0 0 42px rgba(167, 221, 198, .025), 0 0 0 84px rgba(167, 221, 198, .02);
+    }
+    .hero-inner { max-width: 1320px; margin: 0 auto; position: relative; z-index: 2; }
+    .topline { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .brand { display: flex; gap: 12px; align-items: center; font-size: 14px; letter-spacing: .03em; }
+    .brand-mark { width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.45); border-radius: 50%; display: grid; place-items: center; }
+    .brand-mark::before { content: "R"; color: var(--lime); font-weight: 800; }
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      background: rgba(255,255,255,.05);
+    }
+    .source-pill:hover { background: rgba(255,255,255,.11); }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(330px, .75fr);
+      gap: clamp(36px, 7vw, 104px);
+      align-items: end;
+      margin-top: 112px;
+    }
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--mint);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 800px;
+      font-size: clamp(48px, 7vw, 94px);
+      line-height: .98;
+      letter-spacing: -.065em;
+      font-weight: 800;
+    }
+    h1 em { display: block; color: var(--lime); font-style: normal; }
+    .hero-copy {
+      max-width: 730px;
+      margin: 30px 0 0;
+      color: rgba(247,243,232,.78);
+      font-size: clamp(17px, 1.7vw, 21px);
+      line-height: 1.75;
+    }
+    .hero-result {
+      position: relative;
+      padding: 30px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 28px;
+      background: rgba(255,255,255,.07);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter: blur(8px);
+    }
+    .hero-result::before { content: ""; position: absolute; width: 12px; height: 12px; right: 24px; top: 24px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 7px rgba(216,239,154,.12); }
+    .hero-result small { color: rgba(255,255,255,.6); font-size: 12px; letter-spacing: .08em; }
+    .hero-result strong { display: block; margin-top: 8px; font-size: clamp(56px, 7vw, 88px); line-height: 1; letter-spacing: -.06em; color: #fff; }
+    .hero-result strong span { color: var(--mint); }
+    .hero-result p { margin: 18px 0 0; color: rgba(255,255,255,.68); font-size: 14px; }
+    .hero-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px; }
+    .hero-meta div { padding-top: 14px; border-top: 1px solid rgba(255,255,255,.15); }
+    .hero-meta b { display: block; font-size: 17px; color: #fff; }
+    .hero-meta span { font-size: 11px; color: rgba(255,255,255,.56); }
+
+    .shell {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 68px 32px 120px;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 64px;
+    }
+    .toc { position: sticky; top: 34px; align-self: start; }
+    .toc-title { margin: 0 0 15px; font-size: 11px; font-weight: 800; letter-spacing: .16em; color: #718078; }
+    .toc nav { border-left: 1px solid var(--line); }
+    .toc a {
+      display: block;
+      padding: 7px 0 7px 18px;
+      color: #68776f;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.35;
+      border-left: 2px solid transparent;
+      margin-left: -1px;
+      transition: .2s ease;
+    }
+    .toc a:hover, .toc a.active { color: var(--forest); border-left-color: var(--orange); transform: translateX(3px); }
+    .toc-note { margin-top: 24px; padding: 15px; border-radius: 14px; background: rgba(255,255,255,.55); color: var(--ink-soft); font-size: 11px; line-height: 1.6; }
+
+    main { min-width: 0; }
+    section { scroll-margin-top: 28px; margin-bottom: 108px; }
+    .section-head { display: grid; grid-template-columns: 72px 1fr; gap: 18px; align-items: start; margin-bottom: 34px; }
+    .section-no { color: var(--orange); font-size: 12px; font-weight: 800; letter-spacing: .16em; padding-top: 9px; }
+    h2 { margin: 0; font-size: clamp(32px, 4.5vw, 54px); line-height: 1.1; letter-spacing: -.045em; }
+    .section-lead { max-width: 780px; margin: 15px 0 0; color: var(--ink-soft); font-size: 17px; }
+    h3 { margin: 0 0 13px; font-size: 22px; line-height: 1.3; letter-spacing: -.02em; }
+    h4 { margin: 0 0 8px; font-size: 15px; }
+    p { margin: 0 0 14px; }
+
+    .summary-grid { display: grid; grid-template-columns: 1.4fr .8fr; gap: 22px; }
+    .card {
+      border: 1px solid rgba(211,202,185,.86);
+      border-radius: var(--radius);
+      background: rgba(255,253,247,.88);
+      box-shadow: 0 14px 40px rgba(47, 59, 51, .06);
+    }
+    .card-pad { padding: clamp(24px, 4vw, 38px); }
+    .thesis { position: relative; overflow: hidden; }
+    .thesis::after { content: "01"; position: absolute; right: -8px; bottom: -38px; color: rgba(18,60,50,.05); font: 800 150px/1 system-ui; letter-spacing: -.08em; }
+    .thesis p { position: relative; z-index: 1; font-size: 20px; line-height: 1.8; }
+    .thesis mark { background: linear-gradient(transparent 62%, rgba(216,239,154,.85) 62%); color: inherit; }
+    .result-stack { display: grid; gap: 12px; }
+    .mini-metric { padding: 18px 20px; border-radius: 17px; background: var(--forest); color: white; }
+    .mini-metric:nth-child(2) { background: var(--orange-soft); color: #572e1e; }
+    .mini-metric:nth-child(3) { background: #dce9ed; color: #183b4e; }
+    .mini-metric span { display: block; font-size: 11px; opacity: .65; }
+    .mini-metric b { display: block; margin-top: 4px; font-size: 25px; letter-spacing: -.03em; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(105px, 1fr));
+      gap: 9px;
+      align-items: stretch;
+    }
+    .flow-step {
+      position: relative;
+      min-height: 156px;
+      padding: 18px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--card);
+    }
+    .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -12px; top: 63px; z-index: 2; width: 16px; height: 26px; text-align: center; color: var(--orange); font-weight: 800; }
+    .flow-step b { display: block; font-size: 13px; line-height: 1.35; }
+    .flow-step p { margin: 9px 0 0; color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
+    .flow-index { display: grid; place-items: center; width: 27px; height: 27px; margin-bottom: 21px; border-radius: 8px; color: white; background: var(--forest); font: 700 11px/1 monospace; }
+    .flow-step:nth-child(4) .flow-index,
+    .flow-step:nth-child(5) .flow-index { background: var(--orange); }
+    .flow-step:last-child .flow-index { color: var(--forest); background: var(--lime); }
+
+    .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 22px; }
+    .fact { padding: 23px; border-top: 3px solid var(--forest); background: rgba(255,255,255,.56); }
+    .fact:nth-child(2) { border-color: var(--orange); }
+    .fact:nth-child(3) { border-color: var(--gold); }
+    .fact:nth-child(4) { border-color: var(--blue); }
+    .fact b { display: block; font-size: 18px; }
+    .fact span { display: block; margin-top: 7px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
+
+    .data-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .data-card { padding: 26px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+    .data-card .tag { display: inline-block; margin-bottom: 15px; padding: 4px 9px; border-radius: 999px; background: var(--paper-2); font: 700 10px/1.6 monospace; }
+    .data-card ul { margin: 12px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+    .data-card li + li { margin-top: 8px; }
+    .timing {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr 44px 1fr;
+      align-items: center;
+      margin-top: 24px;
+      padding: 26px;
+      border-radius: var(--radius);
+      color: white;
+      background: var(--forest);
+    }
+    .time-node span { color: var(--mint); font: 700 11px/1.2 monospace; }
+    .time-node b { display: block; margin-top: 9px; font-size: 17px; }
+    .time-node p { margin: 5px 0 0; color: rgba(255,255,255,.62); font-size: 12px; line-height: 1.55; }
+    .time-arrow { text-align: center; color: var(--lime); font-size: 24px; }
+
+    .formula {
+      margin: 22px 0;
+      padding: 24px 26px;
+      overflow-x: auto;
+      border-left: 4px solid var(--orange);
+      border-radius: 0 16px 16px 0;
+      background: #172b24;
+      color: #f6f2e7;
+      font: 14px/1.9 "Cascadia Code", Consolas, monospace;
+      white-space: nowrap;
+    }
+    .formula .comment { color: #92b9aa; }
+    .formula .accent { color: var(--lime); }
+    .formula .warm { color: #ffaf87; }
+    .formula.compact { font-size: 13px; white-space: normal; }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .note { padding: 22px 24px; border-radius: 17px; background: #e2eee8; border: 1px solid #c8ddd2; }
+    .note.warning { background: #fae8dc; border-color: #efccb7; }
+    .note strong { display: block; margin-bottom: 7px; font-size: 13px; }
+    .note p { margin: 0; font-size: 13px; color: var(--ink-soft); }
+
+    .regime-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 28px; }
+    .regime-card { padding: 21px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+    .regime-card::before { content: ""; display: block; width: 28px; height: 5px; margin-bottom: 16px; border-radius: 999px; background: var(--forest); }
+    .regime-card:nth-child(2)::before { background: var(--orange); }
+    .regime-card:nth-child(3)::before { background: var(--blue); }
+    .regime-card:nth-child(4)::before { background: var(--gold); }
+    .regime-card b { font-size: 16px; }
+    .regime-card small { display: block; margin-top: 6px; color: var(--ink-soft); line-height: 1.5; }
+
+    .matrix-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 15px 17px; text-align: right; border-bottom: 1px solid #e6dfd2; }
+    th:first-child, td:first-child { text-align: left; font-weight: 700; }
+    th { color: var(--ink-soft); background: #eee9de; font-size: 11px; letter-spacing: .02em; }
+    tr:last-child td { border-bottom: 0; }
+    .bar-cell { position: relative; min-width: 98px; }
+    .bar-cell::before { content: ""; position: absolute; left: 10px; top: 50%; width: var(--w); height: 17px; transform: translateY(-50%); border-radius: 4px; background: rgba(167,221,198,.52); }
+    .bar-cell span { position: relative; z-index: 1; }
+
+    .blend-visual { display: grid; grid-template-columns: 3fr 1fr; gap: 5px; margin: 22px 0 9px; height: 58px; }
+    .blend-visual div { display: grid; place-items: center; border-radius: 13px; font-weight: 800; font-size: 13px; }
+    .blend-visual div:first-child { color: white; background: var(--forest); }
+    .blend-visual div:last-child { color: #443713; background: var(--lime); }
+    .blend-caption { display: flex; justify-content: space-between; color: var(--ink-soft); font-size: 11px; }
+
+    .objective-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; margin-top: 20px; }
+    .objective-term { min-height: 128px; padding: 17px; border-radius: 15px; background: var(--card); border: 1px solid var(--line); }
+    .objective-term strong { display: block; color: var(--orange); font: 800 18px/1.2 monospace; }
+    .objective-term b { display: block; margin-top: 8px; font-size: 13px; }
+    .objective-term p { margin: 6px 0 0; color: var(--ink-soft); font-size: 11px; line-height: 1.5; }
+    .constraints { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 18px; }
+    .constraint { padding: 17px 19px; border-radius: 14px; background: #e7e1d4; }
+    .constraint b { display: block; font-size: 12px; }
+    .constraint code { display: block; margin-top: 5px; font-size: 11px; color: var(--ink-soft); }
+
+    .guard-scale { position: relative; margin: 34px 6px 14px; height: 54px; }
+    .guard-line { position: absolute; left: 0; right: 0; top: 22px; height: 10px; border-radius: 999px; background: linear-gradient(90deg, var(--orange) 0 44%, var(--gold) 44% 64%, var(--mint) 64% 100%); }
+    .guard-point { position: absolute; top: 8px; width: 2px; height: 36px; background: var(--ink); }
+    .guard-point span { position: absolute; top: 38px; left: 50%; transform: translateX(-50%); font: 700 10px/1 monospace; white-space: nowrap; }
+    .guard-point.p1 { left: 0; }
+    .guard-point.p2 { left: 44%; }
+    .guard-point.p3 { left: 100%; }
+    .guard-logic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 50px; }
+    .guard-logic div { padding: 17px; border-radius: 15px; background: var(--card); border: 1px solid var(--line); }
+    .guard-logic b { font-size: 13px; }
+    .guard-logic p { margin: 5px 0 0; color: var(--ink-soft); font-size: 11px; }
+
+    .cost-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .cost-card { padding: 25px; border-radius: 18px; color: white; background: var(--forest); }
+    .cost-card:nth-child(2) { background: #64351f; }
+    .cost-card small { opacity: .62; }
+    .cost-card strong { display: block; margin: 8px 0; font-size: 28px; }
+    .cost-card code { font-size: 11px; color: rgba(255,255,255,.72); }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .metric { min-height: 144px; padding: 22px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+    .metric-label { color: var(--ink-soft); font-size: 10px; letter-spacing: .08em; }
+    .metric strong { display: block; margin: 13px 0 5px; font-size: 31px; line-height: 1; letter-spacing: -.04em; }
+    .metric span { color: var(--ink-soft); font-size: 11px; }
+    .metric.primary { color: white; background: var(--forest); border-color: var(--forest); }
+    .metric.primary .metric-label, .metric.primary span { color: rgba(255,255,255,.62); }
+    .metric.primary strong { color: var(--lime); }
+    .compare { margin-top: 24px; }
+    .compare td:nth-child(4) { font-weight: 800; color: var(--forest); }
+    .compare .selected { background: rgba(216,239,154,.25); }
+    .interpretation { margin-top: 18px; padding: 25px; border-radius: 17px; background: var(--orange-soft); }
+    .interpretation b { display: block; margin-bottom: 8px; }
+    .interpretation p { margin: 0; color: #654332; font-size: 13px; }
+
+    .cal-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; }
+    .grid-count { display: grid; place-items: center; min-height: 280px; border-radius: var(--radius); color: white; background: var(--forest); }
+    .grid-count strong { font-size: 92px; line-height: .9; letter-spacing: -.08em; color: var(--lime); }
+    .grid-count span { display: block; text-align: center; margin-top: 14px; color: rgba(255,255,255,.67); }
+    .candidate-list { display: grid; gap: 10px; }
+    .candidate-list div { display: flex; justify-content: space-between; gap: 18px; padding: 15px 17px; border-bottom: 1px solid var(--line); }
+    .candidate-list b { font-size: 12px; }
+    .candidate-list code { color: var(--ink-soft); font-size: 11px; }
+    .periods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px; }
+    .period { padding: 22px; border: 1px solid var(--line); border-radius: 17px; background: var(--card); }
+    .period small { color: var(--ink-soft); }
+    .period strong { display: block; margin-top: 8px; font-size: 27px; }
+    .period b { display: block; margin-top: 10px; font-size: 11px; color: var(--orange); }
+
+    .limits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .limit { padding: 22px; border-radius: 17px; background: var(--card); border: 1px solid var(--line); }
+    .limit .num { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: 15px; border-radius: 50%; color: white; background: var(--orange); font: 700 11px/1 monospace; }
+    .limit p { margin: 0; color: var(--ink-soft); font-size: 13px; }
+
+    .code-map { display: grid; gap: 10px; }
+    .code-row {
+      display: grid;
+      grid-template-columns: 170px 1fr 105px;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--card);
+      text-decoration: none;
+      transition: .2s ease;
+    }
+    .code-row:hover { transform: translateY(-2px); border-color: #aebbae; box-shadow: 0 10px 26px rgba(31,48,40,.07); }
+    .code-row code { font-size: 12px; font-weight: 800; color: var(--forest); }
+    .code-row span { color: var(--ink-soft); font-size: 12px; }
+    .source-ref { justify-self: end; color: var(--orange) !important; font-size: 10px !important; }
+
+    .footer {
+      padding: 54px 32px 66px;
+      color: rgba(255,255,255,.67);
+      background: #102a23;
+    }
+    .footer-inner { max-width: 1320px; margin: 0 auto; display: flex; justify-content: space-between; gap: 32px; align-items: flex-end; }
+    .footer h2 { max-width: 660px; color: #fff; font-size: clamp(28px, 4vw, 48px); }
+    .footer h2 span { color: var(--lime); }
+    .footer p { max-width: 420px; margin: 0; text-align: right; font-size: 12px; }
+
+    @media (max-width: 1100px) {
+      .hero-grid { grid-template-columns: 1fr; margin-top: 80px; }
+      .hero-result { max-width: 620px; }
+      .shell { grid-template-columns: 1fr; gap: 0; }
+      .toc { position: relative; top: auto; margin: -36px 0 70px; padding: 12px; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,253,247,.92); }
+      .toc-title, .toc-note { display: none; }
+      .toc nav { display: flex; width: max-content; border: 0; }
+      .toc a { padding: 8px 12px; border: 0; margin: 0; }
+      .toc a.active { transform: none; border-radius: 9px; background: var(--paper-2); }
+      .flow { grid-template-columns: repeat(4, 1fr); }
+      .flow-step:not(:last-child)::after { display: none; }
+      .objective-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 760px) {
+      .hero { min-height: auto; padding: 24px 20px 56px; }
+      .topline { align-items: flex-start; }
+      .source-pill { max-width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .hero-grid { margin-top: 68px; }
+      h1 { font-size: clamp(46px, 16vw, 68px); }
+      .hero-copy { font-size: 16px; }
+      .shell { padding: 52px 18px 90px; }
+      section { margin-bottom: 82px; }
+      .section-head { grid-template-columns: 1fr; gap: 4px; }
+      .section-lead { font-size: 15px; }
+      .summary-grid, .split, .data-grid, .cal-grid, .limits, .cost-row { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .facts, .regime-grid, .metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .objective-grid { grid-template-columns: repeat(2, 1fr); }
+      .constraints, .guard-logic, .periods { grid-template-columns: 1fr; }
+      .timing { grid-template-columns: 1fr; gap: 12px; }
+      .time-arrow { transform: rotate(90deg); }
+      .code-row { grid-template-columns: 1fr; gap: 7px; }
+      .source-ref { justify-self: start; }
+      .footer-inner { display: block; }
+      .footer p { margin-top: 24px; text-align: left; }
+    }
+    @media (max-width: 430px) {
+      .hero-meta, .facts, .metric-grid, .regime-grid, .flow, .objective-grid { grid-template-columns: 1fr; }
+      .hero-result { padding: 24px; }
+      .hero-result strong { font-size: 58px; }
+      .card-pad { padding: 22px; }
+    }
+    @media print {
+      .progress, .toc { display: none !important; }
+      body { background: #fff; }
+      .hero { min-height: auto; color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .shell { display: block; max-width: none; padding: 42px 28px; }
+      section { break-inside: avoid; margin-bottom: 60px; }
+      .card, .data-card, .matrix-wrap, .metric, .limit, .code-row { box-shadow: none; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="topline">
+        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>REGIME DECISION TEST · STRATEGY DOSSIER</span></div>
+        <a class="source-pill" href="../../strategies/core/regime_research.py" title="원본 Python 파일 열기">원본 · regime_research.py</a>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Source-guided explainer · 2026-08-26</p>
+          <h1>Sharpe <em>1.1 전략</em></h1>
+          <p class="hero-copy">거시경제를 성장과 물가의 네 국면으로 나눈 뒤, 네 자산의 기준비중을 확률가중하고 변동성·CDaR·회전율·드로다운을 동시에 제어하는 월별 멀티에셋 자산배분 전략입니다.</p>
+        </div>
+
+        <div class="hero-result" aria-label="전체기간 샤프 지수 1.143956">
+          <small>FULL-PERIOD SHARPE · RF 0%</small>
+          <strong>1.<span>144</span></strong>
+          <p>2007-04 → 2026-07 · 거래/환전비용 차감 후<br>“1.1”은 정확한 값 1.143956을 반올림한 표현입니다.</p>
+          <div class="hero-meta">
+            <div><b>232</b><span>개월</span></div>
+            <div><b>8.12%</b><span>CAGR</span></div>
+            <div><b>−8.93%</b><span>MDD</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="toc" aria-label="문서 목차">
+      <p class="toc-title">CONTENTS</p>
+      <nav>
+        <a href="#overview">01 · 한눈에 보기</a>
+        <a href="#pipeline">02 · 전체 파이프라인</a>
+        <a href="#data">03 · 데이터와 시점</a>
+        <a href="#regime">04 · 국면 확률</a>
+        <a href="#allocation">05 · 기준 비중</a>
+        <a href="#optimizer">06 · 위험 최적화</a>
+        <a href="#guard">07 · 드로다운 가드</a>
+        <a href="#backtest">08 · 비용과 백테스트</a>
+        <a href="#performance">09 · 왜 Sharpe 1.1인가</a>
+        <a href="#calibration">10 · 보정과 잠금검증</a>
+        <a href="#limits">11 · 해석상 한계</a>
+        <a href="#code-map">12 · 코드 지도</a>
+      </nav>
+      <div class="toc-note">이 문서는 현재 저장된 <b>regime_research.py</b>, <b>summary.csv</b>, <b>calibration_grid.csv</b>, <b>proposed_backtest.csv</b>를 기준으로 작성했습니다.</div>
+    </aside>
+
+    <main>
+      <section id="overview" data-nav>
+        <div class="section-head">
+          <span class="section-no">01 / 12</span>
+          <div>
+            <h2>한 문장으로 설명하면</h2>
+            <p class="section-lead">고수익 자산을 한 번에 고르는 전략이 아니라, 국면 정보를 이용해 시작 비중을 만든 후 포트폴리오의 나쁜 경로를 줄이는 전략입니다.</p>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <article class="card card-pad thesis">
+            <p><mark>경제 국면은 “방향”을 제시</mark>하고, 비대칭 EWMA·변동성 상한·CDaR·회전율·드로다운 가드는 <mark>그 방향을 얼마나 강하게 실행할지 결정</mark>합니다. Sharpe 1.144는 높은 CAGR 하나보다 낮은 변동성과 작은 MDD에서 만들어졌습니다.</p>
+          </article>
+          <div class="result-stack">
+            <div class="mini-metric"><span>수익 엔진</span><b>4개 국면 × 4개 자산</b></div>
+            <div class="mini-metric"><span>위험 엔진</span><b>Vol + CDaR + DD</b></div>
+            <div class="mini-metric"><span>실행 주기</span><b>월 1회 리밸런싱</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pipeline" data-nav>
+        <div class="section-head">
+          <span class="section-no">02 / 12</span>
+          <div>
+            <h2>전체 파이프라인</h2>
+            <p class="section-lead">매월 같은 순서를 walk-forward 방식으로 반복합니다. 미래 데이터가 신호 계산에 섞이지 않도록 투자월 직전까지만 잘라서 사용합니다.</p>
+          </div>
+        </div>
+
+        <div class="flow" aria-label="전략 처리 단계">
+          <div class="flow-step"><span class="flow-index">01</span><b>거시 특징</b><p>GDP·수출·BSI와 CPI·PPI·수입물가의 rolling z-score</p></div>
+          <div class="flow-step"><span class="flow-index">02</span><b>고/저 확률</b><p>성장과 물가 각각 합성점수 90% + Sparse Jump 10%</p></div>
+          <div class="flow-step"><span class="flow-index">03</span><b>4개 국면</b><p>Goldilocks · Overheating · Slowdown · Stagflation</p></div>
+          <div class="flow-step"><span class="flow-index">04</span><b>Soft anchor</b><p>국면별 자산비중을 국면 확률로 가중평균</p></div>
+          <div class="flow-step"><span class="flow-index">05</span><b>위험 최적화</b><p>EWMA·역변동성·CDaR·회전율·tracking 적용</p></div>
+          <div class="flow-step"><span class="flow-index">06</span><b>DD 방어</b><p>누적 낙폭 −5% 아래에서 방어 포트폴리오 혼합</p></div>
+          <div class="flow-step"><span class="flow-index">07</span><b>순수익</b><p>매매 15bp와 해외비중 변화 환전 5bp 차감</p></div>
+        </div>
+
+        <div class="facts">
+          <div class="fact"><b>Long only</b><span>공매도 없이 모든 자산 비중이 0 이상입니다.</span></div>
+          <div class="fact"><b>Fully invested</b><span>현금 자산 없이 매월 네 자산의 합이 100%입니다.</span></div>
+          <div class="fact"><b>No leverage</b><span>총노출을 100%로 제한하며 레버리지를 사용하지 않습니다.</span></div>
+          <div class="fact"><b>Soft regime</b><span>한 국면에 올인하지 않고 네 국면 확률을 모두 반영합니다.</span></div>
+        </div>
+      </section>
+
+      <section id="data" data-nav>
+        <div class="section-head">
+          <span class="section-no">03 / 12</span>
+          <div>
+            <h2>무엇을 보고, 무엇에 투자하나</h2>
+            <p class="section-lead">신호 데이터와 투자 자산을 분리합니다. 거시 데이터는 국면 판단에만 쓰고, 실제 수익은 네 자산의 월초 가격으로 계산합니다.</p>
+          </div>
+        </div>
+
+        <div class="data-grid">
+          <article class="data-card">
+            <span class="tag">GROWTH MODULE</span>
+            <h3>성장 축</h3>
+            <ul>
+              <li>GDP 전년동기 성장률 · 72개월 rolling z-score</li>
+              <li>수출금액 전년동월 증가율 · 36개월 rolling z-score</li>
+              <li>제조업 업황전망 BSI · 24개월 rolling z-score</li>
+              <li>각 수준값과 3개월 변화량을 함께 사용</li>
+            </ul>
+          </article>
+          <article class="data-card">
+            <span class="tag">INFLATION MODULE</span>
+            <h3>물가 축</h3>
+            <ul>
+              <li>CPI 전년동월 상승률 · 36개월 rolling z-score</li>
+              <li>PPI 전년동월 상승률 · 36개월 rolling z-score</li>
+              <li>수입물가 전년동월 상승률 · 36개월 rolling z-score</li>
+              <li>각 수준값과 3개월 변화량을 함께 사용</li>
+            </ul>
+          </article>
+          <article class="data-card">
+            <span class="tag">DOMESTIC ASSETS</span>
+            <h3>KODEX200 + BOND</h3>
+            <ul>
+              <li>KODEX200은 2009-03 이전 KOSPI200 프록시와 접합</li>
+              <li>BOND는 국내 채권 총수익지수 사용</li>
+              <li>월별 첫 거래일 시가를 기준으로 수익률 구성</li>
+            </ul>
+          </article>
+          <article class="data-card">
+            <span class="tag">GLOBAL ASSETS</span>
+            <h3>GLD + USO</h3>
+            <ul>
+              <li>금 ETF GLD와 원유 ETF USO</li>
+              <li>각 월 첫 거래일의 USDKRW 환율로 원화 환산</li>
+              <li>비중 변경 시 해외자산 합계 변화에 환전비용 부과</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="timing">
+          <div class="time-node"><span>t−1 MONTH END</span><b>알려진 거시자료까지만 절단</b><p><code>features.loc[: signal_month]</code></p></div>
+          <div class="time-arrow">→</div>
+          <div class="time-node"><span>t MONTH OPEN</span><b>신호와 목표비중 결정</b><p>직전 보유비중에서 새 목표비중으로 리밸런싱</p></div>
+          <div class="time-arrow">→</div>
+          <div class="time-node"><span>t → t+1</span><b>한 달 수익과 비용 기록</b><p>다음 월초까지의 자산수익으로 NAV 갱신</p></div>
+        </div>
+      </section>
+
+      <section id="regime" data-nav>
+        <div class="section-head">
+          <span class="section-no">04 / 12</span>
+          <div>
+            <h2>국면은 확률로 계산한다</h2>
+            <p class="section-lead">핵심은 “현재 국면 하나”를 강제로 고르는 것이 아니라 성장·물가의 고확률을 조합해 네 국면에 연속적인 확률을 부여하는 것입니다.</p>
+          </div>
+        </div>
+
+        <div class="split">
+          <div>
+            <h3>① 해석 가능한 합성점수가 90%</h3>
+            <p>성장과 물가 각각 현재 수준 세 변수의 평균에 3개월 모멘텀의 20%를 더하고 logistic 함수로 0~1 확률로 바꿉니다.</p>
+            <div class="formula compact"><span class="accent">p<sub>composite</sub></span> = sigmoid((현재 수준 + 0.20 × 3개월 변화) / 0.55)</div>
+          </div>
+          <div>
+            <h3>② Sparse Jump Model이 10%</h3>
+            <p>두 상태의 중심과 특징 가중치를 반복 추정하고 상태 전환 페널티를 둡니다. 표본이 작기 때문에 모델 비중은 10%만 반영합니다.</p>
+            <div class="formula compact"><span class="accent">p<sub>raw</sub></span> = 0.90 × p<sub>composite</sub> + 0.10 × p<sub>SJM</sub></div>
+          </div>
+        </div>
+
+        <div class="formula">
+          <span class="comment"># 직전 월 확률 15%를 섞어 급격한 신호 점프를 완화</span><br>
+          p<sub>growth</sub> = <span class="accent">0.85</span> × p<sub>growth, raw</sub> + <span class="warm">0.15</span> × p<sub>growth, prev</sub><br>
+          p<sub>inflation</sub> = <span class="accent">0.85</span> × p<sub>inflation, raw</sub> + <span class="warm">0.15</span> × p<sub>inflation, prev</sub>
+        </div>
+
+        <div class="regime-grid">
+          <div class="regime-card"><b>Goldilocks</b><small>성장 高 · 물가 低<br>p<sub>g</sub>(1 − p<sub>i</sub>)</small></div>
+          <div class="regime-card"><b>Overheating</b><small>성장 高 · 물가 高<br>p<sub>g</sub>p<sub>i</sub></small></div>
+          <div class="regime-card"><b>Slowdown</b><small>성장 低 · 물가 低<br>(1 − p<sub>g</sub>)(1 − p<sub>i</sub>)</small></div>
+          <div class="regime-card"><b>Stagflation</b><small>성장 低 · 물가 高<br>(1 − p<sub>g</sub>)p<sub>i</sub></small></div>
+        </div>
+
+        <div class="note warning" style="margin-top:20px">
+          <strong>중요한 구분</strong>
+          <p>화면이나 CSV의 <code>regime</code> 열은 가장 확률이 높은 국면 이름이지만, 실제 <code>proposed</code> 비중은 그 한 국면만 사용하지 않습니다. 네 국면 확률 전체를 가중평균합니다.</p>
+        </div>
+      </section>
+
+      <section id="allocation" data-nav>
+        <div class="section-head">
+          <span class="section-no">05 / 12</span>
+          <div>
+            <h2>국면을 자산 비중으로 번역한다</h2>
+            <p class="section-lead">각 국면에는 경제적 직관을 반영한 기준비중이 있습니다. 아래 숫자는 최종 비중이 아니라 위험 최적화가 시작되는 방향표입니다.</p>
+          </div>
+        </div>
+
+        <div class="matrix-wrap">
+          <table aria-label="국면별 기준 자산 비중">
+            <thead><tr><th>국면 기준비중</th><th>KODEX200</th><th>BOND</th><th>GLD</th><th>USO</th></tr></thead>
+            <tbody>
+              <tr><td>Goldilocks</td><td class="bar-cell" style="--w:58%"><span>58%</span></td><td class="bar-cell" style="--w:22%"><span>22%</span></td><td class="bar-cell" style="--w:15%"><span>15%</span></td><td class="bar-cell" style="--w:5%"><span>5%</span></td></tr>
+              <tr><td>Overheating</td><td class="bar-cell" style="--w:30%"><span>30%</span></td><td class="bar-cell" style="--w:12%"><span>12%</span></td><td class="bar-cell" style="--w:23%"><span>23%</span></td><td class="bar-cell" style="--w:35%"><span>35%</span></td></tr>
+              <tr><td>Slowdown</td><td class="bar-cell" style="--w:12%"><span>12%</span></td><td class="bar-cell" style="--w:66%"><span>66%</span></td><td class="bar-cell" style="--w:20%"><span>20%</span></td><td class="bar-cell" style="--w:2%"><span>2%</span></td></tr>
+              <tr><td>Stagflation</td><td class="bar-cell" style="--w:8%"><span>8%</span></td><td class="bar-cell" style="--w:24%"><span>24%</span></td><td class="bar-cell" style="--w:50%"><span>50%</span></td><td class="bar-cell" style="--w:18%"><span>18%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="formula compact"><span class="accent">soft anchor</span> = Σ (각 국면 확률 × 해당 국면 기준비중)</div>
+
+        <h3 style="margin-top:34px">국면 방향 75% + 장기 전략비중 25%</h3>
+        <div class="blend-visual" aria-label="국면 비중 75%, 장기 전략 비중 25%"><div>국면 확률가중 비중 · 75%</div><div>전략비중 · 25%</div></div>
+        <div class="blend-caption"><span>시점에 따라 움직이는 부분</span><span>STRATEGIC = [20, 45, 30, 5]%</span></div>
+
+        <div class="split" style="margin-top:28px">
+          <div class="note"><strong>왜 25%를 고정축으로 남기나</strong><p>국면 신호가 틀리거나 경계에서 흔들려도 포트폴리오가 한 방향으로 과도하게 이동하지 않도록 장기 기준점을 유지합니다.</p></div>
+          <div class="note"><strong>아직 최종 비중은 아니다</strong><p>이 anchor는 자산별 위험과 최근 수익경로를 반영하지 않았습니다. 다음 단계에서 역변동성 기울기와 최적화를 적용합니다.</p></div>
+        </div>
+      </section>
+
+      <section id="optimizer" data-nav>
+        <div class="section-head">
+          <span class="section-no">06 / 12</span>
+          <div>
+            <h2>위험 최적화가 비중을 다듬는다</h2>
+            <p class="section-lead">최근 최대 84개월을 사용해 위험을 추정하고, 기대수익을 보상하되 변동성·나쁜 드로다운 경로·거래·기준비중 이탈을 동시에 비용으로 처리합니다.</p>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="card card-pad">
+            <h3>비대칭 EWMA 공분산</h3>
+            <p>반감기 12개월로 최근 관측에 더 큰 비중을 둡니다. KODEX200 월수익이 음수일 때 shock multiplier를 키워 하락 충격이 공분산에 더 크게 남도록 합니다.</p>
+            <div class="formula compact">multiplier = 1 + min(max(−r<sub>KODEX</sub>, 0) / 0.08, 1.5)</div>
+          </div>
+          <div class="card card-pad">
+            <h3>완만한 역변동성 기울기</h3>
+            <p>anchor에 <code>(중앙 변동성 / 자산 변동성)<sup>0.35</sup></code>를 곱합니다. 순수 역변동성보다 약한 0.35 지수로 국면 방향을 보존합니다.</p>
+            <div class="formula compact">prior = 0.55 × anchor + 0.45 × inv-vol tilted</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:38px">SLSQP가 최소화하는 목적함수</h3>
+        <div class="formula compact">
+          min<sub>w</sub> <span class="warm">−1.15 × 연환산 기대수익</span>
+          + <span class="accent">0.18 × 연환산 변동성</span>
+          + 0.25 × |CDaR<sub>90</sub>|
+          + 0.05 × 회전율
+          + 0.32 × 기준비중 이탈²
+        </div>
+
+        <div class="objective-grid">
+          <div class="objective-term"><strong>−1.15</strong><b>Return reward</b><p>기대수익이 높을수록 목적함수를 낮춰 선택을 유도</p></div>
+          <div class="objective-term"><strong>+0.18</strong><b>Vol penalty</b><p>공분산으로 예상한 연환산 포트폴리오 변동성</p></div>
+          <div class="objective-term"><strong>+0.25</strong><b>CDaR penalty</b><p>과거 84개월 경로에서 가장 나쁜 10% 드로다운 평균</p></div>
+          <div class="objective-term"><strong>+0.05</strong><b>Turnover</b><p>직전 월 말의 드리프트 후 비중과 새 비중의 차이</p></div>
+          <div class="objective-term"><strong>+0.32</strong><b>Tracking</b><p>국면·역변동성으로 만든 prior에서 너무 멀어지는 것을 억제</p></div>
+        </div>
+
+        <div class="formula compact" style="margin-top:28px"><span class="comment"># 기대수익 추정</span><br>μ = 0.80 × 전체 확장평균 + 0.20 × 최근 24개월 EWMA 평균<br>각 자산 월 기대수익은 <span class="accent">−0.6% ~ +1.5%</span> 범위로 절단</div>
+
+        <h3 style="margin-top:34px">반드시 지켜야 하는 제약</h3>
+        <div class="constraints">
+          <div class="constraint"><b>완전투자</b><code>Σw = 1.00</code></div>
+          <div class="constraint"><b>동적 변동성 상한</b><code>σ(w) ≤ 8% × (0.86 + 0.20p_growth)</code></div>
+          <div class="constraint"><b>경로 위험 상한</b><code>CDaR90 ≥ −16%</code></div>
+          <div class="constraint"><b>자산별 비중 범위</b><code>KODEX 2–68 · BOND 5–88 · GLD 2–62 · USO 0–38%</code></div>
+        </div>
+
+        <div class="note warning" style="margin-top:20px">
+          <strong>최적화 실패 시 안전한 대체값</strong>
+          <p>SLSQP가 실패하거나 비정상 값을 내면 코드가 중단되지 않고 직전 단계의 <code>prior</code> 비중을 사용합니다. 즉 최적화 결과를 무조건 신뢰하지 않는 fallback이 포함되어 있습니다.</p>
+        </div>
+      </section>
+
+      <section id="guard" data-nav>
+        <div class="section-head">
+          <span class="section-no">07 / 12</span>
+          <div>
+            <h2>손실이 쌓이면 방어비중을 섞는다</h2>
+            <p class="section-lead">최적화가 끝난 뒤 실제 전략 NAV가 고점 대비 5% 넘게 하락하면 별도의 상태의존 드로다운 가드가 작동합니다.</p>
+          </div>
+        </div>
+
+        <div class="card card-pad">
+          <h3>방어 포트폴리오</h3>
+          <div class="formula compact">DEFENSIVE = [ KODEX200 <span class="warm">5%</span>, BOND <span class="accent">72%</span>, GLD <span class="accent">23%</span>, USO <span class="warm">0%</span> ]</div>
+          <div class="guard-scale" aria-label="드로다운이 마이너스 5퍼센트를 넘으면 방어 혼합 증가">
+            <div class="guard-line"></div>
+            <div class="guard-point p1"><span>−17% 이하</span></div>
+            <div class="guard-point p2"><span>−5%</span></div>
+            <div class="guard-point p3"><span>0%</span></div>
+          </div>
+          <div class="guard-logic">
+            <div><b>DD ≥ −5%</b><p>가드 비활성. 최적화 비중 그대로 사용</p></div>
+            <div><b>DD &lt; −5%</b><p>최소 약 18.75%부터 방어비중 혼합</p></div>
+            <div><b>DD ≤ −17%</b><p>severity 상한 도달 시 56.25% 혼합</p></div>
+          </div>
+        </div>
+
+        <div class="formula compact">
+          severity = clip((−DD − 0.05) / 0.12, 0, 1)<br>
+          blend = <span class="accent">0.75</span> × (0.25 + 0.50 × severity)<br>
+          final w = (1 − blend) × optimized w + blend × DEFENSIVE
+        </div>
+
+        <div class="note warning">
+          <strong>구현상 미묘한 점</strong>
+          <p>드로다운 혼합은 SLSQP 최적화 <em>후</em>에 적용되며 변동성/CDaR 제약을 다시 검사하지 않습니다. 다만 방어 포트폴리오 자체가 채권·금 중심이라 의도는 위험 축소입니다.</p>
+        </div>
+      </section>
+
+      <section id="backtest" data-nav>
+        <div class="section-head">
+          <span class="section-no">08 / 12</span>
+          <div>
+            <h2>월별 체결과 비용 처리</h2>
+            <p class="section-lead"><code>run_backtest(mode="proposed")</code>가 매월 비중을 계산하고, 비용을 즉시 차감한 순수익으로 NAV와 드로다운을 갱신합니다.</p>
+          </div>
+        </div>
+
+        <div class="cost-row">
+          <div class="cost-card"><small>매수·매도 명목 비용</small><strong>15 bp</strong><code>trade_cost = Σ|w − pretrade| × 0.0015</code></div>
+          <div class="cost-card"><small>해외자산 합계 변경 비용</small><strong>5 bp</strong><code>fx_cost = |Δ(GLD + USO)| × 0.0005</code></div>
+        </div>
+
+        <div class="formula">
+          gross return = w · asset returns<br>
+          <span class="accent">net return</span> = gross return − trade cost − FX cost<br>
+          NAV<sub>t</sub> = NAV<sub>t−1</sub> × (1 + net return)
+        </div>
+
+        <div class="split">
+          <div class="card card-pad">
+            <h3>드리프트 후 비중을 기억</h3>
+            <p>한 달 수익이 난 뒤 자산별 비중은 달라집니다. 다음 달 거래량은 지난 목표비중이 아니라 수익률 반영 후의 <code>end_w</code>에서 계산합니다.</p>
+          </div>
+          <div class="card card-pad">
+            <h3>감사 가능한 월별 산출물</h3>
+            <p><code>proposed_backtest.csv</code>에 신호월, 국면, 성장·물가 확률, gross/net 수익, 회전율, 비용, NAV, drawdown, 네 목표비중이 저장됩니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="performance" data-nav>
+        <div class="section-head">
+          <span class="section-no">09 / 12</span>
+          <div>
+            <h2>왜 Sharpe가 1.1인가</h2>
+            <p class="section-lead">전체기간 월별 순수익의 평균을 표준편차로 나눈 뒤 √12로 연환산합니다. 무위험수익률은 0%입니다.</p>
+          </div>
+        </div>
+
+        <div class="formula compact"><span class="accent">Sharpe</span> = mean(월별 순수익) ÷ std(월별 순수익, ddof=1) × √12 = <span class="warm">1.143956</span></div>
+
+        <div class="metric-grid">
+          <div class="metric primary"><span class="metric-label">SHARPE</span><strong>1.144</strong><span>무위험수익률 0%</span></div>
+          <div class="metric"><span class="metric-label">CAGR</span><strong>8.12%</strong><span>최종 자산배수 4.53×</span></div>
+          <div class="metric"><span class="metric-label">VOLATILITY</span><strong>7.06%</strong><span>월수익 표준편차 연환산</span></div>
+          <div class="metric"><span class="metric-label">MAX DRAWDOWN</span><strong>−8.93%</strong><span>전체 경로의 최대 낙폭</span></div>
+          <div class="metric"><span class="metric-label">SORTINO</span><strong>2.241</strong><span>하방 변동성 기준</span></div>
+          <div class="metric"><span class="metric-label">CALMAR</span><strong>0.909</strong><span>CAGR ÷ |MDD|</span></div>
+          <div class="metric"><span class="metric-label">POSITIVE MONTHS</span><strong>64.2%</strong><span>232개월 중 양(+) 수익 비율</span></div>
+          <div class="metric"><span class="metric-label">AVG TURNOVER</span><strong>2.51%</strong><span>평균 월 회전율</span></div>
+        </div>
+
+        <div class="matrix-wrap compare">
+          <table aria-label="비교 전략 성과">
+            <thead><tr><th>전략</th><th>CAGR</th><th>연 변동성</th><th>Sharpe</th><th>MDD</th></tr></thead>
+            <tbody>
+              <tr class="selected"><td>Proposed · Regime + Risk control</td><td>8.12%</td><td>7.06%</td><td>1.144</td><td>−8.93%</td></tr>
+              <tr><td>Soft regime only</td><td>9.58%</td><td>11.34%</td><td>0.866</td><td>−19.27%</td></tr>
+              <tr><td>Hard regime</td><td>18.46%</td><td>22.59%</td><td>0.867</td><td>−26.67%</td></tr>
+              <tr><td>Static defensive</td><td>8.05%</td><td>7.73%</td><td>1.043</td><td>−11.65%</td></tr>
+              <tr><td>KODEX200 buy &amp; hold</td><td>10.80%</td><td>23.89%</td><td>0.548</td><td>−48.52%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="interpretation"><b>결과의 핵심</b><p>Hard regime은 CAGR이 더 높지만 변동성과 MDD도 훨씬 큽니다. Proposed 전략의 Sharpe 개선은 수익을 극대화해서라기보다, 국면 신호를 soft하게 적용하고 여러 위험제어로 수익 경로를 평탄하게 만든 결과입니다.</p></div>
+      </section>
+
+      <section id="calibration" data-nav>
+        <div class="section-head">
+          <span class="section-no">10 / 12</span>
+          <div>
+            <h2>36개 후보에서 설정을 잠갔다</h2>
+            <p class="section-lead">전체기간 Sharpe를 보고 설정을 고르지 않았습니다. 2017-12까지의 보정 구간에서 제한된 조합을 평가하고, 2018-01 이후는 선택 후 잠금 테스트로 사용했습니다.</p>
+          </div>
+        </div>
+
+        <div class="cal-grid">
+          <div class="grid-count"><div><strong>36</strong><span>3 × 3 × 2 × 2 후보 설정</span></div></div>
+          <div class="candidate-list">
+            <div><b>Regime strength</b><code>0.25 · 0.50 · 0.75</code></div>
+            <div><b>Target volatility</b><code>0.08 · 0.10 · 0.12</code></div>
+            <div><b>Inverse-vol tilt</b><code>0.15 · 0.35</code></div>
+            <div><b>Drawdown guard</b><code>0.40 · 0.75</code></div>
+          </div>
+        </div>
+
+        <div class="formula compact"><span class="accent">Validation score</span> = Sharpe + 0.35 × Calmar − 4 × max(|MDD| − 15%, 0) − 0.20 × 평균 회전율</div>
+
+        <div class="note" style="margin-bottom:22px">
+          <strong>선택된 설정</strong>
+          <p><code>rs0.75_tv0.08_iv0.35_dg0.75</code> · 국면 강도 75%, 목표 변동성 8%, 역변동성 기울기 0.35, 드로다운 가드 0.75</p>
+        </div>
+
+        <div class="periods">
+          <div class="period"><small>보정 구간 · 2007-04~2017-12</small><strong>1.105</strong><b>SHARPE · 129개월</b></div>
+          <div class="period"><small>잠금 구간 · 2018-01~2026-07</small><strong>1.183</strong><b>SHARPE · 103개월</b></div>
+          <div class="period"><small>전체 구간 · 2007-04~2026-07</small><strong>1.144</strong><b>SHARPE · 232개월</b></div>
+        </div>
+      </section>
+
+      <section id="limits" data-nav>
+        <div class="section-head">
+          <span class="section-no">11 / 12</span>
+          <div>
+            <h2>숫자를 과대해석하면 안 되는 이유</h2>
+            <p class="section-lead">이 결과는 구현을 설명하는 역사적 시뮬레이션이지, 미래 Sharpe 1.1이나 손실 한도를 보장하는 자료가 아닙니다.</p>
+          </div>
+        </div>
+
+        <div class="limits">
+          <article class="limit"><span class="num">01</span><h3>진정한 point-in-time 데이터가 아님</h3><p>현재 파일의 거시 데이터는 발표시차를 반영하지만 과거 시점별 빈티지 개정값을 완전히 복원한 데이터베이스는 아닙니다.</p></article>
+          <article class="limit"><span class="num">02</span><h3>비용 모델이 단순함</h3><p>15bp 매매비용과 5bp 환전비용은 반영하지만 실제 호가 스프레드, 시장충격, 세금, 추적오차는 포함하지 않습니다.</p></article>
+          <article class="limit"><span class="num">03</span><h3>선택 편향을 완전히 제거하지 못함</h3><p>36개로 후보를 제한하고 잠금 구간을 뒀지만, 한 번의 시계열 분할만으로 모든 데이터 마이닝 위험을 제거할 수는 없습니다.</p></article>
+          <article class="limit"><span class="num">04</span><h3>위험 상한은 보장이 아님</h3><p>목표 변동성과 CDaR는 과거 수익으로 추정한 최적화 제약입니다. 미래 급변이나 자산 간 동조화 확대 시 실제 위험은 더 커질 수 있습니다.</p></article>
+          <article class="limit"><span class="num">05</span><h3>자산 프록시와 접합</h3><p>KODEX200 초창기 공백은 KOSPI200 프록시로 접합합니다. 장기 시계열 확보에는 유리하지만 실제 ETF 체결 이력과 완전히 같지는 않습니다.</p></article>
+          <article class="limit"><span class="num">06</span><h3>무위험수익률 0%</h3><p>Sharpe 분자에서 기간별 현금금리나 조달금리를 차감하지 않습니다. 다른 자료와 비교할 때 같은 정의인지 확인해야 합니다.</p></article>
+        </div>
+      </section>
+
+      <section id="code-map" data-nav>
+        <div class="section-head">
+          <span class="section-no">12 / 12</span>
+          <div>
+            <h2>원본 코드를 읽는 순서</h2>
+            <p class="section-lead">전략을 수정하거나 검증할 때는 아래 순서대로 보면 데이터 → 신호 → 비중 → 체결 → 성과의 연결이 끊기지 않습니다.</p>
+          </div>
+        </div>
+
+        <div class="code-map">
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>load_macro_data()</code><span>거시 데이터 발표시차, rolling z-score, 수준·3개월 변화 특징</span><span class="source-ref">L42–95</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>load_monthly_asset_returns()</code><span>4개 자산, KODEX 프록시 접합, 원화 환산, 월초 수익률</span><span class="source-ref">L120–179</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>SparseJump2</code><span>두 상태, sparse 특징 가중, 상태 전환 페널티</span><span class="source-ref">L188–262</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>compute_regime_signals()</code><span>성장·물가 고확률과 네 국면 확률 생성</span><span class="source-ref">L265–315</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>REGIME_ANCHORS</code><span>국면별 네 자산 기준비중과 soft anchor</span><span class="source-ref">L318–333</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>StrategyConfig</code><span>잠금된 위험·목적함수·국면 강도 설정</span><span class="source-ref">L357–372</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>controlled_weights()</code><span>EWMA, 역변동성, SLSQP, 제약, fallback, DD 가드</span><span class="source-ref">L375–431</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>run_backtest()</code><span>월별 상태전이, 거래·환전비용, 비중 드리프트, NAV</span><span class="source-ref">L444–510</span></a>
+          <a class="code-row" href="../../strategies/core/regime_research.py"><code>performance_summary()</code><span>Sharpe·CAGR·MDD·Sortino·Calmar 산출</span><span class="source-ref">L513–535</span></a>
+          <a class="code-row" href="../../strategies/stage01_baseline/calibrate_configs.py"><code>calibrate_configs.py</code><span>36개 제한 그리드, 점수화, 우승 설정 선택</span><span class="source-ref">L18–70</span></a>
+        </div>
+
+        <div class="split" style="margin-top:24px">
+          <div class="note"><strong>핵심 구현 파일</strong><p><code>regime_research.py</code>가 원본입니다. 신호 생성부터 성과 집계까지 실제 전략 로직이 들어 있습니다.</p></div>
+          <div class="note"><strong>결과 확인 파일</strong><p><code>results/summary.csv</code>와 <code>results/proposed_backtest.csv</code>가 전체 성과와 월별 감사 경로를 보관합니다.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <h2>Sharpe 1.1은 <span>국면 예측 하나</span>가 아니라,<br>국면과 위험제어를 연결한 결과입니다.</h2>
+      <p>연구용 역사적 시뮬레이션 · 미래 성과 비보장<br>Source: regime_research.py / results snapshot as of 2026-08-26</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const progress = document.getElementById('progress');
+      const links = [...document.querySelectorAll('.toc a')];
+      const sections = [...document.querySelectorAll('[data-nav]')];
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0;
+        progress.style.width = pct + '%';
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+        links.forEach(link => link.classList.toggle('active', link.hash === '#' + visible.target.id));
+      }, { rootMargin: '-16% 0px -70% 0px', threshold: [0, .1] });
+
+      sections.forEach(section => observer.observe(section));
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,9 @@
+Signal,Control,Observations,SpearmanCorrelation
+wing_asym_near,vix6_stress_score,244,0.2742083990859515
+wing_asym_near,recent_1m_return,244,-0.27982308628069796
+wing_asym_near,realized_vol_21d,244,0.3760279814316545
+wing_asym_near,macro_fragility,244,-0.10929976815209268
+fear_term_slope,vix6_stress_score,244,0.09829106851850071
+fear_term_slope,recent_1m_return,244,-0.11762548200195928
+fear_term_slope,realized_vol_21d,244,0.13700163734854137
+fear_term_slope,macro_fragility,244,0.019726451251879946

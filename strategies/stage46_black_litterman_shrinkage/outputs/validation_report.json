@@ -1,0 +1,619 @@
+{
+  "study": "Stage46_BlackLitterman_LedoitWolf_Ablation",
+  "base_strategy": "Stage36_GVZ_OVXAssetRisk",
+  "decision": "promote_Stage46_GuardedBlackLitterman_LW",
+  "promoted_strategy": "Stage46_GuardedBlackLitterman_LW",
+  "fixed_design": {
+    "experiments": {
+      "A": "Stage36 frozen baseline",
+      "B": "Stage36 expected return plus 252-day constant-correlation Ledoit-Wolf covariance",
+      "C": "drawdown-sensitive 5% maximum Black-Litterman tilt around Stage36; Ledoit-Wolf risk veto with frozen Stage36 fallback"
+    },
+    "strategic_prior": "causal expanding mean of prior Stage36 weights; current month excluded",
+    "equilibrium_return": "risk_aversion * covariance * strategic_prior",
+    "views": "Stage36 expected returns only; no new ML signal",
+    "view_confidence": "normalized Herfindahl concentration of four regime probabilities",
+    "omega": "Idzorek confidence ratio applied to diagonal prior view variance",
+    "tau": "1 / prior Stage36 months",
+    "risk_overlays": "Stage36 GVZ-to-GLD and OVX-to-USO variance multipliers",
+    "optimizer": "Stage36 long-only, fully invested SLSQP utility with 13% volatility and 16% CDaR guards",
+    "bl_deployment": "maximum tilt 1/(N*(N+1)); linearly reduced to zero over one monthly-equivalent 13% annual drawdown budget; retain Stage36 when the tilt fails LW/CDaR guards",
+    "turnover_rule": "B and the BL shadow use no more than Stage36 monthly L1 trade except minimum risk-required trade; guarded C is rejected if average turnover exceeds Stage36 by 10% in any period",
+    "turnover_gate": "average turnover no more than 10% above Stage36 in every reported period",
+    "cagr_tolerance": 0.005,
+    "bootstrap_sharpe_gate": 0.5,
+    "bootstrap_mdd_gate": 0.5,
+    "parameter_grid": null
+  },
+  "gate_results": {
+    "Stage46_Stage36Mu_LW": {
+      "gates": {
+        "full_2007_2026_sharpe_not_lower": false,
+        "full_2007_2026_mdd_not_worse": false,
+        "full_2007_2026_cagr_within_50bp": true,
+        "full_2007_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_sharpe_not_lower": false,
+        "common_2010_2026_mdd_not_worse": false,
+        "common_2010_2026_cagr_within_50bp": true,
+        "common_2010_2026_turnover_not_materially_higher": true,
+        "locked_2018_2026_sharpe_not_lower": false,
+        "locked_2018_2026_mdd_not_worse": false,
+        "locked_2018_2026_cagr_within_50bp": true,
+        "locked_2018_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_bootstrap_sharpe_probability": false,
+        "common_2010_2026_bootstrap_mdd_probability": false,
+        "locked_2018_2026_bootstrap_sharpe_probability": false,
+        "locked_2018_2026_bootstrap_mdd_probability": false
+      },
+      "pass": false
+    },
+    "Stage46_GuardedBlackLitterman_LW": {
+      "gates": {
+        "full_2007_2026_sharpe_not_lower": true,
+        "full_2007_2026_mdd_not_worse": true,
+        "full_2007_2026_cagr_within_50bp": true,
+        "full_2007_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_sharpe_not_lower": true,
+        "common_2010_2026_mdd_not_worse": true,
+        "common_2010_2026_cagr_within_50bp": true,
+        "common_2010_2026_turnover_not_materially_higher": true,
+        "locked_2018_2026_sharpe_not_lower": true,
+        "locked_2018_2026_mdd_not_worse": true,
+        "locked_2018_2026_cagr_within_50bp": true,
+        "locked_2018_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_bootstrap_sharpe_probability": true,
+        "common_2010_2026_bootstrap_mdd_probability": true,
+        "locked_2018_2026_bootstrap_sharpe_probability": true,
+        "locked_2018_2026_bootstrap_mdd_probability": true
+      },
+      "pass": true
+    }
+  },
+  "performance_comparison": [
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1049938875,
+      "Volatility": 0.0947174638,
+      "Sharpe": 1.1049112901,
+      "Sortino": 2.2018564577,
+      "MDD": -0.1240708722,
+      "Calmar": 0.8462412301,
+      "FinalMultiple": 6.8911377181,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0369775517,
+      "TotalCost": 0.0265354519
+    },
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0923177929,
+      "Volatility": 0.087193443,
+      "Sharpe": 1.0592360313,
+      "Sortino": 2.0494518521,
+      "MDD": -0.1240708722,
+      "Calmar": 0.7440730548,
+      "FinalMultiple": 4.3246840303,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0279465684,
+      "TotalCost": 0.0180913888
+    },
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1262562043,
+      "Volatility": 0.1017821984,
+      "Sharpe": 1.2235051573,
+      "Sortino": 2.5377845953,
+      "MDD": -0.119311114,
+      "Calmar": 1.0582099189,
+      "FinalMultiple": 2.7747206697,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0261551454,
+      "TotalCost": 0.0086887009
+    },
+    {
+      "Strategy": "Stage46_Stage36Mu_LW",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.114160551,
+      "Volatility": 0.1098728777,
+      "Sharpe": 1.0420225108,
+      "Sortino": 2.0499653339,
+      "MDD": -0.1409075116,
+      "Calmar": 0.8101807324,
+      "FinalMultiple": 8.0845719197,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0289466476,
+      "TotalCost": 0.0204623848
+    },
+    {
+      "Strategy": "Stage46_Stage36Mu_LW",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.1051294062,
+      "Volatility": 0.1078734261,
+      "Sharpe": 0.9831812205,
+      "Sortino": 1.9098818673,
+      "MDD": -0.1409075116,
+      "Calmar": 0.7460880189,
+      "FinalMultiple": 5.2472830411,
+      "PositiveMonths": 0.6130653266,
+      "AvgTurnover": 0.0189875219,
+      "TotalCost": 0.0123267438
+    },
+    {
+      "Strategy": "Stage46_Stage36Mu_LW",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1458124712,
+      "Volatility": 0.1259902951,
+      "Sharpe": 1.1474328626,
+      "Sortino": 2.3633586032,
+      "MDD": -0.1409075116,
+      "Calmar": 1.0348097805,
+      "FinalMultiple": 3.2165570605,
+      "PositiveMonths": 0.640776699,
+      "AvgTurnover": 0.01951101,
+      "TotalCost": 0.0063969882
+    },
+    {
+      "Strategy": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1051913508,
+      "Volatility": 0.0948560087,
+      "Sharpe": 1.1053179569,
+      "Sortino": 2.2106059714,
+      "MDD": -0.1233956035,
+      "Calmar": 0.8524724369,
+      "FinalMultiple": 6.9149848221,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0377731107,
+      "TotalCost": 0.027155166
+    },
+    {
+      "Strategy": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0925923673,
+      "Volatility": 0.0873614768,
+      "Sharpe": 1.0602412542,
+      "Sortino": 2.0623695275,
+      "MDD": -0.1233956035,
+      "Calmar": 0.7503700673,
+      "FinalMultiple": 4.3427469516,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0289135349,
+      "TotalCost": 0.0187356447
+    },
+    {
+      "Strategy": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1273352474,
+      "Volatility": 0.102087075,
+      "Sharpe": 1.2295960014,
+      "Sortino": 2.5677239155,
+      "MDD": -0.1182252045,
+      "Calmar": 1.0770566894,
+      "FinalMultiple": 2.7976216972,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0273990369,
+      "TotalCost": 0.0091047794
+    }
+  ],
+  "bootstrap_vs_stage36": [
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0093985369,
+      "P05": -0.0024032808,
+      "P50": 0.0086860335,
+      "P95": 0.022922313,
+      "ProbabilityPositive": 0.9115,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0628360572,
+      "P05": -0.1395133162,
+      "P50": -0.0609338201,
+      "P95": 0.0083076338,
+      "ProbabilityPositive": 0.079,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0178004276,
+      "P05": -0.0478502802,
+      "P50": -0.0171520247,
+      "P95": 0.0055459723,
+      "ProbabilityPositive": 0.098,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.000221324,
+      "P05": -0.0004211335,
+      "P50": 0.0002134201,
+      "P95": 0.0008973546,
+      "ProbabilityPositive": 0.704,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0004216608,
+      "P05": -0.0054358953,
+      "P50": 0.0005101083,
+      "P95": 0.006332838,
+      "ProbabilityPositive": 0.5515,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0006187489,
+      "P05": -0.0005683647,
+      "P50": 0.0006314003,
+      "P95": 0.00224315,
+      "ProbabilityPositive": 0.813,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0132682973,
+      "P05": 0.0007037649,
+      "P50": 0.012580628,
+      "P95": 0.0284155739,
+      "ProbabilityPositive": 0.9625,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0766951502,
+      "P05": -0.1653921491,
+      "P50": -0.0743313496,
+      "P95": 0.0037545143,
+      "ProbabilityPositive": 0.06,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0216118818,
+      "P05": -0.0501505069,
+      "P50": -0.0204988872,
+      "P95": -0.0004054561,
+      "ProbabilityPositive": 0.0485,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0002960238,
+      "P05": -0.0005050106,
+      "P50": 0.0002934322,
+      "P95": 0.0011132995,
+      "ProbabilityPositive": 0.738,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0007843305,
+      "P05": -0.0076217442,
+      "P50": 0.0009927184,
+      "P95": 0.0080047078,
+      "ProbabilityPositive": 0.5935,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0006634266,
+      "P05": -0.0006389893,
+      "P50": 0.0006593393,
+      "P95": 0.0023990859,
+      "ProbabilityPositive": 0.8235,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0205213812,
+      "P05": 0.0004376852,
+      "P50": 0.0183266371,
+      "P95": 0.046950198,
+      "ProbabilityPositive": 0.9565,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0777014952,
+      "P05": -0.2072227774,
+      "P50": -0.0730105706,
+      "P95": 0.0353332562,
+      "ProbabilityPositive": 0.1455,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_Stage36Mu_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0228495613,
+      "P05": -0.0454351215,
+      "P50": -0.0204988872,
+      "P95": -0.003533391,
+      "ProbabilityPositive": 0.0245,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0011364229,
+      "P05": 4.02416e-05,
+      "P50": 0.0010931267,
+      "P95": 0.0024060875,
+      "ProbabilityPositive": 0.9545,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0058120601,
+      "P05": -0.0043425642,
+      "P50": 0.0060422968,
+      "P95": 0.0147540123,
+      "ProbabilityPositive": 0.8545,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage46_GuardedBlackLitterman_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0008820692,
+      "P05": -0.0006294745,
+      "P50": 0.0010971394,
+      "P95": 0.0025740307,
+      "ProbabilityPositive": 0.8355,
+      "Replications": 2000,
+      "BlockMonths": 12
+    }
+  ],
+  "solver_audit": {
+    "Stage46_Stage36Mu_LW": {
+      "months": 220,
+      "successes": 220,
+      "fallbacks": 0,
+      "minimum_volatility_slack": -9.871919948167829e-10,
+      "minimum_cdar_slack": -5.036483452514062e-10,
+      "minimum_turnover_slack": 2.581268532253489e-15,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "average_lw_shrinkage": 0.21571165849704607
+    },
+    "Stage46_GuardedBlackLitterman_LW": {
+      "months": 220,
+      "successes": 220,
+      "fallbacks": 20,
+      "minimum_volatility_slack": -9.44443218076074e-10,
+      "minimum_cdar_slack": -1.1235457009206584e-13,
+      "minimum_turnover_slack": null,
+      "maximum_weight_sum_error": 4.440892098500626e-16,
+      "average_lw_shrinkage": 0.21571165849704607,
+      "bl_overlay_deployed_months": 200,
+      "lw_overlay_veto_months": 20
+    }
+  },
+  "causality_audit": {
+    "Stage46_Stage36Mu_LW": {
+      "all_covariance_dates_before_target": true,
+      "all_covariance_windows_have_252_rows": true
+    },
+    "Stage46_GuardedBlackLitterman_LW": {
+      "all_covariance_dates_before_target": true,
+      "all_covariance_windows_have_252_rows": true
+    }
+  },
+  "checks": {
+    "stage36_and_stage45_frozen_files_unchanged": true,
+    "only_three_predeclared_ablation_paths": true,
+    "no_new_machine_learning_signal": true,
+    "all_candidate_solvers_feasible": true,
+    "guarded_bl_passes_every_performance_gate": true
+  },
+  "frozen_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\asset_implied_volatility_risk_slsqp.py": {
+      "sha256": "9b6a3d8d867a8700302db1dc51f30b1009538e2f1e864998f16a1171ec963569",
+      "bytes": 52426
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\stage36_gvz_ovxassetrisk_monthly.csv": {
+      "sha256": "dfe180aa55cb71a9764e8b9011b94a847ed4c2ba50e5a59a880431460f987dda",
+      "bytes": 176515
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\validation_report.json": {
+      "sha256": "b64ee27fb4867ffb142493382cad0a5f07e860cb9e88a2a8c4a35e257e6ec11b",
+      "bytes": 45558
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\volatility_targeted_shrinkage_mlp.py": {
+      "sha256": "ee458d5d4958fccfed85812ecea55c800e97c71123b9ef6865a3b4687344bcec",
+      "bytes": 38862
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\outputs\\validation_report.json": {
+      "sha256": "e1eb32bf9af264773f45b655dceef0526cf5560b32d37508160c3211f41a71ff",
+      "bytes": 14240
+    }
+  },
+  "frozen_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\asset_implied_volatility_risk_slsqp.py": {
+      "sha256": "9b6a3d8d867a8700302db1dc51f30b1009538e2f1e864998f16a1171ec963569",
+      "bytes": 52426
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\stage36_gvz_ovxassetrisk_monthly.csv": {
+      "sha256": "dfe180aa55cb71a9764e8b9011b94a847ed4c2ba50e5a59a880431460f987dda",
+      "bytes": 176515
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\validation_report.json": {
+      "sha256": "b64ee27fb4867ffb142493382cad0a5f07e860cb9e88a2a8c4a35e257e6ec11b",
+      "bytes": 45558
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\volatility_targeted_shrinkage_mlp.py": {
+      "sha256": "ee458d5d4958fccfed85812ecea55c800e97c71123b9ef6865a3b4687344bcec",
+      "bytes": 38862
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\outputs\\validation_report.json": {
+      "sha256": "e1eb32bf9af264773f45b655dceef0526cf5560b32d37508160c3211f41a71ff",
+      "bytes": 14240
+    }
+  },
+  "data_audit": {
+    "return_rows": 244,
+    "return_level_rows": 320,
+    "macro_rank_rows": 794,
+    "fundamental": {
+      "earnings_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_fwdPE.EPS.rev.xlsx",
+      "credit_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_국고채.회사채.xlsx",
+      "daily_rows": 9564,
+      "first_date": "1990-01-02",
+      "last_date": "2026-08-28",
+      "earnings_first_valid": "2000-02-25",
+      "credit_first_valid": "1995-05-30",
+      "eps_revision_provider_field_used": true,
+      "eps_revision_formula": "vendor EPS(Fwd.12M) one-month revision percentage",
+      "computed_revision_role": "source cross-check only",
+      "provider_computed_revision_correlation": 0.4580566581047895,
+      "eps_level_stale_share": 0.7912154948909562,
+      "credit_primary_formula": "(AA- unsecured 3Y yield - KTB 3Y yield) 20-observation change",
+      "credit_primary_role": "widening=funding stress; easing=positive equity-return input",
+      "bbb_and_quality_role": "robustness diagnostics only",
+      "earnings_yield_gap_role": "slow valuation diagnostic only",
+      "winsorization": false,
+      "parameter_grid": false
+    },
+    "asset_volatility": {
+      "gvz_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\GVZCLS.csv",
+      "ovx_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\OVXCLS.csv",
+      "daily_union_rows": 5036,
+      "first_union_date": "2007-05-10",
+      "last_union_date": "2026-08-27",
+      "gvz_first_valid": "2008-06-03",
+      "gvz_last_valid": "2026-08-27",
+      "gvz_valid_observations": 4590,
+      "ovx_first_valid": "2007-05-10",
+      "ovx_last_valid": "2026-08-27",
+      "ovx_valid_observations": 4858,
+      "minimum_prior_observations": 252,
+      "prehistory_policy": "neutral variance multiplier 1.0; no backfill",
+      "directional_mu_effect": false,
+      "winsorization": false,
+      "parameter_grid": false
+    },
+    "market": {
+      "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+      "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+      "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+      "foreign_prices_converted_to_krw": true,
+      "bond_atr_uses_close_to_close_proxy": true,
+      "kodex_volume_segments_normalized_separately": true,
+      "assets": {
+        "KODEX200": {
+          "rows": 6535,
+          "start": "2000-01-04",
+          "end": "2026-08-25",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        },
+        "BOND": {
+          "rows": 7469,
+          "start": "2006-03-02",
+          "end": "2026-08-12",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 7469
+        },
+        "GLD": {
+          "rows": 5474,
+          "start": "2004-11-18",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        },
+        "USO": {
+          "rows": 5125,
+          "start": "2006-04-10",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "strategy": "SharpeCAGRObjective_SLSQP100",
+  "allocation": {
+    "hard_share": 0.0,
+    "slsqp_share": 1.0,
+    "leverage": 1.0
+  },
+  "objective": "maximize 0.50 times cross-sectionally standardized expected Sharpe plus 0.50 times cross-sectionally standardized expected CAGR",
+  "expected_cagr_definition": "exp(12 * (expected monthly return - 0.5 * expected monthly variance)) - 1",
+  "standardization": "At each month, center and scale each metric using the four standalone asset values estimated from the same causal history.",
+  "preserved_from_existing_slsqp": [
+    "expected return estimator",
+    "EWMA covariance estimator",
+    "long-only asset bounds",
+    "weights sum to one",
+    "state-dependent target volatility constraint",
+    "CDaR constraint"
+  ],
+  "removed_from_objective": [
+    "volatility penalty",
+    "CDaR penalty",
+    "turnover penalty",
+    "tracking penalty"
+  ],
+  "full_period": {
+    "Months": 232.0,
+    "CAGR": 0.06858522529638589,
+    "Sharpe": 1.3293257462723727,
+    "MDD": -0.06878310909124918,
+    "Calmar": 0.9971230757452272,
+    "AvgTurnover": 0.030547440068229216
+  },
+  "locked_period": {
+    "Months": 103.0,
+    "CAGR": 0.06985416990716597,
+    "Sharpe": 1.1773216422131998,
+    "MDD": -0.06878310909124885,
+    "Calmar": 1.0155715673523311,
+    "AvgTurnover": 0.03793336306008306
+  },
+  "solver": {
+    "months": 232,
+    "successes": 232,
+    "failures": 0,
+    "fallbacks": 0,
+    "maximum_weight_sum_error": 2.220446049250313e-16,
+    "minimum_volatility_slack": -1.450966430338596e-10,
+    "minimum_cdar_slack": 0.09369361281063983
+  },
+  "sharpe_only_solver": {
+    "months": 232,
+    "successes": 232,
+    "failures": 0,
+    "fallbacks": 0,
+    "maximum_weight_sum_error": 2.220446049250313e-16,
+    "minimum_volatility_slack": 0.0005623730732624843,
+    "minimum_cdar_slack": 0.1011860378493408
+  },
+  "checks": {
+    "macro_signal_precedes_target": true,
+    "weight_sum_is_one": true,
+    "constraints_within_numerical_tolerance": true,
+    "no_hard_blend": true,
+    "no_leverage": true
+  }
+}

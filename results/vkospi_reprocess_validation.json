@@ -1,0 +1,59 @@
+{
+  "objective": "Reprocess VKOSPI to reduce false defensive activations",
+  "feature_variants": [
+    "LegacySignalMonth",
+    "RobustMultiscale",
+    "PanicInteraction"
+  ],
+  "processing": {
+    "LegacySignalMonth": "legacy features realigned by actual signal date",
+    "RobustMultiscale": "causal percentiles, rolling MAD z-scores, volatility-normalized shocks and month-end state",
+    "PanicInteraction": "robust multiscale plus acceleration, high-distance, close-location, panic confirmation/exhaustion interactions"
+  },
+  "policy_target": "whether next-month BOND or GLD return exceeds the existing VKOSPI dynamic strategy return",
+  "calibration_end": "2017-12",
+  "locked_start": "2018-01",
+  "selected_variant": "LegacySignalMonth",
+  "selected_config": {
+    "threshold": 0.5,
+    "max_shift": 0.1,
+    "receiver": "GLD"
+  },
+  "baseline_locked_metrics": {
+    "Months": 103.0,
+    "CAGR": 0.18298446144639158,
+    "Volatility": 0.13389120459522738,
+    "Sharpe": 1.3289531274434303,
+    "Sortino": 2.705242424492421,
+    "MDD": -0.11289722654519829,
+    "Calmar": 1.6208056393053547,
+    "FinalMultiple": 4.230614253711762,
+    "PositiveMonths": 0.6310679611650486
+  },
+  "selected_locked_metrics": {
+    "Months": 103.0,
+    "CAGR": 0.18286748547292642,
+    "Volatility": 0.13380087132288868,
+    "Sharpe": 1.3290137167227027,
+    "Sortino": 2.7048614741152024,
+    "MDD": -0.11289722654519829,
+    "Calmar": 1.6197695113414996,
+    "FinalMultiple": 4.227024916921137,
+    "PositiveMonths": 0.6310679611650486
+  },
+  "locked_deltas": {
+    "CAGR": -0.00011697597346516098,
+    "Sharpe": 6.058927927243829e-05,
+    "MDD": 0.0,
+    "Calmar": -0.0010361279638551046
+  },
+  "passes_all_three": false,
+  "bootstrap": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_cagr_improves": 0.2562,
+    "probability_sharpe_improves": 0.5328,
+    "probability_mdd_improves": 0.5042,
+    "probability_all_three_improve": 0.1538
+  }
+}

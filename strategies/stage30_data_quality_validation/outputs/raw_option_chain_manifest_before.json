@@ -1,0 +1,142 @@
+{
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice.csv": {
+    "sha256": "8687e09198e4951716fa87e301db7f98567fc681dd33c86c8c24d4ec6de0d497",
+    "bytes": 113611559,
+    "last_write_time_ns": 1787869403560228800
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2000.csv": {
+    "sha256": "8f932c7d0b04698f02fcb50369ebbee720fa56d72336cd826de82cc19373912f",
+    "bytes": 1151983,
+    "last_write_time_ns": 1787868096761029400
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2001.csv": {
+    "sha256": "cd01be18c500decf917db0ced11dbfb9570564e824f6b6bb223d478899dd6657",
+    "bytes": 878699,
+    "last_write_time_ns": 1787868063341607800
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2002.csv": {
+    "sha256": "92ddb7eb42319fea2ad6d7bbe6fd20018b2a7e1a43b2324f5b74be3fa1030eb8",
+    "bytes": 1352821,
+    "last_write_time_ns": 1787868019977102400
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2003.csv": {
+    "sha256": "97cfad38e37796a294511a89e7d6a88fe848e37eddc261c02decf77b85b743fd",
+    "bytes": 1111103,
+    "last_write_time_ns": 1787867980160295100
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2004.csv": {
+    "sha256": "8ae2832f43f04517bbd99873b12e14212989a9927b9d4417254ea616c8a49a5b",
+    "bytes": 1131604,
+    "last_write_time_ns": 1787867950718328100
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2005.csv": {
+    "sha256": "7ccbd3e6fa2bce631e399d92ef9093c8c546db9fb5c2302671d616ba49c8f82c",
+    "bytes": 1196771,
+    "last_write_time_ns": 1787867915209976900
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2006.csv": {
+    "sha256": "84522ccb7922baefb485ec3f1fbd2b12573da23023f7904a32777b1653155e76",
+    "bytes": 1324603,
+    "last_write_time_ns": 1787867884919909800
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2007.csv": {
+    "sha256": "b8384f57f72923a1f9169a45a787b1ba075098e0479efabbea903867487f0e5e",
+    "bytes": 1897274,
+    "last_write_time_ns": 1787867845678929500
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2008.csv": {
+    "sha256": "f8fed7326783f8c8155eca8ec007c8464091a8d612476d1a83ef41a3273fca8e",
+    "bytes": 2212487,
+    "last_write_time_ns": 1787867806603783200
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2009.csv": {
+    "sha256": "ebbd77121e7d9a9aa7dab9ccf242ea83e450d09a6ef8fa7b6e050c74c4999ada",
+    "bytes": 1994163,
+    "last_write_time_ns": 1787867753792663600
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2010.csv": {
+    "sha256": "aaa2a1c08188f8d83dd49757d52f6c832e979466bde7dd18205a03ce62a81b05",
+    "bytes": 1603673,
+    "last_write_time_ns": 1787867717936245000
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2011.csv": {
+    "sha256": "d380dbe5a1926c4c62ef7db3cbedf1834d418b76f3c805c16c363382b39ae4fa",
+    "bytes": 2006807,
+    "last_write_time_ns": 1787867674735680900
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2012.csv": {
+    "sha256": "1615e6416c745589f733e17f08dc25af325359e07b1528c6098d0de5850418ea",
+    "bytes": 1698566,
+    "last_write_time_ns": 1787867604897179800
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2013.csv": {
+    "sha256": "de037769bb12aaceacc820520b3bd6153f11462a7d53fea514a5ca9d358adddb",
+    "bytes": 1580071,
+    "last_write_time_ns": 1787867566897122400
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2014.csv": {
+    "sha256": "33a248ccbd9681fe3a97383596e53d53cba77cd413b8b8de959432f33b7ea542",
+    "bytes": 1582908,
+    "last_write_time_ns": 1787867548445900800
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2015.csv": {
+    "sha256": "9b276276ab7b093b92a963e136bb6acedf4e2d9b2c9bcc0b5f09368fd56583a2",
+    "bytes": 2537563,
+    "last_write_time_ns": 1787867525445882200
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2016.csv": {
+    "sha256": "fb2c6245be550db95e2c129b3f5ba04fe718cd51cfbbee12cd2049ec454c72fd",
+    "bytes": 2423636,
+    "last_write_time_ns": 1787867492545610500
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2017.csv": {
+    "sha256": "945dad1f4bd939ce349d6d97e3967fa36abbeed389339c5aaf6086ce8a1467e3",
+    "bytes": 2872863,
+    "last_write_time_ns": 1787867418800262900
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2018.csv": {
+    "sha256": "b80a831d4f1bafd526c994fc8639bad56bf924086988b1c6e0262e7d0dfc160c",
+    "bytes": 3426662,
+    "last_write_time_ns": 1787867345386410600
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2019.csv": {
+    "sha256": "ab7684fc42bbb996be94b7d92e3ede8a2763bbf6e6ad75a04240ca5ef8f78b99",
+    "bytes": 3506144,
+    "last_write_time_ns": 1787867263824964600
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2020.csv": {
+    "sha256": "3766b224a15d592403b23d3afca451c82b8377043fd433fbe382a40356de8bbe",
+    "bytes": 4630023,
+    "last_write_time_ns": 1787867192767538600
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2021.csv": {
+    "sha256": "485fefa950608fb9b99db7ae7092d63228ffcb7f890025ee962f525aa6d63b72",
+    "bytes": 5372032,
+    "last_write_time_ns": 1787866917290447900
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2022.csv": {
+    "sha256": "08b73e69287b327fed16e0cd586484742dd0d618c4de0716337a942c0ba6e9e8",
+    "bytes": 6926697,
+    "last_write_time_ns": 1787866748261437100
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2023.csv": {
+    "sha256": "bdf9d92ada2f772b92ced51debcffe29d92cff5fbb871543f0c6dbf78267507e",
+    "bytes": 7105431,
+    "last_write_time_ns": 1787866677869775900
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2024.csv": {
+    "sha256": "8d4236fb5a5ab8699867596e725615b6b36db3cd8aed9ddc94255b3204e58163",
+    "bytes": 7232827,
+    "last_write_time_ns": 1787866395747263400
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2025.csv": {
+    "sha256": "d180f74da437b191e92963ce7ff6835e680c667bf6ef005b926cd4f6d2ca808e",
+    "bytes": 13216921,
+    "last_write_time_ns": 1787866255381737800
+  },
+  "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\KOSPI200OptionPrice\\KOSPI200Option2026.csv": {
+    "sha256": "66f9b618005ab4cb1de98a052fd742387c12b11d354f32c912b607140489745d",
+    "bytes": 26477345,
+    "last_write_time_ns": 1787866118770032100
+  }
+}

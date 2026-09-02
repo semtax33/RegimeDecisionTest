@@ -1,0 +1,660 @@
+{
+  "created": "2026-08-28T15:16:59",
+  "source_snapshot": "artifacts/archive/pre_refactor_python_20260828.zip",
+  "moves": [
+    {
+      "old": "regime_research.py",
+      "new": "strategies/core/regime_research.py",
+      "bytes": 26056,
+      "modified": "2026-08-23T20:03:22"
+    },
+    {
+      "old": "calibrate_configs.py",
+      "new": "strategies/stage01_baseline/calibrate_configs.py",
+      "bytes": 2497,
+      "modified": "2026-08-23T19:52:15"
+    },
+    {
+      "old": "analyze_cagr_constraint.py",
+      "new": "strategies/stage02_return_enhancement/analyze_cagr_constraint.py",
+      "bytes": 2169,
+      "modified": "2026-08-24T00:32:49"
+    },
+    {
+      "old": "adaptive_vol_experiment.py",
+      "new": "strategies/stage02_return_enhancement/adaptive_vol_experiment.py",
+      "bytes": 10204,
+      "modified": "2026-08-24T00:44:09"
+    },
+    {
+      "old": "validate_cagr_accelerator.py",
+      "new": "strategies/stage02_return_enhancement/validate_cagr_accelerator.py",
+      "bytes": 6138,
+      "modified": "2026-08-24T00:54:37"
+    },
+    {
+      "old": "cagr_accelerator_experiment.py",
+      "new": "strategies/stage02_return_enhancement/cagr_accelerator_experiment.py",
+      "bytes": 12143,
+      "modified": "2026-08-24T00:55:38"
+    },
+    {
+      "old": "analyze_hard_strategy.py",
+      "new": "strategies/stage02_return_enhancement/analyze_hard_strategy.py",
+      "bytes": 2986,
+      "modified": "2026-08-24T01:09:37"
+    },
+    {
+      "old": "hard_overlay_experiment.py",
+      "new": "strategies/stage02_return_enhancement/hard_overlay_experiment.py",
+      "bytes": 9088,
+      "modified": "2026-08-24T01:11:37"
+    },
+    {
+      "old": "build_crash_features.py",
+      "new": "strategies/stage03_tail_risk/build_crash_features.py",
+      "bytes": 5579,
+      "modified": "2026-08-24T01:19:49"
+    },
+    {
+      "old": "hard_crash_model_experiment.py",
+      "new": "strategies/stage03_tail_risk/hard_crash_model_experiment.py",
+      "bytes": 12624,
+      "modified": "2026-08-24T01:21:46"
+    },
+    {
+      "old": "daily_hard_overlay_experiment.py",
+      "new": "strategies/stage03_tail_risk/daily_hard_overlay_experiment.py",
+      "bytes": 13201,
+      "modified": "2026-08-24T01:28:17"
+    },
+    {
+      "old": "leveraged_daily_overlay_experiment.py",
+      "new": "strategies/stage03_tail_risk/leveraged_daily_overlay_experiment.py",
+      "bytes": 12353,
+      "modified": "2026-08-24T02:22:25"
+    },
+    {
+      "old": "daily_stoploss_experiment.py",
+      "new": "strategies/stage03_tail_risk/daily_stoploss_experiment.py",
+      "bytes": 9987,
+      "modified": "2026-08-24T02:29:27"
+    },
+    {
+      "old": "hard_crash_rank_experiment.py",
+      "new": "strategies/stage03_tail_risk/hard_crash_rank_experiment.py",
+      "bytes": 8801,
+      "modified": "2026-08-24T02:34:32"
+    },
+    {
+      "old": "daily_guard_experiment.py",
+      "new": "strategies/stage03_tail_risk/daily_guard_experiment.py",
+      "bytes": 8793,
+      "modified": "2026-08-24T02:39:07"
+    },
+    {
+      "old": "hard_crash_short_experiment.py",
+      "new": "strategies/stage03_tail_risk/hard_crash_short_experiment.py",
+      "bytes": 8592,
+      "modified": "2026-08-24T02:45:12"
+    },
+    {
+      "old": "evaluate_hard_crash_short_boundary.py",
+      "new": "strategies/stage03_tail_risk/evaluate_hard_crash_short_boundary.py",
+      "bytes": 3439,
+      "modified": "2026-08-24T02:48:56"
+    },
+    {
+      "old": "download_stress_data.py",
+      "new": "strategies/stage03_tail_risk/download_stress_data.py",
+      "bytes": 1872,
+      "modified": "2026-08-24T02:51:02"
+    },
+    {
+      "old": "synthetic_put_overlay_experiment.py",
+      "new": "strategies/stage03_tail_risk/synthetic_put_overlay_experiment.py",
+      "bytes": 12314,
+      "modified": "2026-08-24T02:54:10"
+    },
+    {
+      "old": "evaluate_rank_mdd15.py",
+      "new": "strategies/stage03_tail_risk/evaluate_rank_mdd15.py",
+      "bytes": 3612,
+      "modified": "2026-08-24T02:58:40"
+    },
+    {
+      "old": "blend_leverage_experiment.py",
+      "new": "strategies/stage03_tail_risk/blend_leverage_experiment.py",
+      "bytes": 6516,
+      "modified": "2026-08-24T03:00:14"
+    },
+    {
+      "old": "simple_risk_overlay_experiment.py",
+      "new": "strategies/stage03_tail_risk/simple_risk_overlay_experiment.py",
+      "bytes": 4494,
+      "modified": "2026-08-24T03:01:53"
+    },
+    {
+      "old": "evaluate_simple_risk_mdd12.py",
+      "new": "strategies/stage03_tail_risk/evaluate_simple_risk_mdd12.py",
+      "bytes": 2860,
+      "modified": "2026-08-24T03:04:14"
+    },
+    {
+      "old": "evaluate_blend_mdd15_return.py",
+      "new": "strategies/stage03_tail_risk/evaluate_blend_mdd15_return.py",
+      "bytes": 2354,
+      "modified": "2026-08-24T03:05:04"
+    },
+    {
+      "old": "validate_final_blend.py",
+      "new": "strategies/stage03_tail_risk/validate_final_blend.py",
+      "bytes": 12050,
+      "modified": "2026-08-24T03:07:32"
+    },
+    {
+      "old": "regime_lightgbm_factor_experiment.py",
+      "new": "strategies/stage04_ml_feedback/regime_lightgbm_factor_experiment.py",
+      "bytes": 43082,
+      "modified": "2026-08-25T20:38:01"
+    },
+    {
+      "old": "feedback_alternative_strategies_experiment.py",
+      "new": "strategies/stage04_ml_feedback/feedback_alternative_strategies_experiment.py",
+      "bytes": 23389,
+      "modified": "2026-08-25T21:28:48"
+    },
+    {
+      "old": "feedback_strategy_robustness.py",
+      "new": "strategies/stage04_ml_feedback/feedback_strategy_robustness.py",
+      "bytes": 3323,
+      "modified": "2026-08-25T21:28:48"
+    },
+    {
+      "old": "short_regime_tail_risk_experiment.py",
+      "new": "strategies/stage04_ml_feedback/short_regime_tail_risk_experiment.py",
+      "bytes": 15870,
+      "modified": "2026-08-26T17:51:14"
+    },
+    {
+      "old": "final_blend_crash_meta_experiment.py",
+      "new": "strategies/stage04_ml_feedback/final_blend_crash_meta_experiment.py",
+      "bytes": 10385,
+      "modified": "2026-08-26T17:56:33"
+    },
+    {
+      "old": "final_blend_crash_meta_robustness.py",
+      "new": "strategies/stage04_ml_feedback/final_blend_crash_meta_robustness.py",
+      "bytes": 3839,
+      "modified": "2026-08-26T17:58:00"
+    },
+    {
+      "old": "market_structure_feature_experiment.py",
+      "new": "strategies/stage04_ml_feedback/market_structure_feature_experiment.py",
+      "bytes": 19655,
+      "modified": "2026-08-26T18:18:02"
+    },
+    {
+      "old": "market_structure_robustness.py",
+      "new": "strategies/stage04_ml_feedback/market_structure_robustness.py",
+      "bytes": 11964,
+      "modified": "2026-08-26T18:23:10"
+    },
+    {
+      "old": "openassetpricing_signal_experiment.py",
+      "new": "strategies/stage05_openassetpricing/openassetpricing_signal_experiment.py",
+      "bytes": 45682,
+      "modified": "2026-08-26T18:56:06"
+    },
+    {
+      "old": "vkospi_feature_experiment.py",
+      "new": "strategies/stage06_vkospi/vkospi_feature_experiment.py",
+      "bytes": 29012,
+      "modified": "2026-08-27T04:23:38"
+    },
+    {
+      "old": "vkospi_dynamic_risk_experiment.py",
+      "new": "strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py",
+      "bytes": 32672,
+      "modified": "2026-08-27T19:06:00"
+    },
+    {
+      "old": "vkospi_reprocessing_experiment.py",
+      "new": "strategies/stage06_vkospi/vkospi_reprocessing_experiment.py",
+      "bytes": 29436,
+      "modified": "2026-08-27T19:03:00"
+    },
+    {
+      "old": "vkospi_robust_dynamic_experiment.py",
+      "new": "strategies/stage06_vkospi/vkospi_robust_dynamic_experiment.py",
+      "bytes": 17132,
+      "modified": "2026-08-27T19:13:44"
+    },
+    {
+      "old": "vkospi_robust_dynamic_attribution.py",
+      "new": "strategies/stage06_vkospi/vkospi_robust_dynamic_attribution.py",
+      "bytes": 9614,
+      "modified": "2026-08-27T19:29:37"
+    },
+    {
+      "old": "vkospi_extended_diagnostics.py",
+      "new": "strategies/stage06_vkospi/vkospi_extended_diagnostics.py",
+      "bytes": 24109,
+      "modified": "2026-08-27T21:58:32"
+    },
+    {
+      "old": "vkospi_model_robustness.py",
+      "new": "strategies/stage06_vkospi/vkospi_model_robustness.py",
+      "bytes": 51213,
+      "modified": "2026-08-28T14:52:48"
+    },
+    {
+      "old": "balanced_logistic_no_sjm_strategy.py",
+      "new": "strategies/stage06_vkospi/balanced_logistic_no_sjm_strategy.py",
+      "bytes": 27944,
+      "modified": "2026-08-28T14:52:48"
+    },
+    {
+      "old": "top3_regime_model_experiment.py",
+      "new": "strategies/stage07_regime_models/top3_regime_model_experiment.py",
+      "bytes": 44143,
+      "modified": "2026-08-27T18:56:09"
+    },
+    {
+      "old": "vix6_case1_strategy.py",
+      "new": "strategies/stage08_options/vix6_case1_strategy.py",
+      "bytes": 49066,
+      "modified": "2026-08-28T11:04:46"
+    },
+    {
+      "old": "vix6_case1_model_comparison.py",
+      "new": "strategies/stage08_options/vix6_case1_model_comparison.py",
+      "bytes": 24975,
+      "modified": "2026-08-28T08:22:51"
+    },
+    {
+      "old": "vix6_processed_input_experiment.py",
+      "new": "strategies/stage08_options/vix6_processed_input_experiment.py",
+      "bytes": 16084,
+      "modified": "2026-08-28T10:53:03"
+    },
+    {
+      "old": "option_asset_slippage_experiment.py",
+      "new": "strategies/stage08_options/option_asset_slippage_experiment.py",
+      "bytes": 34955,
+      "modified": "2026-08-28T11:09:13"
+    },
+    {
+      "old": "hysteresis_hard40_leverage_experiment.py",
+      "new": "strategies/stage09_hysteresis/hysteresis_hard40_leverage_experiment.py",
+      "bytes": 16595,
+      "modified": "2026-08-28T14:54:53"
+    },
+    {
+      "old": "build_validated_notebook.py",
+      "new": "tools/builders/build_validated_notebook.py",
+      "bytes": 18888,
+      "modified": "2026-08-23T20:07:58"
+    },
+    {
+      "old": "build_cagr_enhanced_notebook.py",
+      "new": "tools/builders/build_cagr_enhanced_notebook.py",
+      "bytes": 16719,
+      "modified": "2026-08-24T01:04:49"
+    },
+    {
+      "old": "build_final_blend_notebook.py",
+      "new": "tools/builders/build_final_blend_notebook.py",
+      "bytes": 18747,
+      "modified": "2026-08-24T03:14:09"
+    },
+    {
+      "old": "build_colab_notebook.py",
+      "new": "tools/builders/build_colab_notebook.py",
+      "bytes": 23627,
+      "modified": "2026-08-26T17:52:46"
+    },
+    {
+      "old": "build_implementation_guide.py",
+      "new": "tools/builders/build_implementation_guide.py",
+      "bytes": 113317,
+      "modified": "2026-08-23T21:26:42"
+    },
+    {
+      "old": "build_openassetpricing_colab_notebook.py",
+      "new": "tools/builders/build_openassetpricing_colab_notebook.py",
+      "bytes": 32782,
+      "modified": "2026-08-26T19:12:59"
+    },
+    {
+      "old": "build_vkospi_dynamic_deliverables.py",
+      "new": "tools/builders/build_vkospi_dynamic_deliverables.py",
+      "bytes": 33171,
+      "modified": "2026-08-27T06:37:19"
+    },
+    {
+      "old": "build_vkospi_robust_dynamic_deliverables.py",
+      "new": "tools/builders/build_vkospi_robust_dynamic_deliverables.py",
+      "bytes": 35179,
+      "modified": "2026-08-28T02:31:11"
+    },
+    {
+      "old": "build_vkospi_robust_dynamic_technical_report.py",
+      "new": "tools/builders/build_vkospi_robust_dynamic_technical_report.py",
+      "bytes": 156158,
+      "modified": "2026-08-28T02:34:33"
+    },
+    {
+      "old": "build_top3_regime_model_deliverables.py",
+      "new": "tools/builders/build_top3_regime_model_deliverables.py",
+      "bytes": 34971,
+      "modified": "2026-08-27T18:53:10"
+    },
+    {
+      "old": "build_vix6_case1_html.py",
+      "new": "tools/builders/build_vix6_case1_html.py",
+      "bytes": 10542,
+      "modified": "2026-08-28T08:33:24"
+    },
+    {
+      "old": "build_robust_vkospi_implementation_guide.py",
+      "new": "tools/builders/build_robust_vkospi_implementation_guide.py",
+      "bytes": 60011,
+      "modified": "2026-08-28T13:08:21"
+    },
+    {
+      "old": "build_hysteresis_hard40_leverage_deliverables.py",
+      "new": "tools/builders/build_hysteresis_hard40_leverage_deliverables.py",
+      "bytes": 29640,
+      "modified": "2026-08-28T15:04:32"
+    },
+    {
+      "old": "test_vkospi_feature_experiment.py",
+      "new": "tests/test_vkospi_feature_experiment.py",
+      "bytes": 3415,
+      "modified": "2026-08-27T04:26:34"
+    },
+    {
+      "old": "test_vkospi_dynamic_risk_experiment.py",
+      "new": "tests/test_vkospi_dynamic_risk_experiment.py",
+      "bytes": 4485,
+      "modified": "2026-08-27T04:55:26"
+    },
+    {
+      "old": "test_top3_regime_model_experiment.py",
+      "new": "tests/test_top3_regime_model_experiment.py",
+      "bytes": 4138,
+      "modified": "2026-08-27T18:48:10"
+    },
+    {
+      "old": "test_vkospi_robust_dynamic_experiment.py",
+      "new": "tests/test_vkospi_robust_dynamic_experiment.py",
+      "bytes": 6078,
+      "modified": "2026-08-27T19:36:58"
+    },
+    {
+      "old": "test_vkospi_extended_diagnostics.py",
+      "new": "tests/test_vkospi_extended_diagnostics.py",
+      "bytes": 6282,
+      "modified": "2026-08-27T22:15:03"
+    },
+    {
+      "old": "test_vkospi_model_robustness.py",
+      "new": "tests/test_vkospi_model_robustness.py",
+      "bytes": 4115,
+      "modified": "2026-08-28T02:30:36"
+    },
+    {
+      "old": "test_balanced_logistic_no_sjm_strategy.py",
+      "new": "tests/test_balanced_logistic_no_sjm_strategy.py",
+      "bytes": 3900,
+      "modified": "2026-08-28T02:55:47"
+    },
+    {
+      "old": "test_vix6_case1_strategy.py",
+      "new": "tests/test_vix6_case1_strategy.py",
+      "bytes": 4489,
+      "modified": "2026-08-28T08:24:09"
+    },
+    {
+      "old": "test_vix6_processed_input_experiment.py",
+      "new": "tests/test_vix6_processed_input_experiment.py",
+      "bytes": 2816,
+      "modified": "2026-08-28T10:47:17"
+    },
+    {
+      "old": "test_option_asset_slippage_experiment.py",
+      "new": "tests/test_option_asset_slippage_experiment.py",
+      "bytes": 4379,
+      "modified": "2026-08-28T11:09:23"
+    },
+    {
+      "old": "test_hysteresis_hard40_leverage_experiment.py",
+      "new": "tests/test_hysteresis_hard40_leverage_experiment.py",
+      "bytes": 5233,
+      "modified": "2026-08-28T15:08:38"
+    },
+    {
+      "old": "balanced_logistic_no_sjm_strategy_explainer.html",
+      "new": "artifacts/reports/balanced_logistic_no_sjm_strategy_explainer.html",
+      "bytes": 46921,
+      "modified": "2026-08-28T03:19:06"
+    },
+    {
+      "old": "economic_regime_allocation_cagr_enhanced.html",
+      "new": "artifacts/reports/economic_regime_allocation_cagr_enhanced.html",
+      "bytes": 847455,
+      "modified": "2026-08-24T01:05:43"
+    },
+    {
+      "old": "economic_regime_allocation_four_asset_mdd15.html",
+      "new": "artifacts/reports/economic_regime_allocation_four_asset_mdd15.html",
+      "bytes": 1009408,
+      "modified": "2026-08-24T03:14:37"
+    },
+    {
+      "old": "economic_regime_allocation_validated.html",
+      "new": "artifacts/reports/economic_regime_allocation_validated.html",
+      "bytes": 829790,
+      "modified": "2026-08-23T20:10:28"
+    },
+    {
+      "old": "economic_regime_implementation_guide.html",
+      "new": "artifacts/reports/economic_regime_implementation_guide.html",
+      "bytes": 324013,
+      "modified": "2026-08-23T21:26:52"
+    },
+    {
+      "old": "hysteresis_hard40_leverage_report.html",
+      "new": "artifacts/reports/hysteresis_hard40_leverage_report.html",
+      "bytes": 34578,
+      "modified": "2026-08-28T15:04:41"
+    },
+    {
+      "old": "regime_strategy_sharpe_1_1_explainer.html",
+      "new": "artifacts/reports/regime_strategy_sharpe_1_1_explainer.html",
+      "bytes": 56903,
+      "modified": "2026-08-26T17:37:21"
+    },
+    {
+      "old": "robust_vkospi_implementation_guide.html",
+      "new": "artifacts/reports/robust_vkospi_implementation_guide.html",
+      "bytes": 52659,
+      "modified": "2026-08-28T13:08:26"
+    },
+    {
+      "old": "top3_regime_model_report.html",
+      "new": "artifacts/reports/top3_regime_model_report.html",
+      "bytes": 31201,
+      "modified": "2026-08-27T18:56:28"
+    },
+    {
+      "old": "vix6_case1_strategy_report.html",
+      "new": "artifacts/reports/vix6_case1_strategy_report.html",
+      "bytes": 28560,
+      "modified": "2026-08-28T08:33:44"
+    },
+    {
+      "old": "vkospi_dynamic_strategy_explainer.html",
+      "new": "artifacts/reports/vkospi_dynamic_strategy_explainer.html",
+      "bytes": 32457,
+      "modified": "2026-08-27T06:37:23"
+    },
+    {
+      "old": "vkospi_robust_dynamic_strategy_explainer.html",
+      "new": "artifacts/reports/vkospi_robust_dynamic_strategy_explainer.html",
+      "bytes": 30452,
+      "modified": "2026-08-28T02:31:18"
+    },
+    {
+      "old": "vkospi_robust_dynamic_technical_report.html",
+      "new": "artifacts/reports/vkospi_robust_dynamic_technical_report.html",
+      "bytes": 525704,
+      "modified": "2026-08-28T02:34:39"
+    },
+    {
+      "old": "economic_regime_allocation_cagr_enhanced.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_cagr_enhanced.ipynb",
+      "bytes": 61061,
+      "modified": "2026-08-24T01:05:03"
+    },
+    {
+      "old": "economic_regime_allocation_cagr_enhanced_executed.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_cagr_enhanced_executed.ipynb",
+      "bytes": 629192,
+      "modified": "2026-08-24T01:05:41"
+    },
+    {
+      "old": "economic_regime_allocation_colab.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_colab.ipynb",
+      "bytes": 60722,
+      "modified": "2026-08-26T17:52:54"
+    },
+    {
+      "old": "economic_regime_allocation_colab_executed.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_colab_executed.ipynb",
+      "bytes": 579422,
+      "modified": "2026-08-26T17:52:56"
+    },
+    {
+      "old": "economic_regime_allocation_four_asset_mdd15.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_four_asset_mdd15.ipynb",
+      "bytes": 59322,
+      "modified": "2026-08-24T03:14:16"
+    },
+    {
+      "old": "economic_regime_allocation_four_asset_mdd15_executed.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_four_asset_mdd15_executed.ipynb",
+      "bytes": 794557,
+      "modified": "2026-08-24T03:14:35"
+    },
+    {
+      "old": "economic_regime_allocation_validated.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_validated.ipynb",
+      "bytes": 54789,
+      "modified": "2026-08-23T20:08:06"
+    },
+    {
+      "old": "economic_regime_allocation_validated_executed.ipynb",
+      "new": "artifacts/notebooks/economic_regime_allocation_validated_executed.ipynb",
+      "bytes": 600316,
+      "modified": "2026-08-23T20:08:39"
+    },
+    {
+      "old": "hysteresis_hard40_leverage_colab.ipynb",
+      "new": "artifacts/notebooks/hysteresis_hard40_leverage_colab.ipynb",
+      "bytes": 9335,
+      "modified": "2026-08-28T15:04:41"
+    },
+    {
+      "old": "openassetpricing_latest_experiment_colab.ipynb",
+      "new": "artifacts/notebooks/openassetpricing_latest_experiment_colab.ipynb",
+      "bytes": 782926,
+      "modified": "2026-08-26T19:15:17"
+    },
+    {
+      "old": "openassetpricing_latest_experiment_colab_executed.ipynb",
+      "new": "artifacts/notebooks/openassetpricing_latest_experiment_colab_executed.ipynb",
+      "bytes": 782926,
+      "modified": "2026-08-26T19:15:17"
+    },
+    {
+      "old": "top3_regime_models_colab.ipynb",
+      "new": "artifacts/notebooks/top3_regime_models_colab.ipynb",
+      "bytes": 17067,
+      "modified": "2026-08-27T18:56:28"
+    },
+    {
+      "old": "vix6_case1_colab.ipynb",
+      "new": "artifacts/notebooks/vix6_case1_colab.ipynb",
+      "bytes": 7438,
+      "modified": "2026-08-28T08:36:11"
+    },
+    {
+      "old": "vkospi_dynamic_strategy_colab.ipynb",
+      "new": "artifacts/notebooks/vkospi_dynamic_strategy_colab.ipynb",
+      "bytes": 13342,
+      "modified": "2026-08-27T06:37:23"
+    },
+    {
+      "old": "vkospi_robust_dynamic_strategy_colab.ipynb",
+      "new": "artifacts/notebooks/vkospi_robust_dynamic_strategy_colab.ipynb",
+      "bytes": 20360,
+      "modified": "2026-08-28T02:31:18"
+    },
+    {
+      "old": "hysteresis_hard40_leverage_colab_bundle.zip",
+      "new": "artifacts/bundles/hysteresis_hard40_leverage_colab_bundle.zip",
+      "bytes": 3198412,
+      "modified": "2026-08-28T15:04:42"
+    },
+    {
+      "old": "openassetpricing_latest_colab_bundle.zip",
+      "new": "artifacts/bundles/openassetpricing_latest_colab_bundle.zip",
+      "bytes": 3803890,
+      "modified": "2026-08-26T19:13:07"
+    },
+    {
+      "old": "openassetpricing_latest_results.zip",
+      "new": "artifacts/bundles/openassetpricing_latest_results.zip",
+      "bytes": 648783,
+      "modified": "2026-08-26T19:15:16"
+    },
+    {
+      "old": "regime_colab_inputs.zip",
+      "new": "artifacts/bundles/regime_colab_inputs.zip",
+      "bytes": 3025634,
+      "modified": "2026-08-26T17:52:56"
+    },
+    {
+      "old": "top3_regime_models_colab_bundle.zip",
+      "new": "artifacts/bundles/top3_regime_models_colab_bundle.zip",
+      "bytes": 3446972,
+      "modified": "2026-08-27T18:56:30"
+    },
+    {
+      "old": "top3_regime_model_results.zip",
+      "new": "artifacts/bundles/top3_regime_model_results.zip",
+      "bytes": 154068,
+      "modified": "2026-08-27T18:55:01"
+    },
+    {
+      "old": "vkospi_dynamic_colab_bundle.zip",
+      "new": "artifacts/bundles/vkospi_dynamic_colab_bundle.zip",
+      "bytes": 3423455,
+      "modified": "2026-08-27T06:37:25"
+    },
+    {
+      "old": "vkospi_dynamic_results.zip",
+      "new": "artifacts/bundles/vkospi_dynamic_results.zip",
+      "bytes": 524658,
+      "modified": "2026-08-27T06:36:12"
+    },
+    {
+      "old": "vkospi_robust_dynamic_colab_bundle.zip",
+      "new": "artifacts/bundles/vkospi_robust_dynamic_colab_bundle.zip",
+      "bytes": 4702142,
+      "modified": "2026-08-28T02:31:21"
+    }
+  ]
+}

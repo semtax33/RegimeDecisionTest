@@ -1,0 +1,22 @@
+{
+  "baseline": "Stage20_DailyTechnicalConfidence",
+  "point_targets": {
+    "cagr_at_least": 0.1,
+    "sharpe_at_least": 1.0,
+    "mdd_no_worse_than_stage20": true
+  },
+  "candidates_passing_all_point_targets": [],
+  "candidates_pareto_improving_stage20": [
+    "Stage24_EquityKRatioOnly"
+  ],
+  "recommended_deployment_candidate": "Stage24_EquityKRatioOnly",
+  "target_achieved": false,
+  "selection_warning": "Stage21-23 were predeclared. Stage24-27 are exploratory adaptive follow-ups and require fresh out-of-sample confirmation.",
+  "bootstrap": {
+    "method": "paired moving-block bootstrap",
+    "block_months": 12,
+    "replications": 2000,
+    "seed": 20260829,
+    "purpose": "descriptive uncertainty, not post-selection significance"
+  }
+}

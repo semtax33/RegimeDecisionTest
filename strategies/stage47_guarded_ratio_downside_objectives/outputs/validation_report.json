@@ -1,0 +1,1048 @@
+{
+  "study": "Stage47_Guarded_Ratio_Downside_Objectives",
+  "base_strategy": "Stage36_GVZ_OVXAssetRisk",
+  "decision": "retain_stage36_no_objective_passed_all_gates",
+  "promoted_strategy": "Stage36_GVZ_OVXAssetRisk",
+  "promotion_priority": [
+    "Stage47_D_GuardedDownsidePenalty_LW",
+    "Stage47_C_GuardedExAnteSharpe_LW",
+    "Stage47_B_GuardedStage36Objective_LW",
+    "Stage47_E_GuardedDirectSortino_LW"
+  ],
+  "fixed_design": {
+    "experiments": {
+      "A": "Stage36 frozen baseline",
+      "B": "Stage36 expected return plus LW covariance plus original Stage36 utility",
+      "C": "Stage36 expected return plus LW covariance; directly maximize ex-ante Sharpe",
+      "D": "Stage36 expected return plus LW guard; maximize excess return after cost minus historical excess downside semivariance",
+      "E": "Stage36 expected return plus LW guard; directly maximize ex-ante Sortino"
+    },
+    "cash_proxy": "prior-known KTB 3Y annual yield divided by 12",
+    "covariance": "252 complete prior daily rows; constant-correlation Ledoit-Wolf; Stage36 GVZ/OVX variance scaling",
+    "shadow_constraints": "long-only, fully invested, 13% annual volatility, -16% CDaR, Stage36 turnover budget except minimum risk-required trade",
+    "common_deployment_guard": "Stage46 rule: maximum 1/(N*(N+1))=5% tilt, drawdown attenuation, LW/CDaR risk veto, Stage36 fallback",
+    "downside_penalty_lambda": 1.0,
+    "parameter_grid": null,
+    "promotion_rule": "predeclared D then C then B then E; first candidate passing every Stage46 performance and majority-positive bootstrap gate"
+  },
+  "gate_results": {
+    "Stage47_B_GuardedStage36Objective_LW": {
+      "gates": {
+        "full_2007_2026_sharpe_not_lower": false,
+        "full_2007_2026_mdd_not_worse": false,
+        "full_2007_2026_cagr_within_50bp": true,
+        "full_2007_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_sharpe_not_lower": false,
+        "common_2010_2026_mdd_not_worse": false,
+        "common_2010_2026_cagr_within_50bp": true,
+        "common_2010_2026_turnover_not_materially_higher": true,
+        "locked_2018_2026_sharpe_not_lower": false,
+        "locked_2018_2026_mdd_not_worse": false,
+        "locked_2018_2026_cagr_within_50bp": true,
+        "locked_2018_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_bootstrap_sharpe_probability": false,
+        "common_2010_2026_bootstrap_mdd_probability": false,
+        "locked_2018_2026_bootstrap_sharpe_probability": false,
+        "locked_2018_2026_bootstrap_mdd_probability": false
+      },
+      "pass": false
+    },
+    "Stage47_C_GuardedExAnteSharpe_LW": {
+      "gates": {
+        "full_2007_2026_sharpe_not_lower": true,
+        "full_2007_2026_mdd_not_worse": true,
+        "full_2007_2026_cagr_within_50bp": true,
+        "full_2007_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_sharpe_not_lower": false,
+        "common_2010_2026_mdd_not_worse": true,
+        "common_2010_2026_cagr_within_50bp": true,
+        "common_2010_2026_turnover_not_materially_higher": true,
+        "locked_2018_2026_sharpe_not_lower": false,
+        "locked_2018_2026_mdd_not_worse": true,
+        "locked_2018_2026_cagr_within_50bp": true,
+        "locked_2018_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_bootstrap_sharpe_probability": false,
+        "common_2010_2026_bootstrap_mdd_probability": true,
+        "locked_2018_2026_bootstrap_sharpe_probability": false,
+        "locked_2018_2026_bootstrap_mdd_probability": true
+      },
+      "pass": false
+    },
+    "Stage47_D_GuardedDownsidePenalty_LW": {
+      "gates": {
+        "full_2007_2026_sharpe_not_lower": false,
+        "full_2007_2026_mdd_not_worse": false,
+        "full_2007_2026_cagr_within_50bp": true,
+        "full_2007_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_sharpe_not_lower": false,
+        "common_2010_2026_mdd_not_worse": false,
+        "common_2010_2026_cagr_within_50bp": true,
+        "common_2010_2026_turnover_not_materially_higher": true,
+        "locked_2018_2026_sharpe_not_lower": false,
+        "locked_2018_2026_mdd_not_worse": false,
+        "locked_2018_2026_cagr_within_50bp": true,
+        "locked_2018_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_bootstrap_sharpe_probability": false,
+        "common_2010_2026_bootstrap_mdd_probability": false,
+        "locked_2018_2026_bootstrap_sharpe_probability": false,
+        "locked_2018_2026_bootstrap_mdd_probability": false
+      },
+      "pass": false
+    },
+    "Stage47_E_GuardedDirectSortino_LW": {
+      "gates": {
+        "full_2007_2026_sharpe_not_lower": false,
+        "full_2007_2026_mdd_not_worse": true,
+        "full_2007_2026_cagr_within_50bp": true,
+        "full_2007_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_sharpe_not_lower": false,
+        "common_2010_2026_mdd_not_worse": true,
+        "common_2010_2026_cagr_within_50bp": true,
+        "common_2010_2026_turnover_not_materially_higher": true,
+        "locked_2018_2026_sharpe_not_lower": false,
+        "locked_2018_2026_mdd_not_worse": true,
+        "locked_2018_2026_cagr_within_50bp": true,
+        "locked_2018_2026_turnover_not_materially_higher": true,
+        "common_2010_2026_bootstrap_sharpe_probability": false,
+        "common_2010_2026_bootstrap_mdd_probability": true,
+        "locked_2018_2026_bootstrap_sharpe_probability": false,
+        "locked_2018_2026_bootstrap_mdd_probability": true
+      },
+      "pass": false
+    }
+  },
+  "performance_comparison": [
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1049938875,
+      "Volatility": 0.0947174638,
+      "Sharpe": 1.1049112901,
+      "Sortino": 2.2018564577,
+      "MDD": -0.1240708722,
+      "Calmar": 0.8462412301,
+      "FinalMultiple": 6.8911377181,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0369775517,
+      "TotalCost": 0.0265354519
+    },
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0923177929,
+      "Volatility": 0.087193443,
+      "Sharpe": 1.0592360313,
+      "Sortino": 2.0494518521,
+      "MDD": -0.1240708722,
+      "Calmar": 0.7440730548,
+      "FinalMultiple": 4.3246840303,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0279465684,
+      "TotalCost": 0.0180913888
+    },
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1262562043,
+      "Volatility": 0.1017821984,
+      "Sharpe": 1.2235051573,
+      "Sortino": 2.5377845953,
+      "MDD": -0.119311114,
+      "Calmar": 1.0582099189,
+      "FinalMultiple": 2.7747206697,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0261551454,
+      "TotalCost": 0.0086887009
+    },
+    {
+      "Strategy": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1054425256,
+      "Volatility": 0.0951795519,
+      "Sharpe": 1.104291359,
+      "Sortino": 2.2018045693,
+      "MDD": -0.1240891095,
+      "Calmar": 0.8497323098,
+      "FinalMultiple": 6.9454316208,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.037152934,
+      "TotalCost": 0.0266835591
+    },
+    {
+      "Strategy": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0928570941,
+      "Volatility": 0.0877719568,
+      "Sharpe": 1.0584728995,
+      "Sortino": 2.0509361237,
+      "MDD": -0.1240891095,
+      "Calmar": 0.7483097788,
+      "FinalMultiple": 4.3602291554,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.028157663,
+      "TotalCost": 0.0182443552
+    },
+    {
+      "Strategy": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1268708608,
+      "Volatility": 0.1025613252,
+      "Sharpe": 1.2203242729,
+      "Sortino": 2.5316665154,
+      "MDD": -0.1200150901,
+      "Calmar": 1.0571242392,
+      "FinalMultiple": 2.7877454188,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0266705242,
+      "TotalCost": 0.008872856
+    },
+    {
+      "Strategy": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1031810034,
+      "Volatility": 0.0929152375,
+      "Sharpe": 1.1067658674,
+      "Sortino": 2.2009027922,
+      "MDD": -0.1213796511,
+      "Calmar": 0.8500683809,
+      "FinalMultiple": 6.6758152947,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0384445435,
+      "TotalCost": 0.0277089264
+    },
+    {
+      "Strategy": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0900778498,
+      "Volatility": 0.0851355764,
+      "Sharpe": 1.0585539071,
+      "Sortino": 2.0321448798,
+      "MDD": -0.1213796511,
+      "Calmar": 0.7421165662,
+      "FinalMultiple": 4.1799439327,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0293212821,
+      "TotalCost": 0.0190187335
+    },
+    {
+      "Strategy": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1223641517,
+      "Volatility": 0.0994368986,
+      "Sharpe": 1.2149626371,
+      "Sortino": 2.4904232463,
+      "MDD": -0.1177082282,
+      "Calmar": 1.0395547839,
+      "FinalMultiple": 2.6934877461,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.027775851,
+      "TotalCost": 0.0092737551
+    },
+    {
+      "Strategy": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1055269191,
+      "Volatility": 0.0952618945,
+      "Sharpe": 1.1042217703,
+      "Sortino": 2.2032667209,
+      "MDD": -0.1240932692,
+      "Calmar": 0.8503839069,
+      "FinalMultiple": 6.9556900899,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0374000004,
+      "TotalCost": 0.0268633656
+    },
+    {
+      "Strategy": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0929544234,
+      "Volatility": 0.08787722,
+      "Sharpe": 1.0583239963,
+      "Sortino": 2.0527429383,
+      "MDD": -0.1240932692,
+      "Calmar": 0.7490690185,
+      "FinalMultiple": 4.3666732622,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0284456487,
+      "TotalCost": 0.0184241308
+    },
+    {
+      "Strategy": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1270485664,
+      "Volatility": 0.1027238215,
+      "Sharpe": 1.2200951929,
+      "Sortino": 2.5343565389,
+      "MDD": -0.1200150195,
+      "Calmar": 1.0586055549,
+      "FinalMultiple": 2.7915211027,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0271966825,
+      "TotalCost": 0.0090416973
+    },
+    {
+      "Strategy": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.103247858,
+      "Volatility": 0.0931860304,
+      "Sharpe": 1.1044629246,
+      "Sortino": 2.1971839661,
+      "MDD": -0.1214158518,
+      "Calmar": 0.8503655531,
+      "FinalMultiple": 6.6836412311,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.03828155,
+      "TotalCost": 0.0275791924
+    },
+    {
+      "Strategy": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0901707339,
+      "Volatility": 0.085448955,
+      "Sharpe": 1.0559718453,
+      "Sortino": 2.0295588008,
+      "MDD": -0.1214158518,
+      "Calmar": 0.7426603084,
+      "FinalMultiple": 4.1858543002,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0291912723,
+      "TotalCost": 0.0189316453
+    },
+    {
+      "Strategy": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1226997941,
+      "Volatility": 0.0998987508,
+      "Sharpe": 1.2128015109,
+      "Sortino": 2.4888601339,
+      "MDD": -0.1173252464,
+      "Calmar": 1.0458089614,
+      "FinalMultiple": 2.7004093464,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0275483873,
+      "TotalCost": 0.0091995663
+    }
+  ],
+  "bootstrap_vs_stage36": [
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0004545892,
+      "P05": -2.8222e-06,
+      "P50": 0.0004279799,
+      "P95": 0.0010086384,
+      "ProbabilityPositive": 0.9485,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0006257116,
+      "P05": -0.0039690999,
+      "P50": -0.0005507476,
+      "P95": 0.0022896871,
+      "ProbabilityPositive": 0.3915,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0003476566,
+      "P05": -0.001526134,
+      "P50": -6.45548e-05,
+      "P95": 0.0001857565,
+      "ProbabilityPositive": 0.1125,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.001848714,
+      "P05": -0.0038315152,
+      "P50": -0.0017046847,
+      "P95": -0.0002708639,
+      "ProbabilityPositive": 0.0185,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.002350675,
+      "P05": -0.006176256,
+      "P50": 0.002258668,
+      "P95": 0.0111176583,
+      "ProbabilityPositive": 0.671,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0017646356,
+      "P05": -7.48947e-05,
+      "P50": 0.0016028859,
+      "P95": 0.004405635,
+      "ProbabilityPositive": 0.845,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0005454566,
+      "P05": 9.4694e-06,
+      "P50": 0.000515258,
+      "P95": 0.0011998214,
+      "ProbabilityPositive": 0.9555,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0007428811,
+      "P05": -0.0041131115,
+      "P50": -0.0006283445,
+      "P95": 0.002054188,
+      "ProbabilityPositive": 0.3685,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0004083839,
+      "P05": -0.0016493455,
+      "P50": -0.000114731,
+      "P95": 6.7654e-06,
+      "ProbabilityPositive": 0.054,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.001774885,
+      "P05": -0.0035417996,
+      "P50": -0.0016523229,
+      "P95": -0.000309859,
+      "ProbabilityPositive": 0.015,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0001327016,
+      "P05": -0.0092701893,
+      "P50": 0.0001945542,
+      "P95": 0.0093551387,
+      "ProbabilityPositive": 0.5145,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "full_2007_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0017990871,
+      "P05": -0.0002431556,
+      "P50": 0.0019495762,
+      "P95": 0.0044894169,
+      "ProbabilityPositive": 0.837,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0005539555,
+      "P05": 3.748e-05,
+      "P50": 0.0005193356,
+      "P95": 0.0011763617,
+      "ProbabilityPositive": 0.966,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0007132538,
+      "P05": -0.0046182253,
+      "P50": -0.0006507731,
+      "P95": 0.0030233978,
+      "ProbabilityPositive": 0.38,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0004075781,
+      "P05": -0.0015609699,
+      "P50": -0.0001147301,
+      "P95": 0.000180137,
+      "ProbabilityPositive": 0.1255,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0023097693,
+      "P05": -0.0045866011,
+      "P50": -0.0021878832,
+      "P95": -0.0004823625,
+      "ProbabilityPositive": 0.011,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0001288147,
+      "P05": -0.0089602135,
+      "P50": -0.0003199169,
+      "P95": 0.0107943539,
+      "ProbabilityPositive": 0.48,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0018001128,
+      "P05": -2.87575e-05,
+      "P50": 0.0016028859,
+      "P95": 0.0043582453,
+      "ProbabilityPositive": 0.884,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0006599511,
+      "P05": 5.80562e-05,
+      "P50": 0.0006149569,
+      "P95": 0.001415171,
+      "ProbabilityPositive": 0.9755,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0009455576,
+      "P05": -0.0049808444,
+      "P50": -0.0008005722,
+      "P95": 0.0025318869,
+      "ProbabilityPositive": 0.348,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0004747587,
+      "P05": -0.001678187,
+      "P50": -0.00016337,
+      "P95": 2.95853e-05,
+      "ProbabilityPositive": 0.068,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0022063903,
+      "P05": -0.0042709539,
+      "P50": -0.0021017275,
+      "P95": -0.000550953,
+      "ProbabilityPositive": 0.0075,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0023111419,
+      "P05": -0.0122572535,
+      "P50": -0.0028859811,
+      "P95": 0.0091714343,
+      "ProbabilityPositive": 0.3485,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "common_2010_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0018403013,
+      "P05": -0.0002648608,
+      "P50": 0.0019823263,
+      "P95": 0.0045021572,
+      "ProbabilityPositive": 0.867,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0006478353,
+      "P05": -0.0002515852,
+      "P50": 0.0005717105,
+      "P95": 0.0018027058,
+      "ProbabilityPositive": 0.856,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0031683365,
+      "P05": -0.0099207994,
+      "P50": -0.002838742,
+      "P95": 0.0022483268,
+      "ProbabilityPositive": 0.2005,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_B_GuardedStage36Objective_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.000749937,
+      "P05": -0.0021463811,
+      "P50": -0.0006373034,
+      "P95": 2.42416e-05,
+      "ProbabilityPositive": 0.059,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0040422872,
+      "P05": -0.0082042466,
+      "P50": -0.0037366968,
+      "P95": -0.0010665796,
+      "ProbabilityPositive": 0.001,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0068655632,
+      "P05": -0.0169922211,
+      "P50": -0.0074715867,
+      "P95": 0.0053723782,
+      "ProbabilityPositive": 0.151,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_C_GuardedExAnteSharpe_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0009890779,
+      "P05": -0.0006033594,
+      "P50": 0.0009753401,
+      "P95": 0.0027088445,
+      "ProbabilityPositive": 0.8345,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0008462204,
+      "P05": -0.0002194767,
+      "P50": 0.0007347052,
+      "P95": 0.002245389,
+      "ProbabilityPositive": 0.873,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.003653121,
+      "P05": -0.010563529,
+      "P50": -0.0032143153,
+      "P95": 0.0017301949,
+      "ProbabilityPositive": 0.1625,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_D_GuardedDownsidePenalty_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0008440702,
+      "P05": -0.0022304611,
+      "P50": -0.00067009,
+      "P95": -3.88392e-05,
+      "ProbabilityPositive": 0.0175,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0036897497,
+      "P05": -0.0073902609,
+      "P50": -0.0034532059,
+      "P95": -0.0009811161,
+      "ProbabilityPositive": 0.0025,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.0086994677,
+      "P05": -0.0195176083,
+      "P50": -0.0094050208,
+      "P95": 0.004350598,
+      "ProbabilityPositive": 0.123,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage47_E_GuardedDirectSortino_LW",
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": 0.0010962757,
+      "P05": -0.0007431381,
+      "P50": 0.001155538,
+      "P95": 0.0029432629,
+      "ProbabilityPositive": 0.8195,
+      "Replications": 2000,
+      "BlockMonths": 12
+    }
+  ],
+  "shadow_solver_audit": {
+    "Stage47_B_GuardedStage36Objective_LW": {
+      "active_months": 220,
+      "solver_successes": 220,
+      "fallbacks": 0,
+      "minimum_volatility_slack": -9.871919948167829e-10,
+      "minimum_cdar_slack": -5.036483452514062e-10,
+      "minimum_turnover_slack": 2.581268532253489e-15,
+      "maximum_weight_sum_error": 2.220446049250313e-16
+    },
+    "Stage47_C_GuardedExAnteSharpe_LW": {
+      "active_months": 232,
+      "solver_successes": 232,
+      "fallbacks": 1,
+      "minimum_volatility_slack": -5.092678778684245e-10,
+      "minimum_cdar_slack": 0.06209443654964236,
+      "minimum_turnover_slack": 7.840204874209888e-11,
+      "maximum_weight_sum_error": 2.220446049250313e-16
+    },
+    "Stage47_D_GuardedDownsidePenalty_LW": {
+      "active_months": 232,
+      "solver_successes": 232,
+      "fallbacks": 0,
+      "minimum_volatility_slack": -9.764973551984468e-10,
+      "minimum_cdar_slack": -5.233040389907018e-10,
+      "minimum_turnover_slack": 5.134781488891349e-15,
+      "maximum_weight_sum_error": 2.220446049250313e-16
+    },
+    "Stage47_E_GuardedDirectSortino_LW": {
+      "active_months": 232,
+      "solver_successes": 232,
+      "fallbacks": 0,
+      "minimum_volatility_slack": -1.0393297333877172e-10,
+      "minimum_cdar_slack": 0.06677485016180892,
+      "minimum_turnover_slack": -3.3598374429844036e-10,
+      "maximum_weight_sum_error": 2.220446049250313e-16
+    }
+  },
+  "deployment_audit": {
+    "Stage47_B_GuardedStage36Objective_LW": {
+      "maximum_objective_tilt": 0.05,
+      "overlay_deployed_months": 200,
+      "lw_risk_veto_months": 20,
+      "long_only": true,
+      "fully_invested": true
+    },
+    "Stage47_C_GuardedExAnteSharpe_LW": {
+      "maximum_objective_tilt": 0.05,
+      "overlay_deployed_months": 210,
+      "lw_risk_veto_months": 22,
+      "long_only": true,
+      "fully_invested": true
+    },
+    "Stage47_D_GuardedDownsidePenalty_LW": {
+      "maximum_objective_tilt": 0.05,
+      "overlay_deployed_months": 207,
+      "lw_risk_veto_months": 25,
+      "long_only": true,
+      "fully_invested": true
+    },
+    "Stage47_E_GuardedDirectSortino_LW": {
+      "maximum_objective_tilt": 0.05,
+      "overlay_deployed_months": 210,
+      "lw_risk_veto_months": 22,
+      "long_only": true,
+      "fully_invested": true
+    }
+  },
+  "causality_audit": {
+    "Stage47_B_GuardedStage36Objective_LW": {
+      "all_covariance_dates_before_target": true,
+      "all_covariance_windows_have_252_rows": true
+    },
+    "Stage47_C_GuardedExAnteSharpe_LW": {
+      "all_covariance_dates_before_target": true,
+      "all_covariance_windows_have_252_rows": true
+    },
+    "Stage47_D_GuardedDownsidePenalty_LW": {
+      "all_covariance_dates_before_target": true,
+      "all_covariance_windows_have_252_rows": true
+    },
+    "Stage47_E_GuardedDirectSortino_LW": {
+      "all_covariance_dates_before_target": true,
+      "all_covariance_windows_have_252_rows": true
+    }
+  },
+  "checks": {
+    "stage36_stage45_stage46_frozen_files_unchanged": true,
+    "exactly_five_predeclared_performance_paths": true,
+    "no_new_return_forecast_model": true,
+    "all_shadow_solvers_feasible": true,
+    "all_deployments_long_only_fully_invested": true,
+    "promoted_strategy_passes_every_gate": false
+  },
+  "frozen_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\asset_implied_volatility_risk_slsqp.py": {
+      "sha256": "9b6a3d8d867a8700302db1dc51f30b1009538e2f1e864998f16a1171ec963569",
+      "bytes": 52426
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\stage36_gvz_ovxassetrisk_monthly.csv": {
+      "sha256": "dfe180aa55cb71a9764e8b9011b94a847ed4c2ba50e5a59a880431460f987dda",
+      "bytes": 176515
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\validation_report.json": {
+      "sha256": "b64ee27fb4867ffb142493382cad0a5f07e860cb9e88a2a8c4a35e257e6ec11b",
+      "bytes": 45558
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\volatility_targeted_shrinkage_mlp.py": {
+      "sha256": "ee458d5d4958fccfed85812ecea55c800e97c71123b9ef6865a3b4687344bcec",
+      "bytes": 38862
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\outputs\\validation_report.json": {
+      "sha256": "e1eb32bf9af264773f45b655dceef0526cf5560b32d37508160c3211f41a71ff",
+      "bytes": 14240
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage46_black_litterman_shrinkage\\black_litterman_shrinkage_slsqp.py": {
+      "sha256": "42e97bca15f3ee5e5058c4502b9ca1ea29357e37a614594fdc5454bce45c3dde",
+      "bytes": 43527
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage46_black_litterman_shrinkage\\outputs\\validation_report.json": {
+      "sha256": "fada52d2668d5adc80366cfd53d40a02d396f6653719cc709007138401c11c29",
+      "bytes": 22346
+    }
+  },
+  "frozen_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\asset_implied_volatility_risk_slsqp.py": {
+      "sha256": "9b6a3d8d867a8700302db1dc51f30b1009538e2f1e864998f16a1171ec963569",
+      "bytes": 52426
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\stage36_gvz_ovxassetrisk_monthly.csv": {
+      "sha256": "dfe180aa55cb71a9764e8b9011b94a847ed4c2ba50e5a59a880431460f987dda",
+      "bytes": 176515
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\validation_report.json": {
+      "sha256": "b64ee27fb4867ffb142493382cad0a5f07e860cb9e88a2a8c4a35e257e6ec11b",
+      "bytes": 45558
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\volatility_targeted_shrinkage_mlp.py": {
+      "sha256": "ee458d5d4958fccfed85812ecea55c800e97c71123b9ef6865a3b4687344bcec",
+      "bytes": 38862
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage45_volatility_targeted_shrinkage_mlp\\outputs\\validation_report.json": {
+      "sha256": "e1eb32bf9af264773f45b655dceef0526cf5560b32d37508160c3211f41a71ff",
+      "bytes": 14240
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage46_black_litterman_shrinkage\\black_litterman_shrinkage_slsqp.py": {
+      "sha256": "42e97bca15f3ee5e5058c4502b9ca1ea29357e37a614594fdc5454bce45c3dde",
+      "bytes": 43527
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage46_black_litterman_shrinkage\\outputs\\validation_report.json": {
+      "sha256": "fada52d2668d5adc80366cfd53d40a02d396f6653719cc709007138401c11c29",
+      "bytes": 22346
+    }
+  },
+  "data_audit": {
+    "return_rows": 244,
+    "return_level_rows": 320,
+    "macro_rank_rows": 794,
+    "fundamental": {
+      "earnings_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_fwdPE.EPS.rev.xlsx",
+      "credit_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_국고채.회사채.xlsx",
+      "daily_rows": 9564,
+      "first_date": "1990-01-02",
+      "last_date": "2026-08-28",
+      "earnings_first_valid": "2000-02-25",
+      "credit_first_valid": "1995-05-30",
+      "eps_revision_provider_field_used": true,
+      "eps_revision_formula": "vendor EPS(Fwd.12M) one-month revision percentage",
+      "computed_revision_role": "source cross-check only",
+      "provider_computed_revision_correlation": 0.4580566581047895,
+      "eps_level_stale_share": 0.7912154948909562,
+      "credit_primary_formula": "(AA- unsecured 3Y yield - KTB 3Y yield) 20-observation change",
+      "credit_primary_role": "widening=funding stress; easing=positive equity-return input",
+      "bbb_and_quality_role": "robustness diagnostics only",
+      "earnings_yield_gap_role": "slow valuation diagnostic only",
+      "winsorization": false,
+      "parameter_grid": false
+    },
+    "asset_volatility": {
+      "gvz_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\GVZCLS.csv",
+      "ovx_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\OVXCLS.csv",
+      "daily_union_rows": 5036,
+      "first_union_date": "2007-05-10",
+      "last_union_date": "2026-08-27",
+      "gvz_first_valid": "2008-06-03",
+      "gvz_last_valid": "2026-08-27",
+      "gvz_valid_observations": 4590,
+      "ovx_first_valid": "2007-05-10",
+      "ovx_last_valid": "2026-08-27",
+      "ovx_valid_observations": 4858,
+      "minimum_prior_observations": 252,
+      "prehistory_policy": "neutral variance multiplier 1.0; no backfill",
+      "directional_mu_effect": false,
+      "winsorization": false,
+      "parameter_grid": false
+    },
+    "market": {
+      "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+      "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+      "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+      "foreign_prices_converted_to_krw": true,
+      "bond_atr_uses_close_to_close_proxy": true,
+      "kodex_volume_segments_normalized_separately": true,
+      "assets": {
+        "KODEX200": {
+          "rows": 6535,
+          "start": "2000-01-04",
+          "end": "2026-08-25",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        },
+        "BOND": {
+          "rows": 7469,
+          "start": "2006-03-02",
+          "end": "2026-08-12",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 7469
+        },
+        "GLD": {
+          "rows": 5474,
+          "start": "2004-11-18",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        },
+        "USO": {
+          "rows": 5125,
+          "start": "2006-04-10",
+          "end": "2026-08-24",
+          "missing_close": 0,
+          "missing_high": 0,
+          "missing_low": 0,
+          "missing_volume": 0
+        }
+      }
+    }
+  }
+}

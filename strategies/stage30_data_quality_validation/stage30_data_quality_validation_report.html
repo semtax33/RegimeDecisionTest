@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage 30 옵션 체인 데이터 품질 원인검증</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #dce3ea;
+      --paper: #ffffff;
+      --wash: #f3f6f9;
+      --navy: #142d4c;
+      --blue: #2563a6;
+      --green: #18794e;
+      --red: #b42318;
+      --amber: #9a5b00;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--wash);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      line-height: 1.72;
+    }
+    main {
+      width: min(1140px, calc(100% - 32px));
+      margin: 28px auto 64px;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 48px rgba(20, 45, 76, .08);
+    }
+    header {
+      padding: 50px 58px 44px;
+      color: white;
+      background: linear-gradient(135deg, #10233c, #214b73);
+    }
+    header .eyebrow { color: #bdd6ec; font-size: 13px; letter-spacing: .08em; }
+    h1 { margin: 8px 0 14px; font-size: clamp(29px, 4vw, 44px); line-height: 1.24; }
+    header p { max-width: 900px; margin: 0; color: #e6eef6; }
+    section { padding: 34px 58px; border-bottom: 1px solid var(--line); }
+    h2 { margin: 0 0 18px; color: var(--navy); font-size: 25px; }
+    h3 { margin: 26px 0 10px; color: var(--blue); font-size: 18px; }
+    p { margin: 10px 0; }
+    .verdict {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 20px;
+    }
+    .callout, .card {
+      padding: 20px 22px;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .callout { border-left: 5px solid var(--red); }
+    .callout strong { color: var(--red); }
+    .subtle { border-left-color: var(--amber); background: #fffaf1; }
+    .subtle strong { color: var(--amber); }
+    .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .kpi { padding: 17px; border-radius: 9px; background: #edf4fa; }
+    .kpi span { display: block; color: var(--muted); font-size: 12px; }
+    .kpi b { display: block; margin-top: 3px; color: var(--navy); font-size: 23px; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+    .flow div { position: relative; padding: 17px; border-radius: 9px; background: #eef4f9; }
+    .flow div:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -10px;
+      top: 31%;
+      color: var(--blue);
+      font-size: 20px;
+      z-index: 2;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 8px; font-size: 14px; }
+    th { color: white; background: var(--navy); text-align: left; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .good { color: var(--green); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .neutral { color: var(--amber); font-weight: 700; }
+    code, pre { font-family: Consolas, "D2Coding", monospace; }
+    pre {
+      padding: 16px 18px;
+      overflow-x: auto;
+      color: #edf5fc;
+      background: #14263b;
+      border-radius: 8px;
+    }
+    .chart { width: 100%; margin-top: 18px; border: 1px solid var(--line); border-radius: 8px; }
+    .note { color: var(--muted); font-size: 13px; }
+    ul { padding-left: 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--blue); }
+    footer { padding: 24px 58px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 800px) {
+      header, section, footer { padding-left: 24px; padding-right: 24px; }
+      .verdict { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .flow div:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -17px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">REGIME DECISION TEST · CAUSAL DIAGNOSTIC</div>
+    <h1>Stage 30 옵션 체인<br>데이터 품질 원인검증</h1>
+    <p>2018~2026의 좋은 체인을 2007~2017 수준으로 의도적으로 열화하고, 초기 구간 안에서도 품질과 ODS 예측력의 관계를 따로 확인했다. 열화 체인은 메모리에서만 만들었으며 원본 옵션 체인은 수정하지 않았다.</p>
+  </header>
+
+  <section>
+    <div class="verdict">
+      <div class="callout">
+        <h2>판정</h2>
+        <p><strong>Stage 30의 후기 성과가 주로 옵션 체인 품질 개선에서 나왔다는 가설은 지지되지 않았다.</strong> 후기 체인을 강하게 열화해도 평균 CAGR과 Sharpe가 낮아지지 않았고, 2007~2017 안에서도 종합 품질 Q가 높을수록 원시 ODS IC가 단조롭게 커지지 않았다.</p>
+        <p>공식 판정은 <code>data_quality_hypothesis_not_supported</code>다. 이는 “데이터 품질이 무관하다”는 말이 아니다. IV 유효성에는 별도의 긍정적 단서가 남았지만 후기 성과 전체를 설명하기에는 부족하다.</p>
+      </div>
+      <div class="card">
+        <div class="kpis">
+          <div class="kpi"><span>열화 반복</span><b>20회</b></div>
+          <div class="kpi"><span>원본 수정</span><b>0건</b></div>
+          <div class="kpi"><span>원본 후기 CAGR</span><b>14.01%</b></div>
+          <div class="kpi"><span>열화 평균 CAGR</span><b>14.09%</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>무엇을 원인으로 의심했나</h2>
+    <p>Stage 30의 ODS는 25델타 풋 스큐와 내재분산 비대칭의 변화를 사용한다. 초기에는 상장 계약 수가 적고 행사가 범위가 좁으며 IV 실패율도 높다. 이 차이가 후기 ODS의 측정 정밀도와 성과를 끌어올렸는지 확인하는 것이 이번 실험의 목적이다.</p>
+    <table>
+      <thead><tr><th>관측 품질</th><th class="num">2007~2017</th><th class="num">2018~2026</th><th>예상 영향</th></tr></thead>
+      <tbody>
+        <tr><td>상장 계약 수</td><td class="num">약 61개</td><td class="num">약 221개</td><td>25Δ 인접 행사가 선택 정밀도</td></tr>
+        <tr><td>로그 행사가 커버리지</td><td class="num">약 0.29~0.32</td><td class="num">0.6995</td><td>풋·콜 꼬리 적분 범위</td></tr>
+        <tr><td>후기 무효 IV 비율</td><td class="num">초기 템플릿으로 11.51%</td><td class="num">5.03%</td><td>서페이스 계산 성공률과 노이즈</td></tr>
+        <tr><td>후기 25Δ 거리</td><td class="num">초기 템플릿으로 0.002806</td><td class="num">0.001835</td><td>목표 델타 근사오차</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>판정 규칙은 결과 전에 고정했다</h2>
+    <div class="flow">
+      <div><b>초기 품질 5분위</b><br><span class="note">2007~2017, Q1~Q5</span></div>
+      <div><b>원시 ODS IC</b><br><span class="note">5일·20일·1개월</span></div>
+      <div><b>후기 20회 열화</b><br><span class="note">고정 seed 20260829~</span></div>
+      <div><b>두 조건 동시 판정</b><br><span class="note">성과를 보고 규칙 변경 없음</span></div>
+    </div>
+    <table>
+      <thead><tr><th>고정 조건</th><th>가설을 지지하려면</th><th>실제</th><th>통과</th></tr></thead>
+      <tbody>
+        <tr><td>Within-era</td><td>초기 20일·1개월 Q5-Q1 IC가 모두 양수</td><td>20일 -0.1079, 1개월 +0.1209</td><td class="bad">실패</td></tr>
+        <tr><td>Degradation</td><td>열화 평균 CAGR·Sharpe가 원본보다 모두 낮음</td><td>CAGR·Sharpe 모두 평균 상승</td><td class="bad">실패</td></tr>
+      </tbody>
+    </table>
+    <p class="note">두 조건은 결과 확인 전에 코드에 고정했다. OTM 구간, 품질 임계값, 반복 seed를 성과에 맞춰 탐색하지 않았다.</p>
+  </section>
+
+  <section>
+    <h2>2007~2017 안에서는 품질이 높을수록 ODS가 좋아졌나</h2>
+    <table>
+      <thead><tr><th>검정</th><th class="num">Q1 IC</th><th class="num">Q5 IC</th><th class="num">Q5-Q1</th><th class="num">분위-IC 상관</th><th>판정</th></tr></thead>
+      <tbody>
+        <tr><td>일별 5일</td><td class="num">0.0752</td><td class="num">-0.0032</td><td class="num bad">-0.0784</td><td class="num">-0.30</td><td class="bad">단조 개선 없음</td></tr>
+        <tr><td>일별 20일</td><td class="num">0.0789</td><td class="num">-0.0291</td><td class="num bad">-0.1079</td><td class="num">-0.80</td><td class="bad">반대 기울기</td></tr>
+        <tr><td>월별 1개월</td><td class="num">-0.0281</td><td class="num">0.0928</td><td class="num good">+0.1209</td><td class="num">+0.60</td><td class="neutral">중간 분위 비단조·소표본</td></tr>
+      </tbody>
+    </table>
+    <img class="chart" src="outputs/early_quality_quintile_ic.png" alt="2007~2017 종합 품질 분위별 원시 ODS IC">
+    <p>월별 결과만 양의 Q5-Q1을 보였지만 Q2 -0.1063, Q3 -0.2479, Q4 +0.0373으로 이어져 매끄러운 품질-예측력 관계는 아니다. 분위별 관측치도 26~27개라 이 결과 하나로 원인을 확정하기 어렵다.</p>
+  </section>
+
+  <section>
+    <h2>HAC 상호작용도 같은 결론이었다</h2>
+    <pre>future_return = a + b₁·raw_ODS + b₂·quality + b₃·(raw_ODS × quality) + error</pre>
+    <table>
+      <thead><tr><th>목표수익률</th><th class="num">관측치</th><th class="num">상호작용 beta</th><th class="num">HAC p값</th><th>해석</th></tr></thead>
+      <tbody>
+        <tr><td>일별 5일</td><td class="num">2,077</td><td class="num">-0.00358</td><td class="num">0.106</td><td>양의 품질 증폭 아님</td></tr>
+        <tr><td>일별 20일</td><td class="num">2,062</td><td class="num">-0.00101</td><td class="num">0.683</td><td>양의 품질 증폭 아님</td></tr>
+        <tr><td>월별 1개월</td><td class="num">132</td><td class="num">-0.00263</td><td class="num">0.586</td><td>양의 품질 증폭 아님</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>후기 체인은 실제로 얼마나 열화됐나</h2>
+    <p>각 후기 거래일에 DTE가 같은 초기 날짜를 뽑았다. 초기 날짜의 행사가/선도가격 비율과 IV 유효·결측 패턴을 템플릿으로 삼아 후기 행사가를 일대일 최근접 매칭했다. 가격과 시장 상태는 그대로 두었다.</p>
+    <table>
+      <thead><tr><th>품질 지표</th><th class="num">원본 후기</th><th class="num">열화 평균</th><th class="num">열화/원본</th></tr></thead>
+      <tbody>
+        <tr><td>일평균 상장 계약 수</td><td class="num">221.08</td><td class="num">60.97</td><td class="num">0.28배</td></tr>
+        <tr><td>로그 행사가 커버리지</td><td class="num">0.6995</td><td class="num">0.2894</td><td class="num">0.41배</td></tr>
+        <tr><td>무효 IV 비율</td><td class="num">5.03%</td><td class="num">11.51%</td><td class="num">2.29배</td></tr>
+        <tr><td>25Δ 최근접 행사가 거리</td><td class="num">0.001835</td><td class="num">0.002806</td><td class="num">1.53배</td></tr>
+        <tr><td>DTE</td><td class="num">18.028</td><td class="num">17.987</td><td class="num">사실상 동일</td></tr>
+        <tr><td>Stage 30 품질 Q</td><td class="num">0.2257</td><td class="num">0.1380</td><td class="num">0.61배</td></tr>
+      </tbody>
+    </table>
+    <img class="chart" src="outputs/late_degradation_quality_shift.png" alt="열화 전후 옵션 체인 품질 비율">
+  </section>
+
+  <section>
+    <h2>열화 뒤 성과가 무너지지 않았다</h2>
+    <table>
+      <thead><tr><th>2018~2026</th><th class="num">원본 Stage 30</th><th class="num">열화 평균</th><th class="num">평균 변화</th><th class="num">원본보다 낮은 반복</th></tr></thead>
+      <tbody>
+        <tr><td>CAGR</td><td class="num">14.0068%</td><td class="num">14.0935%</td><td class="num good">+0.0867%p</td><td class="num">45%</td></tr>
+        <tr><td>Sharpe</td><td class="num">1.2405</td><td class="num">1.2658</td><td class="num good">+0.0253</td><td class="num">45%</td></tr>
+        <tr><td>MDD</td><td class="num">-11.5536%</td><td class="num">-10.4910%</td><td class="num good">+1.0626%p</td><td class="num">30%</td></tr>
+        <tr><td>Calmar</td><td class="num">1.2123</td><td class="num">1.4147</td><td class="num good">+0.2024</td><td class="num">45%</td></tr>
+      </tbody>
+    </table>
+    <img class="chart" src="outputs/late_degradation_performance_distribution.png" alt="20회 옵션 체인 열화 후 Stage 30 성과 분포">
+    <p>20개 seed 중 일부에서는 CAGR과 Sharpe가 낮아졌지만 그 비율은 45%다. 동전 던지기보다 일관되게 나쁘다고 볼 분포가 아니다. MDD는 열화 평균에서 오히려 완화됐다. 품질가중이 공격적인 포지션을 줄이는 위험관리 장치라는 구조와 맞지만, 이를 새 매매 규칙으로 삼을 근거는 아니다.</p>
+  </section>
+
+  <section>
+    <h2>원시 ODS 자체도 유지됐다</h2>
+    <table>
+      <thead><tr><th>선행수익률</th><th class="num">원본 후기 IC</th><th class="num">열화 평균 IC</th><th class="num">평균 변화</th><th class="num">원본보다 낮은 반복</th></tr></thead>
+      <tbody>
+        <tr><td>5일</td><td class="num">-0.04714</td><td class="num">-0.02431</td><td class="num">+0.02284</td><td class="num">5%</td></tr>
+        <tr><td>20일</td><td class="num">0.02550</td><td class="num">0.02635</td><td class="num">+0.00085</td><td class="num">55%</td></tr>
+      </tbody>
+    </table>
+    <p>특히 Stage 30이 기대수익 조정에 쓰는 20일 관계가 열화 뒤에도 거의 그대로다. 성과만 우연히 버틴 것이 아니라 원시 신호의 순위 관계도 함께 무너지지 않았다.</p>
+  </section>
+
+  <section>
+    <h2>남은 단서: IV 유효성</h2>
+    <div class="callout subtle">
+      <p><strong>IV 유효성은 무시할 수 없는 보조 결과다.</strong> 초기 20일 IC의 Q5-Q1이 +0.1254였고, 원시 ODS×IV 유효성의 HAC 상호작용은 +0.00374, p=0.011이었다.</p>
+      <p>다만 이 진단은 공식 판정 뒤에 품질 구성요소를 분해한 결과다. 하나의 유의한 p값을 보고 IV 필터·임계값을 추가하면 사후 최적화가 된다.</p>
+    </div>
+    <table>
+      <thead><tr><th>20일 품질 척도</th><th class="num">Q5-Q1 IC</th><th class="num">상호작용 beta</th><th class="num">HAC p값</th></tr></thead>
+      <tbody>
+        <tr><td>종합 Q</td><td class="num">-0.1079</td><td class="num">-0.00101</td><td class="num">0.683</td></tr>
+        <tr><td>롤 제외 측정 품질</td><td class="num">+0.0161</td><td class="num">+0.00119</td><td class="num">0.391</td></tr>
+        <tr><td>상장 계약 수</td><td class="num">-0.0175</td><td class="num">-0.00126</td><td class="num">0.549</td></tr>
+        <tr><td>행사가 커버리지</td><td class="num">+0.0132</td><td class="num">+0.00004</td><td class="num">0.978</td></tr>
+        <tr><td>IV 유효성</td><td class="num good">+0.1254</td><td class="num good">+0.00374</td><td class="num good">0.011</td></tr>
+        <tr><td>25Δ 정밀도</td><td class="num">+0.0120</td><td class="num">-0.00017</td><td class="num">0.929</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>경제적으로 어떻게 읽어야 하나</h2>
+    <p>체인이 촘촘하면 25델타 스큐와 IVA를 더 정밀하게 계산할 수 있다는 논리는 여전히 타당하다. 다만 더 정확한 센서가 곧 더 강한 알파를 뜻하지는 않는다. 시장 참가자 구조, 유동성, 가격발견 기능과 실제 위험프리미엄의 부호가 시대에 따라 달라질 수 있기 때문이다.</p>
+    <p>Stage 30의 최종 성과에는 원시 ODS뿐 아니라 인과적 평균수익 보정, 거시 확률, 기술적 신뢰도, VIX6 위험 엔진과 SLSQP 배분이 함께 들어간다. 이번 결과는 체인 품질 하나를 후기 성과의 주된 원인으로 지목하기 어렵다는 뜻이다. 초기 데이터가 후기처럼 완벽했다면 후기와 같은 성과를 냈을 것이라는 반대방향 명제도 증명하지 못했다.</p>
+  </section>
+
+  <section>
+    <h2>한계와 다음 검증</h2>
+    <ul>
+      <li>좋은 후기 데이터를 나쁘게 만드는 검정이다. 존재하지 않는 초기 고품질 체인을 복원하지는 못한다.</li>
+      <li>행사가 그리드와 IV 패턴은 열화했지만 과거 호가 스프레드, 체결 가능성, 거래량·미결제약정까지 재현하지 못했다.</li>
+      <li>20회는 방향 판정을 위한 진단 표본이다. 극단 꼬리확률을 정밀하게 추정하는 대규모 몬테카를로는 아니다.</li>
+      <li>IV 유효성은 보조 진단이다. 다음 연구에서는 실패 원인을 사전에 나누고 독립 OOS 구간에서 고정 필터를 검정해야 한다.</li>
+    </ul>
+    <p>현 단계에서는 Stage 30을 데이터 품질 문제 때문에 폐기할 이유도, 초기 고품질 체인을 가정해 성과를 상향 보정할 이유도 없다.</p>
+  </section>
+
+  <section>
+    <h2>원본 보존과 재현 파일</h2>
+    <table>
+      <thead><tr><th>감사 항목</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>통합 옵션 체인 SHA-256</td><td><code>8687e09198e4951716fa87e301db7f98567fc681dd33c86c8c24d4ec6de0d497</code></td></tr>
+        <tr><td>원본 옵션 파일의 해시·크기·수정시각</td><td class="good">실험 전후 동일</td></tr>
+        <tr><td>재구축 Stage 30 특성 최대 절대오차</td><td><code>2.98e-14</code> 이하</td></tr>
+        <tr><td>열화 체인 저장</td><td class="good">없음, 메모리에서만 생성</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li><code>validate_data_quality_hypothesis.py</code>: 5분위·HAC·열화 20회·판정·무결성 감사</li>
+      <li><code>build_report_assets.py</code>: 저장된 CSV로 보고서 차트 재생성</li>
+      <li><code>outputs/validation_report.json</code>: 고정 규칙과 전체 수치</li>
+      <li><code>outputs/early_quality_quintile_ic.csv</code>: 초기 품질 분위별 IC</li>
+      <li><code>outputs/late_degradation_replications.csv</code>: seed별 열화 결과</li>
+      <li><code>outputs/late_degradation_comparison.csv</code>: 원본·열화 성과 비교</li>
+      <li><code>outputs/raw_option_chain_manifest_before.json</code> / <code>after.json</code>: 원본 무결성 기록</li>
+    </ul>
+  </section>
+
+  <footer>
+    검증 기간: 초기 2007~2017, 후기 2018~2026-07 · 최종 재실행: 2026-08-29 · 원본 옵션 체인 읽기 전용
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,412 @@
+{
+  "study": "Stage45_VolatilityTargetedShrinkageTinyMLP",
+  "base_strategy": "Stage36_GVZ_OVXAssetRisk",
+  "decision": "retain_stage36_and_keep_stage45_as_research_only",
+  "promote": false,
+  "fixed_design": {
+    "assets": [
+      "KODEX200",
+      "BOND",
+      "GLD",
+      "USO"
+    ],
+    "target": "next-month realized asset return minus prior-known KTB 3Y yield / 12",
+    "normalization": "training-window time-series StandardScaler; no cross-sectional ranks",
+    "model": "pooled 4-asset MLP, one tanh hidden layer",
+    "hidden_units": 4,
+    "ensemble_seeds": [
+      20260730,
+      20260731,
+      20260732
+    ],
+    "minimum_training_months": 36,
+    "refit_frequency": "annual",
+    "covariance": "252 complete prior daily rows; constant-correlation Ledoit-Wolf; monthly scale",
+    "stage36_risk_overlay": "GVZ only scales GLD variance; OVX only scales USO variance",
+    "target_annual_volatility": 0.1,
+    "portfolio": "long-only risky assets; sum risky <= 1; remainder in cash; no leverage",
+    "cdar_guard": 0.16,
+    "transaction_costs": "same domestic and foreign-weight-change rates as Stage36",
+    "hyperparameter_search": null
+  },
+  "model_activation_month": "2011-01",
+  "performance_gates": {
+    "active_sharpe_not_lower": false,
+    "active_mdd_not_worse": false,
+    "active_cagr_not_lower_by_more_than_50bp": false,
+    "locked_sharpe_not_lower": false,
+    "locked_mdd_not_worse": false
+  },
+  "headline_deltas_vs_stage36": {
+    "mlp_active_cagr": -0.04930907039314869,
+    "mlp_active_sharpe": -0.5556868455812671,
+    "mlp_active_mdd": -0.05892628256501575,
+    "locked_cagr": -0.0709071872425373,
+    "locked_sharpe": -0.6857078331433505,
+    "locked_mdd": -0.06368604075849926
+  },
+  "performance_comparison": [
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "full_with_stage36_warmup",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1049938875,
+      "Volatility": 0.0947174638,
+      "Sharpe": 1.1049112901,
+      "Sortino": 2.2018564577,
+      "MDD": -0.1240708722,
+      "Calmar": 0.8462412301,
+      "FinalMultiple": 6.8911377181,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0369775517,
+      "TotalCost": 0.0265354519
+    },
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "mlp_active",
+      "Start": "2011-01",
+      "End": "2026-07",
+      "Months": 187.0,
+      "CAGR": 0.0871107084,
+      "Volatility": 0.0880289751,
+      "Sharpe": 0.995314733,
+      "Sortino": 1.9011644227,
+      "MDD": -0.1240708722,
+      "Calmar": 0.7021044246,
+      "FinalMultiple": 3.6750758479,
+      "PositiveMonths": 0.614973262,
+      "AvgTurnover": 0.0268034826,
+      "TotalCost": 0.0161866151
+    },
+    {
+      "Strategy": "Stage36_GVZ_OVXAssetRisk",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1262562043,
+      "Volatility": 0.1017821984,
+      "Sharpe": 1.2235051573,
+      "Sortino": 2.5377845953,
+      "MDD": -0.119311114,
+      "Calmar": 1.0582099189,
+      "FinalMultiple": 2.7747206697,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0261551454,
+      "TotalCost": 0.0086887009
+    },
+    {
+      "Strategy": "Stage45_TinyMLP_LW_VolTarget",
+      "Period": "full_with_stage36_warmup",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0644142656,
+      "Volatility": 0.1002489232,
+      "Sharpe": 0.6733660303,
+      "Sortino": 1.2201689482,
+      "MDD": -0.1829971548,
+      "Calmar": 0.3519959951,
+      "FinalMultiple": 3.3430274163,
+      "PositiveMonths": 0.6163793103,
+      "AvgTurnover": 0.200754734,
+      "TotalCost": 0.1502540248
+    },
+    {
+      "Strategy": "Stage45_TinyMLP_LW_VolTarget",
+      "Period": "mlp_active",
+      "Start": "2011-01",
+      "End": "2026-07",
+      "Months": 187.0,
+      "CAGR": 0.037801638,
+      "Volatility": 0.0944582442,
+      "Sharpe": 0.4396278874,
+      "Sortino": 0.7436348018,
+      "MDD": -0.1829971548,
+      "Calmar": 0.2065695393,
+      "FinalMultiple": 1.7828520948,
+      "PositiveMonths": 0.5989304813,
+      "AvgTurnover": 0.2299922863,
+      "TotalCost": 0.139905188
+    },
+    {
+      "Strategy": "Stage45_TinyMLP_LW_VolTarget",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.0553490171,
+      "Volatility": 0.1115924584,
+      "Sharpe": 0.5377973242,
+      "Sortino": 0.9953813804,
+      "MDD": -0.1829971548,
+      "Calmar": 0.3024583477,
+      "FinalMultiple": 1.5878760954,
+      "PositiveMonths": 0.5631067961,
+      "AvgTurnover": 0.2290325343,
+      "TotalCost": 0.0765204736
+    }
+  ],
+  "bootstrap_vs_stage36": [
+    {
+      "Period": "mlp_active",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0491913401,
+      "P05": -0.0762629691,
+      "P50": -0.0486756451,
+      "P95": -0.0246954869,
+      "ProbabilityPositive": 0.0005,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Period": "mlp_active",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.5718084714,
+      "P05": -0.8994100771,
+      "P50": -0.5622662254,
+      "P95": -0.2802618477,
+      "ProbabilityPositive": 0.0,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Period": "mlp_active",
+      "Metric": "delta_MDD",
+      "Mean": -0.0847269254,
+      "P05": -0.2155123066,
+      "P50": -0.0735256468,
+      "P95": 0.0111448339,
+      "ProbabilityPositive": 0.091,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0708265443,
+      "P05": -0.1076911752,
+      "P50": -0.070368153,
+      "P95": -0.0361852078,
+      "ProbabilityPositive": 0.0,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.7314278555,
+      "P05": -1.1896887547,
+      "P50": -0.7104873482,
+      "P95": -0.3261727163,
+      "ProbabilityPositive": 0.0,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Metric": "delta_MDD",
+      "Mean": -0.0792180497,
+      "P05": -0.2141805794,
+      "P50": -0.0648019577,
+      "P95": 0.0061333213,
+      "ProbabilityPositive": 0.0885,
+      "Replications": 2000,
+      "BlockMonths": 12
+    }
+  ],
+  "forecast_diagnostics": {
+    "active_months": 187,
+    "asset_month_predictions": 748,
+    "pooled_rmse": 0.08042849431436493,
+    "pooled_mae": 0.05109704056065129,
+    "pooled_directional_accuracy": 0.517379679144385,
+    "by_asset": {
+      "KODEX200": {
+        "rmse": 0.08290464499393252,
+        "mae": 0.05896702582882052,
+        "directional_accuracy": 0.5240641711229946,
+        "correlation": 0.007741861995344007
+      },
+      "BOND": {
+        "rmse": 0.00990043743418489,
+        "mae": 0.0075123932431898684,
+        "directional_accuracy": 0.5026737967914439,
+        "correlation": -0.13022141283711797
+      },
+      "GLD": {
+        "rmse": 0.06359706334011284,
+        "mae": 0.048034060678908676,
+        "directional_accuracy": 0.5187165775401069,
+        "correlation": 0.012383242013476457
+      },
+      "USO": {
+        "rmse": 0.1218982588155336,
+        "mae": 0.08987468249168609,
+        "directional_accuracy": 0.5240641711229946,
+        "correlation": -0.010526357445042153
+      }
+    }
+  },
+  "solver_audit": {
+    "active_months": 187,
+    "successes": 187,
+    "fallbacks": 1,
+    "minimum_budget_slack": 0.0,
+    "minimum_volatility_slack": -9.351309726568502e-10,
+    "minimum_cdar_slack": -9.669831324554679e-10,
+    "maximum_risky_weight_sum": 1.0000000000000195,
+    "average_cash_weight": 0.28914627361721473,
+    "average_lw_shrinkage": 0.23578090064127405
+  },
+  "causality_audit": {
+    "all_model_cutoffs_before_target": true,
+    "all_covariance_dates_before_target": true,
+    "all_covariance_windows_have_252_rows": true,
+    "feature_signal_month_precedes_target": true
+  },
+  "reproduction_audit": {
+    "warmup_months": 45,
+    "maximum_absolute_return_error": 9.020562075079397e-17,
+    "maximum_absolute_weight_error": 0.0
+  },
+  "checks": {
+    "stage36_frozen_files_unchanged": true,
+    "no_cross_sectional_rank": true,
+    "no_cross_sectional_target_demeaning": true,
+    "cash_excess_target": true,
+    "long_only_no_leverage": true,
+    "all_active_solvers_feasible": true,
+    "warmup_reproduces_stage36": true
+  },
+  "source_code": {
+    "path": "C:\\Users\\PC_1M\\Downloads\\volatility-targeted-shrinkage-mlp.py",
+    "sha256": "46967c98ebde3555ed8bde920436912402a6cf32f19b26950608d589ff49716a"
+  },
+  "frozen_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\asset_implied_volatility_risk_slsqp.py": {
+      "sha256": "9b6a3d8d867a8700302db1dc51f30b1009538e2f1e864998f16a1171ec963569",
+      "bytes": 52426
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\stage36_gvz_ovxassetrisk_monthly.csv": {
+      "sha256": "dfe180aa55cb71a9764e8b9011b94a847ed4c2ba50e5a59a880431460f987dda",
+      "bytes": 176515
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\validation_report.json": {
+      "sha256": "b64ee27fb4867ffb142493382cad0a5f07e860cb9e88a2a8c4a35e257e6ec11b",
+      "bytes": 45558
+    }
+  },
+  "frozen_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\asset_implied_volatility_risk_slsqp.py": {
+      "sha256": "9b6a3d8d867a8700302db1dc51f30b1009538e2f1e864998f16a1171ec963569",
+      "bytes": 52426
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\stage36_gvz_ovxassetrisk_monthly.csv": {
+      "sha256": "dfe180aa55cb71a9764e8b9011b94a847ed4c2ba50e5a59a880431460f987dda",
+      "bytes": 176515
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\outputs\\validation_report.json": {
+      "sha256": "b64ee27fb4867ffb142493382cad0a5f07e860cb9e88a2a8c4a35e257e6ec11b",
+      "bytes": 45558
+    }
+  },
+  "return_audit": {
+    "rows": 244,
+    "first_month": "2006-04",
+    "last_month": "2026-07",
+    "level_rows": 320
+  },
+  "macro_audit": {
+    "probability_rows": 244,
+    "first_target_month": "2006-04",
+    "last_target_month": "2026-07",
+    "rank_rows": 794
+  },
+  "fundamental_audit": {
+    "earnings_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_fwdPE.EPS.rev.xlsx",
+    "credit_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_국고채.회사채.xlsx",
+    "daily_rows": 9564,
+    "first_date": "1990-01-02",
+    "last_date": "2026-08-28",
+    "earnings_first_valid": "2000-02-25",
+    "credit_first_valid": "1995-05-30",
+    "eps_revision_provider_field_used": true,
+    "eps_revision_formula": "vendor EPS(Fwd.12M) one-month revision percentage",
+    "computed_revision_role": "source cross-check only",
+    "provider_computed_revision_correlation": 0.4580566581047895,
+    "eps_level_stale_share": 0.7912154948909562,
+    "credit_primary_formula": "(AA- unsecured 3Y yield - KTB 3Y yield) 20-observation change",
+    "credit_primary_role": "widening=funding stress; easing=positive equity-return input",
+    "bbb_and_quality_role": "robustness diagnostics only",
+    "earnings_yield_gap_role": "slow valuation diagnostic only",
+    "winsorization": false,
+    "parameter_grid": false
+  },
+  "asset_volatility_audit": {
+    "gvz_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\GVZCLS.csv",
+    "ovx_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\OVXCLS.csv",
+    "daily_union_rows": 5036,
+    "first_union_date": "2007-05-10",
+    "last_union_date": "2026-08-27",
+    "gvz_first_valid": "2008-06-03",
+    "gvz_last_valid": "2026-08-27",
+    "gvz_valid_observations": 4590,
+    "ovx_first_valid": "2007-05-10",
+    "ovx_last_valid": "2026-08-27",
+    "ovx_valid_observations": 4858,
+    "minimum_prior_observations": 252,
+    "prehistory_policy": "neutral variance multiplier 1.0; no backfill",
+    "directional_mu_effect": false,
+    "winsorization": false,
+    "parameter_grid": false
+  },
+  "market_audit": {
+    "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+    "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+    "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+    "foreign_prices_converted_to_krw": true,
+    "bond_atr_uses_close_to_close_proxy": true,
+    "kodex_volume_segments_normalized_separately": true,
+    "assets": {
+      "KODEX200": {
+        "rows": 6535,
+        "start": "2000-01-04",
+        "end": "2026-08-25",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      },
+      "BOND": {
+        "rows": 7469,
+        "start": "2006-03-02",
+        "end": "2026-08-12",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 7469
+      },
+      "GLD": {
+        "rows": 5474,
+        "start": "2004-11-18",
+        "end": "2026-08-24",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      },
+      "USO": {
+        "rows": 5125,
+        "start": "2006-04-10",
+        "end": "2026-08-24",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "objective": "Use VIX6 as a crisis-type router for Put Spread, Call Spread and Covered Call rather than as a fifth simple asset.",
+  "budgets": {
+    "premium_budget_by_state": {
+      "PreCrash": 0.005,
+      "DeflationCrisis": 0.0075,
+      "InflationCrisis": 0.0025,
+      "Recovery": 0.005
+    },
+    "covered_call_equity_fraction": 0.2,
+    "debit_spread_max_loss_equals_premium_budget": true,
+    "naked_short_options": false
+  },
+  "execution": {
+    "target_dte": 45,
+    "dte_range": [
+      30,
+      60
+    ],
+    "minimum_holding_calendar_days": 1,
+    "exit_rule": "first later archived quote after state changes, otherwise last common quote in entry month",
+    "long_spread_delta": 0.3,
+    "short_spread_delta": 0.1,
+    "covered_call_delta": 0.3,
+    "slippage_scenario": "Base with VKOSPI stress multiplier and tick floor",
+    "fractional_contract_assumption": true
+  },
+  "risk_fields": [
+    "premium_budget",
+    "delta_equivalent",
+    "gamma_pnl_for_1pct_move",
+    "vega_pnl_for_1vol_point",
+    "max_loss_nav"
+  ],
+  "trade_audit": {
+    "completed_trades": 17,
+    "structure_counts": {
+      "PutSpread": 11,
+      "CoveredCall": 5,
+      "CallSpread": 1
+    },
+    "entry_signal_precedes_entry": true,
+    "exit_signal_precedes_exit": true,
+    "entry_precedes_exit": true,
+    "maximum_debit_spread_loss_budget": 0.005,
+    "maximum_absolute_delta_equivalent": 0.16925808677919438
+  },
+  "selection": {
+    "prelock_all_three_pass": false,
+    "locked_all_three_pass": false,
+    "selected": "four_asset_router",
+    "decision": "Keep four-asset router; option structures remain research diagnostics",
+    "locked_not_used_for_selection": true,
+    "development_status": "post-lock exploratory; locked results were visible in the broader project"
+  },
+  "locked": {
+    "deltas_candidate_minus_four_asset": {
+      "CAGR": -0.00016533804106622085,
+      "Sharpe": -0.00160511057625623,
+      "MDD": 1.1102230246251565e-16,
+      "Calmar": -0.0016939641790196802
+    },
+    "bootstrap": {
+      "probability_cagr_improves": 0.3164,
+      "probability_sharpe_improves": 0.17,
+      "probability_mdd_improves": 0.2366,
+      "probability_all_three_improve": 0.0446,
+      "cagr_delta_p05": -0.0006200657932273091,
+      "cagr_delta_median": -0.0001306390966541171,
+      "cagr_delta_p95": 0.0003074354040658256,
+      "sharpe_delta_p05": -0.00464417586488558,
+      "sharpe_delta_median": -0.0016140334401896217,
+      "sharpe_delta_p95": 0.001211079534468696,
+      "mdd_delta_p05": -0.001166338523265531,
+      "mdd_delta_median": 0.0,
+      "mdd_delta_p95": 2.220446049250313e-16
+    }
+  },
+  "comparison": [
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "VIX6_Router_4Asset",
+      "Months": 69.0,
+      "CAGR": 0.19593903094000042,
+      "Volatility": 0.17331534518736672,
+      "Sharpe": 1.1243810201820734,
+      "Sortino": 2.08954078622688,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.5120152670338407,
+      "FinalMultiple": 2.7978664409178116,
+      "PositiveMonths": 0.6666666666666666
+    },
+    {
+      "Period": "calibration_2007_2012",
+      "Strategy": "VIX6_Router_WithOptions",
+      "Months": 69.0,
+      "CAGR": 0.19560333227228544,
+      "Volatility": 0.17314974736479166,
+      "Sharpe": 1.1236426443129468,
+      "Sortino": 2.089004473342267,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.5094247596281805,
+      "FinalMultiple": 2.793353643064593,
+      "PositiveMonths": 0.6666666666666666
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "VIX6_Router_4Asset",
+      "Months": 60.0,
+      "CAGR": 0.030518417586614444,
+      "Volatility": 0.08053529297963194,
+      "Sharpe": 0.41330431530126605,
+      "Sortino": 0.6584376214315012,
+      "MDD": -0.1066314522892039,
+      "Calmar": 0.2862046509864926,
+      "FinalMultiple": 1.162194430361526,
+      "PositiveMonths": 0.5166666666666667
+    },
+    {
+      "Period": "validation_2013_2017",
+      "Strategy": "VIX6_Router_WithOptions",
+      "Months": 60.0,
+      "CAGR": 0.02945413394742924,
+      "Volatility": 0.08043652789396807,
+      "Sharpe": 0.4008346235031297,
+      "Sortino": 0.6377408706035749,
+      "MDD": -0.1066314522892039,
+      "Calmar": 0.2762236968089328,
+      "FinalMultiple": 1.156205443314526,
+      "PositiveMonths": 0.5166666666666667
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "VIX6_Router_4Asset",
+      "Months": 103.0,
+      "CAGR": 0.20907823332988906,
+      "Volatility": 0.13357225120050709,
+      "Sharpe": 1.4969186464577038,
+      "Sortino": 3.581010224776775,
+      "MDD": -0.09760421330851343,
+      "Calmar": 2.1421025408915666,
+      "FinalMultiple": 5.101919757045714,
+      "PositiveMonths": 0.6213592233009708
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Strategy": "VIX6_Router_WithOptions",
+      "Months": 103.0,
+      "CAGR": 0.20891289528882284,
+      "Volatility": 0.13362672064589606,
+      "Sharpe": 1.4953135358814476,
+      "Sortino": 3.5799916516583483,
+      "MDD": -0.09760421330851332,
+      "Calmar": 2.140408576712547,
+      "FinalMultiple": 5.095934499883133,
+      "PositiveMonths": 0.6213592233009708
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "VIX6_Router_4Asset",
+      "Months": 232.0,
+      "CAGR": 0.15636553973863587,
+      "Volatility": 0.13715819260316825,
+      "Sharpe": 1.1325286822772858,
+      "Sortino": 2.282422546924721,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.2066359733870573,
+      "FinalMultiple": 16.58973285850312,
+      "PositiveMonths": 0.6077586206896551
+    },
+    {
+      "Period": "full_2007_2026",
+      "Strategy": "VIX6_Router_WithOptions",
+      "Months": 232.0,
+      "CAGR": 0.15588985899337282,
+      "Volatility": 0.13712153171602062,
+      "Sharpe": 1.1297511103335294,
+      "Sortino": 2.2781747338555545,
+      "MDD": -0.12958799769553853,
+      "Calmar": 1.2029652573198129,
+      "FinalMultiple": 16.458292196923793,
+      "PositiveMonths": 0.6077586206896551
+    }
+  ]
+}

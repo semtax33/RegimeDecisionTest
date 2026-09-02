@@ -1,0 +1,5 @@
+Target,Observations,Events,CreditWideningStandardizedBeta,CreditWideningHACPValue,ExpectedSign,FitScoreName,FitScore,HACLags
+future_realized_vol_1m,231,,0.005086955822501609,0.5266045192808597,positive,AdjustedR2,0.6007696960848947,1
+future_max_drawdown_1m,231,,0.004913050821044745,0.16584761640796175,positive,AdjustedR2,0.2535473955510571,1
+future_max_drawdown_3m,231,,0.010874456284951692,0.03250083557712737,positive,AdjustedR2,0.21017143121904358,3
+future_left_tail_1m,232,8.0,0.18939726974706572,0.4215532305150731,positive,McFaddenPseudoR2,0.1392230883058958,1

@@ -1,0 +1,103 @@
+{
+  "candidate_count": 28,
+  "grid": {
+    "C": [
+      0.01,
+      0.03,
+      0.1,
+      0.3,
+      1.0,
+      3.0
+    ],
+    "families": [
+      "balanced L2 liblinear",
+      "balanced L1 liblinear",
+      "balanced L2 lbfgs",
+      "unweighted L2 liblinear",
+      "balanced ElasticNet saga"
+    ]
+  },
+  "deployed_candidate": "l2_liblinear_c0.1_balanced",
+  "deployed_calibration_prediction_rank": 15,
+  "deployed_locked_prediction_rank": 21,
+  "deployed_calibration_portfolio_rank": 1,
+  "deployed_locked_portfolio_rank": 1,
+  "calibration_prediction_winner": "l2_liblinear_c0.1_none",
+  "calibration_prediction_winner_locked_rank": 4,
+  "calibration_portfolio_winner": "l2_liblinear_c0.1_balanced",
+  "calibration_portfolio_winner_locked_rank": 1,
+  "prediction_rank_correlation_calibration_vs_locked": 0.7446255033521562,
+  "portfolio_rank_correlation_calibration_vs_locked": 0.29017247186340284,
+  "strict_both_prelock_windows_count": 1,
+  "strict_both_prelock_windows_candidates": [
+    "l2_liblinear_c0.1_balanced"
+  ],
+  "candidates_with_convergence_warnings": 3,
+  "total_convergence_warnings": 361,
+  "convergence_warning_candidates": [
+    {
+      "candidate": "elasticnet_saga_c0.1_r0.5_balanced",
+      "warning_count": 29
+    },
+    {
+      "candidate": "elasticnet_saga_c0.3_r0.5_balanced",
+      "warning_count": 159
+    },
+    {
+      "candidate": "elasticnet_saga_c1_r0.5_balanced",
+      "warning_count": 173
+    }
+  ],
+  "zero_coefficient_candidates": [
+    "l1_liblinear_c0.01_balanced",
+    "l1_liblinear_c0.03_balanced"
+  ],
+  "locked_cscv_note": "CSCV/PBO is calculated only on pre-2018 data; locked data is reserved for rank validation.",
+  "prelock_prediction_brier_pbo": {
+    "kind": "mean",
+    "partitions": 8,
+    "splits": 70,
+    "pbo": 0.0,
+    "median_oos_percentile": 0.9107142857142857,
+    "median_logit": 2.322387720290225,
+    "most_selected_candidate": "l2_liblinear_c0.1_none",
+    "most_selected_share": 0.44285714285714284
+  },
+  "prelock_portfolio_sharpe_pbo": {
+    "kind": "sharpe",
+    "partitions": 8,
+    "splits": 70,
+    "pbo": 0.9571428571428572,
+    "median_oos_percentile": 0.19642857142857145,
+    "median_logit": -1.4245868913029325,
+    "most_selected_candidate": "l1_liblinear_c0.01_balanced",
+    "most_selected_share": 0.34285714285714286
+  },
+  "prelock_prediction_brier_pbo_excluding_warning_candidates": {
+    "kind": "mean",
+    "partitions": 8,
+    "splits": 70,
+    "pbo": 0.0,
+    "median_oos_percentile": 0.9,
+    "median_logit": 2.1972245773362196,
+    "most_selected_candidate": "l2_liblinear_c0.1_none",
+    "most_selected_share": 0.44285714285714284
+  },
+  "prelock_portfolio_sharpe_pbo_excluding_warning_candidates": {
+    "kind": "sharpe",
+    "partitions": 8,
+    "splits": 70,
+    "pbo": 0.9428571428571428,
+    "median_oos_percentile": 0.19,
+    "median_logit": -1.4619472249674041,
+    "most_selected_candidate": "l1_liblinear_c0.01_balanced",
+    "most_selected_share": 0.34285714285714286
+  },
+  "deployed_reproduction": {
+    "probability_observations": 194,
+    "max_absolute_probability_difference": 7.771561172376096e-15,
+    "portfolio_observations": 232,
+    "max_absolute_portfolio_return_difference": 1.1102230246251565e-16
+  },
+  "schema_version": 2
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Proposed",
+  "target_vol": 0.08,
+  "half_life": 12.0,
+  "invvol_tilt": 0.35,
+  "return_reward": 1.15,
+  "vol_penalty": 0.18,
+  "cdar_penalty": 0.25,
+  "turnover_penalty": 0.05,
+  "tracking_penalty": 0.32,
+  "max_cdar": 0.16,
+  "drawdown_guard": 0.75,
+  "regime_strength": 0.75,
+  "use_regime": true,
+  "use_risk_control": true
+}

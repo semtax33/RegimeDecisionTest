@@ -1,0 +1,5 @@
+Target,Observations,Events,DislocationStandardizedBeta,DislocationHACPValue,ExpectedSign,FitScoreName,FitScore,HACLags
+future_realized_vol_1m,231,,0.002684254916917246,0.6898519641058116,positive,AdjustedR2,0.5998669879676486,1
+future_max_drawdown_1m,231,,0.0010187034147765472,0.7603397637862862,positive,AdjustedR2,0.2448771240772667,1
+future_max_drawdown_3m,231,,-0.004524006608812975,0.26545132851793285,positive,AdjustedR2,0.19242803388183038,3
+future_left_tail_1m,232,8.0,0.09607847639037004,0.8044419268961293,positive,McFaddenPseudoR2,0.13335908507841687,1

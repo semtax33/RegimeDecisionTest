@@ -1,0 +1,146 @@
+{
+  "primary_strategy": "MSELogGrowthObjective_SLSQP100",
+  "allocation": {
+    "hard_share": 0.0,
+    "slsqp_share": 1.0,
+    "leverage": 1.0
+  },
+  "objectives": {
+    "mse_only": "minimize E[(1 - w^T r)^2] = (1 - w^T mu)^2 + w^T Sigma w",
+    "log_growth_only": "maximize 12 * (w^T mu - 0.5 * w^T Sigma w)",
+    "combined": "maximize 0.50 times standardized negative expected squared loss plus 0.50 times standardized expected log growth"
+  },
+  "standardization": "Each month uses the four standalone asset values estimated from the same causal history; no realized future metric is used.",
+  "algebraic_relationship": "Negative MSE quality equals -1 + 2*mu_p - mu_p^2 - variance_p, while expected log growth divided by 6 equals 2*mu_p - variance_p. They differ mainly by the small mu_p^2 term for monthly returns, so similar allocations are expected.",
+  "results": {
+    "combined": {
+      "full_2007_2026": {
+        "Months": 232.0,
+        "CAGR": 0.08121806130710008,
+        "Sharpe": 1.062478006177378,
+        "MDD": -0.13374718398394403,
+        "Calmar": 0.607250626800861,
+        "AvgTurnover": 0.0747130507805183
+      },
+      "locked_2018_2026": {
+        "Months": 103.0,
+        "CAGR": 0.0896156905852088,
+        "Sharpe": 1.0478863903190236,
+        "MDD": -0.13374718398394414,
+        "Calmar": 0.6700379620401341,
+        "AvgTurnover": 0.06588403054899782
+      }
+    },
+    "mse_only": {
+      "full_2007_2026": {
+        "Months": 232.0,
+        "CAGR": 0.0812173001322396,
+        "Sharpe": 1.0624704561680909,
+        "MDD": -0.1337492216168642,
+        "Calmar": 0.6072356844430342,
+        "AvgTurnover": 0.07471650824980548
+      },
+      "locked_2018_2026": {
+        "Months": 103.0,
+        "CAGR": 0.08961337556969107,
+        "Sharpe": 1.0478638025186549,
+        "MDD": -0.13374922161686453,
+        "Calmar": 0.6700104455665232,
+        "AvgTurnover": 0.06588294258514227
+      }
+    },
+    "log_growth_only": {
+      "full_2007_2026": {
+        "Months": 232.0,
+        "CAGR": 0.08121808788501039,
+        "Sharpe": 1.0624757517849124,
+        "MDD": -0.13374518927328904,
+        "Calmar": 0.607259882215673,
+        "AvgTurnover": 0.07470996304744132
+      },
+      "locked_2018_2026": {
+        "Months": 103.0,
+        "CAGR": 0.08961709833573206,
+        "Sharpe": 1.0478982895833169,
+        "MDD": -0.13374518927328916,
+        "Calmar": 0.6700584807772961,
+        "AvgTurnover": 0.06588522638305512
+      }
+    }
+  },
+  "solver": {
+    "combined": {
+      "months": 232,
+      "successes": 232,
+      "failures": 0,
+      "retries": 0,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -2.8716190536570707e-10,
+      "minimum_cdar_slack": -6.242933114908311e-10
+    },
+    "mse_only": {
+      "months": 232,
+      "successes": 232,
+      "failures": 0,
+      "retries": 0,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.714411636219111e-10,
+      "minimum_cdar_slack": -5.073556297308102e-10
+    },
+    "log_growth_only": {
+      "months": 232,
+      "successes": 232,
+      "failures": 0,
+      "retries": 0,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.878740742097492e-10,
+      "minimum_cdar_slack": -5.119393242658532e-10
+    }
+  },
+  "average_weights": {
+    "combined": {
+      "KODEX200": 0.19180987107854594,
+      "BOND": 0.4496424026151717,
+      "GLD": 0.35522819577315556,
+      "USO": 0.0033195305331267643
+    },
+    "mse_only": {
+      "KODEX200": 0.19180690095837083,
+      "BOND": 0.44964664175170715,
+      "GLD": 0.3552269571564624,
+      "USO": 0.003319500133459706
+    },
+    "log_growth_only": {
+      "KODEX200": 0.1918114051228346,
+      "BOND": 0.44963917594908076,
+      "GLD": 0.3552299132915767,
+      "USO": 0.0033195056365079956
+    }
+  },
+  "checks": {
+    "combined": {
+      "macro_signal_precedes_target": true,
+      "weight_sum_is_one": true,
+      "constraints_within_numerical_tolerance": true,
+      "no_hard_blend": true,
+      "no_leverage": true
+    },
+    "mse_only": {
+      "macro_signal_precedes_target": true,
+      "weight_sum_is_one": true,
+      "constraints_within_numerical_tolerance": true,
+      "no_hard_blend": true,
+      "no_leverage": true
+    },
+    "log_growth_only": {
+      "macro_signal_precedes_target": true,
+      "weight_sum_is_one": true,
+      "constraints_within_numerical_tolerance": true,
+      "no_hard_blend": true,
+      "no_leverage": true
+    }
+  }
+}

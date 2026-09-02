@@ -1,0 +1,86 @@
+{
+  "objective": "Evaluate every binary combination on the path from Zero-Tune VKOSPI to the current Robust VKOSPI.",
+  "component_count": 7,
+  "combination_count": 128,
+  "components": [
+    {
+      "key": "macro_engine",
+      "zero": "거시수준 expanding rank와 무평활 확률",
+      "robust": "rolling z-score·3개월 변화·sigmoid·85/15 평활"
+    },
+    {
+      "key": "base_allocation",
+      "zero": "사분면 확률을 네 자산 비중으로 직접 사용",
+      "robust": "hard 국면 40% + SLSQP 위험제어 60%"
+    },
+    {
+      "key": "tail_logistic",
+      "zero": "꼬리위험 모델과 자산 tilt 없음",
+      "robust": "16변수 균형 L2 로지스틱과 최대 20% tilt"
+    },
+    {
+      "key": "vol_target_leverage",
+      "zero": "총 자산노출 1배 고정",
+      "robust": "15% 변동성 타깃, 0.5~1.5배 노출"
+    },
+    {
+      "key": "vkospi_signal",
+      "zero": "VKOSPI expanding percentile",
+      "robust": "252일 수준·5일 충격·가속도 robust stress"
+    },
+    {
+      "key": "overlay_policy",
+      "zero": "stress 비율 전부를 채권·금에 균등 이전, 매일 조정",
+      "robust": "최대 35%를 금으로 이전, 20% 밴드"
+    },
+    {
+      "key": "frequency_reconciliation",
+      "zero": "일간 재구성 수익률을 그대로 사용",
+      "robust": "월간 기준경로에 일간 overlay 상대효과만 결합"
+    }
+  ],
+  "periods": {
+    "full": "2007-04 through 2026-07",
+    "locked": "2018-01 through 2026-07"
+  },
+  "endpoint_audit": {
+    "combination_count": 128,
+    "zero_endpoint_months": 244,
+    "zero_endpoint_max_return_difference": 9.8879238130678e-17,
+    "current_medium_months": 232,
+    "current_medium_max_return_difference": 9.874371285911732e-17,
+    "current_endpoint_months": 232,
+    "current_endpoint_max_return_difference": 9.8879238130678e-17
+  },
+  "zero_endpoint": {
+    "Full_CAGR": 0.0713687275831425,
+    "Full_Sharpe": 0.8446994945896235,
+    "Full_MDD": -0.14012928924826884,
+    "Locked_CAGR": 0.07038611121058924,
+    "Locked_Sharpe": 1.1336473538343195,
+    "Locked_MDD": -0.14012928924826884
+  },
+  "current_endpoint": {
+    "Full_CAGR": 0.15636553973863565,
+    "Full_Sharpe": 1.1325286822772858,
+    "Full_MDD": -0.12958799769553853,
+    "Locked_CAGR": 0.20907823332988862,
+    "Locked_Sharpe": 1.4969186464577038,
+    "Locked_MDD": -0.09760421330851354
+  },
+  "endpoint_delta": {
+    "Full_CAGR": 0.08499681215549315,
+    "Full_Sharpe": 0.2878291876876623,
+    "Full_MDD": 0.010541291552730314,
+    "Locked_CAGR": 0.13869212211929938,
+    "Locked_Sharpe": 0.3632712926233843,
+    "Locked_MDD": 0.0425250759397553
+  },
+  "interpretation": {
+    "ordered_transition": "Path-dependent change when modules are enabled in the listed economic pipeline order.",
+    "shapley": "Order-neutral average marginal contribution over all 7! possible module orders.",
+    "main_effect": "Difference between the metric mean over 64 combinations with a component on and the 64 combinations with it off.",
+    "interaction": "Average pairwise difference-in-differences over all settings of the other five components."
+  },
+  "warning": "The 128-combination table is an attribution and sensitivity audit, not a new model-selection search. Ranking combinations on the same sample would create additional selection bias."
+}

@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="SJM을 사용하지 않는 균형가중 로지스틱 경제국면 자산배분과 VKOSPI 오버레이의 전체 알고리즘 설명서">
+  <title>균형가중 로지스틱 + SJM 미사용 전략 | 전체 알고리즘 설명서</title>
+  <style>
+    :root {
+      --bg: #f4f6f1;
+      --paper: #fffef9;
+      --ink: #15231e;
+      --muted: #5e6b65;
+      --line: #d9dfd8;
+      --green: #0b6b53;
+      --green-2: #16866a;
+      --green-soft: #dff1e9;
+      --navy: #183b52;
+      --gold: #bd7b14;
+      --gold-soft: #fff0cc;
+      --red: #a33c35;
+      --red-soft: #fae7e4;
+      --blue-soft: #e3eef5;
+      --shadow: 0 12px 34px rgba(21, 35, 30, .08);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 90% 5%, rgba(22, 134, 106, .10), transparent 29rem),
+        radial-gradient(circle at 5% 28%, rgba(189, 123, 20, .08), transparent 25rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      line-height: 1.72;
+      word-break: keep-all;
+    }
+
+    a { color: var(--green); text-underline-offset: 3px; }
+    a:hover { color: var(--green-2); }
+    code, .mono { font-family: var(--mono); font-size: .92em; }
+    code {
+      padding: .12rem .35rem;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(24, 59, 82, .055);
+      word-break: break-word;
+    }
+
+    .skip {
+      position: absolute;
+      left: -9999px;
+      top: .5rem;
+      padding: .65rem 1rem;
+      background: var(--paper);
+      z-index: 100;
+    }
+    .skip:focus { left: .5rem; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 74px 24px 54px;
+      color: #f8fff9;
+      background:
+        linear-gradient(115deg, rgba(9, 75, 59, .96), rgba(18, 58, 75, .96)),
+        #0b6b53;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -130px;
+      top: -210px;
+      border: 70px solid rgba(255, 255, 255, .055);
+      border-radius: 50%;
+    }
+    .hero-inner { width: min(1180px, 100%); margin: 0 auto; position: relative; z-index: 1; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .32rem .7rem;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      background: rgba(255, 255, 255, .08);
+    }
+    .hero h1 {
+      max-width: 950px;
+      margin: 1.2rem 0 .75rem;
+      font-size: clamp(2rem, 5vw, 4.35rem);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+    .hero .lead { max-width: 830px; margin: 0; color: rgba(248,255,249,.84); font-size: 1.08rem; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: .6rem 1.3rem; margin-top: 1.45rem; font-size: .88rem; color: rgba(248,255,249,.72); }
+
+    .metric-strip {
+      width: min(1180px, calc(100% - 32px));
+      margin: -28px auto 36px;
+      position: relative;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .metric { padding: 1.1rem 1.25rem; border-right: 1px solid var(--line); }
+    .metric:last-child { border: 0; }
+    .metric small { display: block; color: var(--muted); font-size: .75rem; font-weight: 700; }
+    .metric strong { display: block; margin-top: .18rem; font-size: 1.55rem; letter-spacing: -.03em; }
+    .metric .up { color: var(--green); }
+
+    .layout {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto 80px;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+    .toc {
+      position: sticky;
+      top: 18px;
+      padding: 1.05rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 254, 249, .86);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 26px rgba(21, 35, 30, .05);
+    }
+    .toc strong { display: block; margin-bottom: .55rem; font-size: .82rem; color: var(--muted); }
+    .toc a {
+      display: block;
+      padding: .34rem .45rem;
+      border-radius: 7px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+    .toc a:hover { background: var(--green-soft); color: var(--green); }
+
+    main { min-width: 0; }
+    section {
+      scroll-margin-top: 22px;
+      margin-bottom: 28px;
+      padding: clamp(1.25rem, 3vw, 2.3rem);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 0 7px 24px rgba(21, 35, 30, .045);
+    }
+    h2 { margin: 0 0 .75rem; font-size: clamp(1.45rem, 3vw, 2rem); line-height: 1.25; letter-spacing: -.025em; }
+    h3 { margin: 1.65rem 0 .55rem; font-size: 1.12rem; line-height: 1.35; }
+    h4 { margin: 1.2rem 0 .35rem; font-size: .98rem; }
+    p { margin: .55rem 0 1rem; }
+    .section-kicker { margin-bottom: .3rem; color: var(--green); font-weight: 800; font-size: .78rem; letter-spacing: .05em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+    .small { font-size: .84rem; }
+    .tight { margin: .35rem 0; }
+
+    .callout {
+      margin: 1.1rem 0;
+      padding: 1rem 1.1rem;
+      border-left: 4px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      background: var(--green-soft);
+    }
+    .callout.warn { border-color: var(--gold); background: var(--gold-soft); }
+    .callout.risk { border-color: var(--red); background: var(--red-soft); }
+    .callout strong { display: block; margin-bottom: .15rem; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 1.35rem 0 .6rem;
+    }
+    .flow-card {
+      position: relative;
+      min-height: 142px;
+      padding: .95rem;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: linear-gradient(145deg, #fff, #f6f8f4);
+    }
+    .flow-card:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      z-index: 2;
+      width: 23px;
+      height: 23px;
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      background: var(--paper);
+      font-weight: 900;
+    }
+    .flow-card .num { color: var(--green); font: 800 .74rem var(--mono); }
+    .flow-card strong { display: block; margin: .32rem 0 .28rem; font-size: .94rem; }
+    .flow-card p { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.55; }
+
+    .grid-2, .grid-3 { display: grid; gap: 14px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .mini {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcf8;
+    }
+    .mini strong { display: block; margin-bottom: .22rem; }
+    .mini p { margin: 0; color: var(--muted); font-size: .86rem; }
+
+    .formula {
+      margin: .85rem 0;
+      padding: .9rem 1rem;
+      overflow-x: auto;
+      border: 1px solid #cbd8d2;
+      border-radius: 10px;
+      background: #f3f8f5;
+      font-family: Georgia, "Times New Roman", serif;
+      text-align: center;
+      font-size: 1.01rem;
+      white-space: nowrap;
+    }
+    .formula.left { text-align: left; font-family: var(--mono); font-size: .84rem; line-height: 1.75; }
+
+    .table-wrap { overflow-x: auto; margin: .9rem 0 1rem; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: .86rem; }
+    th, td { padding: .72rem .78rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #edf3ef; color: #29453a; font-size: .78rem; letter-spacing: .015em; }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: rgba(223, 241, 233, .35); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .winner td { background: rgba(223, 241, 233, .62); }
+    .bad { color: var(--red); font-weight: 700; }
+    .good { color: var(--green); font-weight: 700; }
+
+    .pill {
+      display: inline-block;
+      margin: .13rem .14rem .13rem 0;
+      padding: .2rem .5rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f6f8f5;
+      font: 700 .72rem var(--mono);
+      white-space: nowrap;
+    }
+    .pill.green { border-color: #9bcbb9; background: var(--green-soft); color: var(--green); }
+    .pill.gold { border-color: #e4c584; background: var(--gold-soft); color: #80520c; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: .7rem; margin: .75rem 0; color: var(--muted); font-size: .78rem; }
+    .dot { width: .7rem; height: .7rem; display: inline-block; margin-right: .3rem; border-radius: 50%; vertical-align: -.05rem; }
+    .bar-group { margin: 1.1rem 0; }
+    .bar-row { display: grid; grid-template-columns: 118px 1fr 62px; gap: .7rem; align-items: center; margin: .55rem 0; font-size: .8rem; }
+    .track { height: 12px; overflow: hidden; border-radius: 999px; background: #e4e8e3; }
+    .bar { height: 100%; border-radius: inherit; background: var(--green); }
+    .bar.old { background: #81918a; }
+
+    ol.steps { counter-reset: item; list-style: none; padding: 0; }
+    ol.steps li { position: relative; padding: 0 0 1.15rem 3rem; }
+    ol.steps li::before {
+      counter-increment: item;
+      content: counter(item);
+      position: absolute;
+      left: 0;
+      top: -.1rem;
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--green);
+      font: 800 .8rem var(--mono);
+    }
+    ol.steps li:not(:last-child)::after { content: ""; position: absolute; left: .98rem; top: 2rem; bottom: 0; width: 1px; background: var(--line); }
+    ol.steps strong { display: block; margin-bottom: .2rem; }
+
+    .file-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+    .file-list a {
+      display: block;
+      padding: .8rem .9rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfcf8;
+      text-decoration: none;
+      font-size: .84rem;
+      word-break: break-all;
+    }
+    .file-list a:hover { border-color: #96c5b4; background: var(--green-soft); }
+
+    footer { padding: 28px 20px 48px; color: var(--muted); text-align: center; font-size: .78rem; }
+    .print-button {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10;
+      border: 0;
+      border-radius: 999px;
+      padding: .75rem 1rem;
+      color: white;
+      background: var(--green);
+      box-shadow: var(--shadow);
+      font: 700 .82rem inherit;
+      cursor: pointer;
+    }
+    .print-button:hover { background: var(--green-2); }
+
+    @media (max-width: 940px) {
+      .metric-strip { grid-template-columns: repeat(2, 1fr); }
+      .metric:nth-child(2) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; display: grid; grid-template-columns: repeat(3, 1fr); }
+      .toc strong { grid-column: 1 / -1; }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .flow-card:nth-child(2)::after { display: none; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding-top: 52px; }
+      .metric-strip, .layout { width: min(100% - 20px, 1180px); }
+      .metric-strip { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:nth-child(3) { border-bottom: 1px solid var(--line); }
+      .toc { grid-template-columns: repeat(2, 1fr); }
+      section { border-radius: 14px; }
+      .flow, .grid-2, .grid-3, .file-list { grid-template-columns: 1fr; }
+      .flow-card::after { display: none !important; }
+      .bar-row { grid-template-columns: 95px 1fr 54px; }
+      .print-button { display: none; }
+    }
+    @media print {
+      :root { --bg: #fff; --paper: #fff; }
+      body { background: #fff; font-size: 10pt; }
+      .hero { padding: 28px 0; print-color-adjust: exact; }
+      .metric-strip, .layout { width: 100%; }
+      .layout { display: block; }
+      .toc, .print-button { display: none; }
+      section { break-inside: avoid; box-shadow: none; padding: 16px; margin-bottom: 12px; }
+      a { color: inherit; text-decoration: none; }
+      .flow-card, th, .callout { print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">본문으로 바로가기</a>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">ALGORITHM NOTE · 2026-08-28</span>
+      <h1>균형가중 로지스틱<br>+ SJM 미사용 전략</h1>
+      <p class="lead">한국의 성장·물가 국면으로 기본 자산배분을 만들고, 꼬리손실 확률로 월간 위험을 조절한 뒤, VKOSPI 급등 때 주식과 원유 일부를 금으로 옮기는 전체 파이프라인을 코드와 같은 순서로 설명합니다.</p>
+      <div class="hero-meta">
+        <span>자산: KODEX200 · 국내채권 · GLD · USO</span>
+        <span>월간 본체 + 일간 VKOSPI 안전장치</span>
+        <span>잠금 검증: 2018-01 이후</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="metric-strip" aria-label="잠금 구간 핵심 성과">
+    <div class="metric"><small>2018–2026 CAGR</small><strong class="up">20.91%</strong></div>
+    <div class="metric"><small>2018–2026 Sharpe</small><strong class="up">1.497</strong></div>
+    <div class="metric"><small>2018–2026 MDD</small><strong class="up">−9.76%</strong></div>
+    <div class="metric"><small>사전 승격 기준</small><strong style="color:var(--gold)">미통과</strong></div>
+  </div>
+
+  <div class="layout">
+    <nav class="toc" aria-label="문서 목차">
+      <strong>이 문서의 순서</strong>
+      <a href="#overview">1. 한눈에 보기</a>
+      <a href="#data">2. 데이터와 시점</a>
+      <a href="#macro">3. SJM 없는 매크로 국면</a>
+      <a href="#allocation">4. 기본 자산배분</a>
+      <a href="#tail">5. 꼬리위험 분류</a>
+      <a href="#features">6. 입력변수 16개</a>
+      <a href="#portfolio">7. 비중 조절과 변동성</a>
+      <a href="#vkospi">8. VKOSPI 오버레이</a>
+      <a href="#timing">9. 누수 방지</a>
+      <a href="#results">10. 결과와 해석</a>
+      <a href="#limits">11. 한계</a>
+      <a href="#files">12. 코드와 결과 파일</a>
+    </nav>
+
+    <main id="content">
+      <section id="overview">
+        <div class="section-kicker">Overview</div>
+        <h2>한 문장으로 요약하면</h2>
+        <p>이 전략은 <strong>경제국면으로 장기 방향을 잡고, 로지스틱 회귀로 앞으로 두 달의 큰 손실 가능성을 점검하며, VKOSPI로 갑작스러운 일중 위험을 한 번 더 막는 3층 구조</strong>입니다. 어느 한 모델이 모든 비중을 직접 결정하지 않습니다.</p>
+
+        <div class="flow" aria-label="전체 알고리즘 흐름">
+          <div class="flow-card"><span class="num">01</span><strong>원자료 정렬</strong><p>매크로, 4개 자산, KRX 업종지수, VKOSPI를 실제 알 수 있었던 시점에 맞춥니다.</p></div>
+          <div class="flow-card"><span class="num">02</span><strong>매크로 국면</strong><p>성장·물가 확률을 투명한 합성식으로 계산합니다. SJM 가중치는 0입니다.</p></div>
+          <div class="flow-card"><span class="num">03</span><strong>기본 비중</strong><p>국면 하드 비중 40%와 SLSQP 방어 비중 60%를 결합합니다.</p></div>
+          <div class="flow-card"><span class="num">04</span><strong>꼬리위험 학습</strong><p>16개 변수로 향후 2개월 경로손실 −5% 사건을 walk-forward 예측합니다.</p></div>
+          <div class="flow-card"><span class="num">05</span><strong>월간 위험 이동</strong><p>꼬리위험이 높을수록 KODEX200·USO에서 BOND·GLD로 최대 20% 이동합니다.</p></div>
+          <div class="flow-card"><span class="num">06</span><strong>변동성 타기팅</strong><p>최근 변동성에 따라 총 익스포저를 0.5~1.5배로 조절합니다.</p></div>
+          <div class="flow-card"><span class="num">07</span><strong>VKOSPI 방어</strong><p>전일 VKOSPI 스트레스에 따라 KODEX200·USO 일부를 GLD로 옮깁니다.</p></div>
+          <div class="flow-card"><span class="num">08</span><strong>비용·검증</strong><p>매매·환전·조달비용을 반영하고 사전구간과 잠금구간을 따로 평가합니다.</p></div>
+        </div>
+
+        <div class="callout">
+          <strong>서로 다른 시간축을 맡긴 것이 핵심입니다.</strong>
+          매크로 국면은 느린 방향, 로지스틱은 1~2개월 꼬리위험, VKOSPI는 며칠 단위의 공포 급등을 담당합니다.
+        </div>
+      </section>
+
+      <section id="data">
+        <div class="section-kicker">Data</div>
+        <h2>데이터와 투자 대상</h2>
+        <div class="grid-2">
+          <div class="mini"><strong>KODEX200</strong><p>한국 주식 위험자산. ETF 실데이터 이전 구간은 국내 지수 프록시를 연결합니다.</p></div>
+          <div class="mini"><strong>BOND</strong><p>국내 채권지수. 성장 둔화와 포트폴리오 방어의 핵심 자산입니다.</p></div>
+          <div class="mini"><strong>GLD</strong><p>금 ETF 가격을 USD/KRW로 원화 환산합니다. 인플레이션·공포 방어 자산입니다.</p></div>
+          <div class="mini"><strong>USO</strong><p>원유 ETF 가격을 USD/KRW로 원화 환산합니다. 경기과열·물가 국면의 위험자산입니다.</p></div>
+        </div>
+
+        <h3>신호 데이터</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>영역</th><th>원자료</th><th>용도</th><th>주기</th></tr></thead>
+            <tbody>
+              <tr><td>성장</td><td>GDP 성장률, 수출 증가율, 기업경기실사지수(BSI)</td><td>성장 확률과 4분면 국면</td><td>월/분기</td></tr>
+              <tr><td>물가</td><td>CPI, PPI, 수입물가 증가율</td><td>물가 확률과 4분면 국면</td><td>월</td></tr>
+              <tr><td>시장 구조</td><td>KOSPI200 및 KRX 업종지수 가격·거래량</td><td>OAP 아이디어의 국내 대용변수</td><td>일</td></tr>
+              <tr><td>공포</td><td>VKOSPI 시가·고가·저가·종가</td><td>최종 일간 스트레스 오버레이</td><td>일</td></tr>
+              <tr><td>자산 가격</td><td>KODEX200, 채권지수, GLD, USO, USD/KRW</td><td>비중 산출과 백테스트</td><td>일/월</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">Open Asset Pricing 자료는 개별 미국 주식 신호를 그대로 내려받아 투입한 것이 아니라, <a href="https://openassetpricing.com/SignalDoc-Browser.html">SignalDoc Browser</a>의 아이디어를 한국 업종지수에서 계산 가능한 가격·거래량 대용변수로 번역해 사용합니다.</p>
+      </section>
+
+      <section id="macro">
+        <div class="section-kicker">Layer 1 · Macro</div>
+        <h2>SJM 없이 성장·물가 확률을 계산하는 방법</h2>
+        <p>각 거시계열을 과거 이동창 기준 z-score로 바꿉니다. GDP는 72개월, 수출·CPI·PPI·수입물가는 36개월, BSI는 24개월 창을 사용하며, 극단값은 ±3으로 제한합니다.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>축</th><th>수준 변수</th><th>전환 변수</th><th>합성값</th></tr></thead>
+            <tbody>
+              <tr><td><strong>성장</strong></td><td><code>GDP_level</code>, <code>Export_level</code>, <code>BSI_level</code></td><td>각 수준의 3개월 변화 <code>_d3</code></td><td>세 변수의 단순평균</td></tr>
+              <tr><td><strong>물가</strong></td><td><code>CPI_level</code>, <code>PPI_level</code>, <code>ImportPrice_level</code></td><td>각 수준의 3개월 변화 <code>_d3</code></td><td>세 변수의 단순평균</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>수준에 3개월 변화를 20%만 더하고 시그모이드 함수로 0~1 확률로 변환합니다.</p>
+        <div class="formula">p̃<sub>t</sub> = sigmoid((level<sub>t</sub> + 0.20 × Δ3<sub>t</sub>) / 0.55)</div>
+        <p>월별 신호가 지나치게 튀지 않도록 현재 계산값 85%와 직전 확률 15%를 섞습니다.</p>
+        <div class="formula">p<sub>t</sub> = 0.85 × p̃<sub>t</sub> + 0.15 × p<sub>t−1</sub></div>
+
+        <div class="callout warn">
+          <strong>SJM은 정확히 어디서 빠졌나?</strong>
+          기존 식의 Sparse Jump Model 확률 가중치를 <code>sjm_weight=0.0</code>으로 고정했습니다. 따라서 국면확률은 위의 투명한 수준·3개월 변화 합성식과 1개월 평활화만으로 결정됩니다.
+        </div>
+
+        <h3>성장 × 물가의 4분면</h3>
+        <div class="formula left">Goldilocks  = p(growth high) × [1 − p(inflation high)]
+Overheating = p(growth high) × p(inflation high)
+Slowdown    = [1 − p(growth high)] × [1 − p(inflation high)]
+Stagflation = [1 − p(growth high)] × p(inflation high)</div>
+        <p>네 확률 중 가장 큰 값을 해당 월의 국면으로 사용합니다. 다만 SLSQP 쪽은 하나의 국면만 고르는 대신 네 확률을 모두 이용한 확률가중 앵커도 함께 사용합니다.</p>
+      </section>
+
+      <section id="allocation">
+        <div class="section-kicker">Layer 2 · Allocation</div>
+        <h2>국면 비중과 SLSQP 방어 비중</h2>
+        <h3>국면 하드 비중</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>국면</th><th class="num">KODEX200</th><th class="num">BOND</th><th class="num">GLD</th><th class="num">USO</th><th>해석</th></tr></thead>
+            <tbody>
+              <tr><td>Goldilocks</td><td class="num">100%</td><td class="num">0%</td><td class="num">0%</td><td class="num">0%</td><td>성장 우위</td></tr>
+              <tr><td>Overheating</td><td class="num">0%</td><td class="num">0%</td><td class="num">0%</td><td class="num">100%</td><td>성장과 물가 동반 상승</td></tr>
+              <tr><td>Slowdown</td><td class="num">60%</td><td class="num">40%</td><td class="num">0%</td><td class="num">0%</td><td>주식 참여를 남긴 둔화 대응</td></tr>
+              <tr><td>Stagflation</td><td class="num">0%</td><td class="num">0%</td><td class="num">100%</td><td class="num">0%</td><td>금 중심 방어</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>SLSQP 위험조정 비중</h3>
+        <p>두 번째 비중은 국면 앵커를 출발점으로 하되, 최근 수익·공분산·낙폭·회전율을 함께 고려하는 제약 최적화입니다. 목적함수는 기대수익을 보상하고 변동성, CDaR, 매매회전율, 앵커 이탈을 벌점으로 둡니다.</p>
+        <div class="formula left">min  −1.15 × 기대 연수익
+     +0.18 × 연환산 변동성
+     +0.25 × |90% CDaR|
+     +0.05 × 회전율
+     +0.32 × 국면·역변동성 prior 이탈</div>
+
+        <div class="grid-3">
+          <div class="mini"><strong>위험 추정</strong><p>최대 84개월, 반감기 12개월 EWMA 공분산을 사용합니다. 주식 급락 관측치는 공분산에 더 크게 반영합니다.</p></div>
+          <div class="mini"><strong>제약</strong><p>비중 합 100%, 목표 변동성 이하, CDaR 16% 이내를 요구합니다.</p></div>
+          <div class="mini"><strong>자산별 범위</strong><p>주식 2~68%, 채권 5~88%, 금 2~62%, 원유 0~38%입니다.</p></div>
+        </div>
+        <p>현재 낙폭이 −5%보다 깊으면 최적 비중을 <code>[주식 5%, 채권 72%, 금 23%, 원유 0%]</code> 방어 포트폴리오 쪽으로 추가 혼합합니다.</p>
+
+        <div class="callout">
+          <strong>월간 본체의 출발 비중</strong>
+          최종 월간 모델은 <strong>하드 국면 비중 40% + SLSQP 비중 60%</strong>로 시작합니다. 하드 규칙의 방향성과 연속적인 위험관리의 안정성을 같이 쓰려는 구성입니다.
+        </div>
+      </section>
+
+      <section id="tail">
+        <div class="section-kicker">Layer 3 · Classifier</div>
+        <h2>균형가중 로지스틱은 무엇을 분류하나</h2>
+        <p>분류 목표는 “다음 달 수익률이 음수인가”가 아닙니다. 기준 포트폴리오의 <strong>앞으로 두 달 누적경로 중 최저점이 −5% 아래로 내려가는지</strong>를 맞힙니다.</p>
+        <div class="formula">tail_event<sub>t</sub> = 1{ min[(1+r<sub>t</sub>), (1+r<sub>t</sub>)(1+r<sub>t+1</sub>)] − 1 &lt; −5% }</div>
+        <p>레이블을 만드는 중립 기준은 하드 국면 40%와 SLSQP 60%를 섞은 뒤 1.2배 익스포저를 적용한 경로입니다. SJM을 빼면 국면과 기준 경로가 바뀌므로, 설명변수뿐 아니라 레이블도 처음부터 다시 계산합니다.</p>
+
+        <h3>학습 규칙</h3>
+        <div class="grid-2">
+          <div class="mini"><strong>모델</strong><p>중앙값 결측치 대체 → 표준화 → L2 로지스틱 회귀. <code>solver=liblinear</code>, <code>C=0.1</code>입니다.</p></div>
+          <div class="mini"><strong>불균형 보정</strong><p><code>class_weight=balanced</code>로 드문 꼬리사건의 학습 가중치를 높입니다. 데이터 재표본추출은 하지 않습니다.</p></div>
+          <div class="mini"><strong>Walk-forward</strong><p>최소 36개월이 쌓인 뒤 매월 과거 데이터만으로 새 모델을 적합합니다.</p></div>
+          <div class="mini"><strong>안전장치</strong><p>양성 최소 4개, 음성 최소 12개가 있어야 적합합니다. 2개월 레이블과 겹치지 않도록 학습 끝 2개월은 제외합니다.</p></div>
+        </div>
+        <p class="small muted">양성 사건이 적기 때문에 정확도보다 ROC-AUC, 평균정밀도, Brier score와 실제 포트폴리오 성과를 함께 봅니다.</p>
+      </section>
+
+      <section id="features">
+        <div class="section-kicker">Inputs</div>
+        <h2>로지스틱 회귀에 들어가는 설명변수 16개</h2>
+        <p>VKOSPI는 아래 16개 변수에 포함되지 않습니다. 로지스틱은 월간 꼬리위험을, VKOSPI는 마지막 단계의 일간 오버레이를 담당합니다.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>변수</th><th>계산과 의미</th><th>구간</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><code>base_USO</code></td><td>현재 하드 국면에서 원유에 주는 기본 비중</td><td>현재 국면</td></tr>
+              <tr><td>2</td><td><code>base_GLD</code></td><td>현재 하드 국면에서 금에 주는 기본 비중</td><td>현재 국면</td></tr>
+              <tr><td>3</td><td><code>base_KODEX200</code></td><td>현재 하드 국면에서 한국 주식에 주는 기본 비중</td><td>현재 국면</td></tr>
+              <tr><td>4</td><td><code>p_inflation_high</code></td><td>SJM 없는 매크로 합성식이 계산한 고물가 확률</td><td>직전 공개정보</td></tr>
+              <tr><td>5</td><td><code>proxy_mom1</code></td><td>하드 국면 비중으로 만든 가상 포트폴리오의 최근 1개월 모멘텀</td><td>1개월</td></tr>
+              <tr><td>6</td><td><code>proxy_mom6</code></td><td>같은 가상 포트폴리오의 누적 모멘텀</td><td>6개월</td></tr>
+              <tr><td>7</td><td><code>proxy_vol6</code></td><td>가상 포트폴리오 월수익률의 연환산 표준편차</td><td>6개월</td></tr>
+              <tr><td>8</td><td><code>daily_mom21</code></td><td>가상 포트폴리오의 일간 누적 모멘텀</td><td>21거래일</td></tr>
+              <tr><td>9</td><td><code>daily_mom252</code></td><td>가상 포트폴리오의 장기 일간 누적 모멘텀</td><td>252거래일</td></tr>
+              <tr><td>10</td><td><code>daily_vol21</code></td><td>일간 수익률 표준편차의 연환산 값</td><td>21거래일</td></tr>
+              <tr><td>11</td><td><code>daily_downvol21</code></td><td>음수 수익률만 사용한 하방 변동성의 연환산 값</td><td>21거래일</td></tr>
+              <tr><td>12</td><td><code>daily_mean_corr63</code></td><td>KODEX200·GLD·USO의 세 쌍 상관계수 평균. 분산효과 붕괴 여부를 측정</td><td>63거래일</td></tr>
+              <tr><td>13</td><td><code>oap_momentum_trend_stress</code></td><td>업종 모멘텀, 52주 고점, 상승 폭이 약할수록 높아지는 추세 스트레스</td><td>복합</td></tr>
+              <tr><td>14</td><td><code>oap_reversal_crowding_stress</code></td><td>단기 반전과 업종 간 모멘텀 분산으로 쏠림·반전 위험 측정</td><td>복합</td></tr>
+              <tr><td>15</td><td><code>oap_low_risk_tail_stress</code></td><td>실현변동성, 잔차변동성, 최대수익, 왜도, 베타의 꼬리위험 합성</td><td>복합</td></tr>
+              <tr><td>16</td><td><code>oap_liquidity_activity_stress</code></td><td>Amihud 대용치, 거래대금, 거래량 추세·변동성으로 유동성 악화 측정</td><td>복합</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted"><code>base_BOND</code>도 중간 데이터에는 계산되지만 로지스틱 입력에서는 제외됩니다. 네 하드 비중의 합이 1이어서 나머지 세 비중과 완전한 선형관계를 만들기 때문입니다.</p>
+
+        <h3>OAP 아이디어를 한국 데이터로 바꾼 방식</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>합성지표</th><th>참고한 SignalDoc 계열</th><th>국내 구현</th></tr></thead>
+            <tbody>
+              <tr><td>모멘텀·추세</td><td>Mom12m, Mom6m, IntMom, High52, IndMom, MomVol</td><td>KRX 업종 12·6개월 및 중기 모멘텀 중앙값, 52주 고점 거리, 상승 업종 비율, 거래대금 가중 모멘텀</td></tr>
+              <tr><td>반전·쏠림</td><td>STreversal, MRreversal, LRreversal</td><td>업종·KOSPI 단기반전과 업종 수익률·모멘텀의 횡단면 분산</td></tr>
+              <tr><td>저위험·꼬리</td><td>RealizedVol, IdioVol3F, MaxRet, ReturnSkew, Beta</td><td>업종 실현변동성, 시장회귀 잔차변동성, 최대 일수익률, 왜도, 베타 평균과 분산</td></tr>
+              <tr><td>유동성·활동</td><td>Illiquidity, DolVol, VolumeTrend, VolSD</td><td>절대수익률/(지수×거래량), 거래대금 z-score, 거래량 장기추세와 변동계수</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>각 하위변수는 현재 월을 제외한 과거 60개월 평균·표준편차로 인과적 z-score를 만들고 합성합니다. <code>지수×거래량</code>은 실제 거래대금이 아니라 지수 데이터에서 계산한 대용치이므로 절대 규모보다 시간변화와 업종 간 상대관계를 해석합니다.</p>
+      </section>
+
+      <section id="portfolio">
+        <div class="section-kicker">Layer 4 · Portfolio</div>
+        <h2>확률을 실제 비중으로 바꾸는 규칙</h2>
+        <ol class="steps">
+          <li><strong>꼬리확률을 최근 과거분포 안에서 순위화</strong>현재 예측확률을 제외한 최근 60개의 유효 예측확률과 비교해 인과적 백분위를 만듭니다. 과거 예측값이 최소 12개 쌓인 뒤부터 계산합니다.</li>
+          <li><strong>상위 20%에서만 방어 가동</strong><span class="mono">severity = clip((risk percentile − 0.80) / 0.20, 0, 1)</span>입니다.</li>
+          <li><strong>방어 점수 생성</strong><span class="mono">p_up = 0.50 − 0.15 × severity</span>, <span class="mono">score = −severity</span>입니다. 점수 범위는 −1~0이므로 이 층은 위험을 추가하지 않고 줄이는 방향으로만 작동합니다.</li>
+          <li><strong>최대 20% 비중 이동</strong>KODEX200과 USO에서 빼서 BOND와 GLD에 기존 방어자산 비중에 비례해 나눕니다. 자산별 최소비중을 침범하지 않습니다.</li>
+          <li><strong>15% 목표변동성</strong>조정된 비중의 최근 24개월 수익률에 최근 관측치가 더 큰 지수형 가중치를 주어 변동성을 예측합니다.</li>
+          <li><strong>총 익스포저 결정</strong><span class="mono">leverage = clip(15% / forecast volatility, 0.50, 1.50)</span>입니다. 1을 넘는 부분은 연 4% 조달비용, 1보다 작은 부분은 현금성 잔여비중으로 처리합니다.</li>
+        </ol>
+
+        <div class="callout">
+          <strong>로지스틱이 직접 종목을 고르는 것은 아닙니다.</strong>
+          로지스틱은 “방어 강도” 하나를 만들고, 자산 간 이동 방향과 최대 이동량은 별도의 명시적 규칙이 정합니다. 분류기의 작은 표본 오차가 곧바로 극단적인 자산 선택으로 번지지 않게 한 구조입니다.
+        </div>
+      </section>
+
+      <section id="vkospi">
+        <div class="section-kicker">Layer 5 · Daily Overlay</div>
+        <h2>마지막 안전장치: VKOSPI 오버레이</h2>
+        <p>월간 전략이 정한 비중을 기준으로, 전날까지의 VKOSPI가 높고 빠르게 상승하며 상승 속도도 빨라질 때 KODEX200과 USO를 줄여 GLD로 이동합니다.</p>
+
+        <h3>스트레스 구성</h3>
+        <div class="grid-3">
+          <div class="mini"><strong>수준 40%</strong><p>최근 252일 백분위가 90%를 넘는 정도. 부족하면 126일 백분위를 사용합니다.</p></div>
+          <div class="mini"><strong>5일 충격 35%</strong><p>5일 로그변화를 직전 63일 변동성으로 표준화하고 1을 넘는 부분을 사용합니다.</p></div>
+          <div class="mini"><strong>5일 가속도 25%</strong><p>최근 5일 상승폭과 직전 5일 상승폭의 차이를 표준화해 공포 확산 속도를 봅니다.</p></div>
+        </div>
+        <div class="formula">VKOSPI stress = 0.40 × level + 0.35 × shock + 0.25 × acceleration</div>
+        <div class="formula">risk transfer = 0.35 × VKOSPI stress</div>
+
+        <p>최대 스트레스일 때 KODEX200과 USO 각각의 현재 비중에서 35%를 줄입니다. 현재 고정 설정은 <code>bond_share=0</code>이므로 줄인 금액은 전부 GLD로 갑니다. 월초에는 반드시 리밸런싱하고, 월중에는 목표 대비 편도 회전율이 20% 이상 벌어졌을 때만 거래합니다.</p>
+
+        <div class="formula left">KODEX200′ = KODEX200 × (1 − transfer)
+USO′      = USO      × (1 − transfer)
+GLD′      = GLD + transfer × (KODEX200 + USO)
+BOND′     = BOND</div>
+
+        <p>일간 재구성으로 생기는 월간 엔진과의 미세한 복리 차이를 수익으로 가장하지 않기 위해, 오버레이 경로를 같은 일간 중립경로로 나눈 <strong>상대수익 효과만</strong> 월간 본체에 곱합니다.</p>
+        <div class="formula">1 + R<sub>final,month</sub> = (1 + R<sub>monthly body</sub>) × [(1 + R<sub>daily overlay</sub>) / (1 + R<sub>daily neutral</sub>)]</div>
+      </section>
+
+      <section id="timing">
+        <div class="section-kicker">Causality</div>
+        <h2>미래정보가 들어오지 않게 맞춘 시점</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>결정</th><th>사용 가능한 정보</th><th>금지한 정보</th></tr></thead>
+            <tbody>
+              <tr><td>월 <em>t</em> 매크로 국면</td><td><em>t−1</em>월까지 공개된 거시자료</td><td><em>t</em>월 이후 값</td></tr>
+              <tr><td>월 <em>t</em> 가격·OAP 변수</td><td>월초 이틀 전까지의 일간자료</td><td>해당 월 수익률</td></tr>
+              <tr><td>월 <em>t</em> 로지스틱 학습</td><td>2개월 embargo 이전까지 레이블이 확정된 표본</td><td>미완성 향후 2개월 경로</td></tr>
+              <tr><td>일 <em>t</em> VKOSPI 비중</td><td><em>t−1</em>일까지 확인된 VKOSPI</td><td><em>t</em>일 종가</td></tr>
+              <tr><td>일 <em>t</em> 수익</td><td><em>t</em>일 시가에 결정된 비중</td><td>같은 날 종가를 미리 안 거래</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>모델 계수는 walk-forward로 매월 다시 적합하지만, <code>C=0.1</code>, 균형가중, −5% 임계값, 2개월 기간, 최대 이동 20%, 변동성 15%, VKOSPI 파라미터는 잠금구간 결과를 보고 다시 고르지 않았습니다.</p>
+      </section>
+
+      <section id="results">
+        <div class="section-kicker">Evidence</div>
+        <h2>무엇이 좋아졌고, 어디까지 믿을 수 있나</h2>
+
+        <h3>최종 경로 비교</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>평가 구간</th><th>전략</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th class="num">Calmar</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="2">보정 2007–2017</td><td>SJM 미사용</td><td class="num">11.59%</td><td class="num">0.857</td><td class="num">−12.96%</td><td class="num">0.895</td></tr>
+              <tr><td>기존 SJM 10%</td><td class="num good">12.92%</td><td class="num good">0.949</td><td class="num">−12.98%</td><td class="num good">0.996</td></tr>
+              <tr><td rowspan="2">검증 2013–2017</td><td>SJM 미사용</td><td class="num good">3.05%</td><td class="num good">0.413</td><td class="num">−10.66%</td><td class="num good">0.286</td></tr>
+              <tr><td>기존 SJM 10%</td><td class="num">2.66%</td><td class="num">0.378</td><td class="num good">−10.64%</td><td class="num">0.250</td></tr>
+              <tr class="winner"><td rowspan="2"><strong>잠금 2018–2026</strong></td><td><strong>SJM 미사용</strong></td><td class="num good">20.91%</td><td class="num good">1.497</td><td class="num good">−9.76%</td><td class="num good">2.142</td></tr>
+              <tr><td>기존 SJM 10%</td><td class="num">18.44%</td><td class="num">1.363</td><td class="num">−11.13%</td><td class="num">1.656</td></tr>
+              <tr><td rowspan="2">전체 2007–2026</td><td>SJM 미사용</td><td class="num good">15.64%</td><td class="num good">1.133</td><td class="num good">−12.96%</td><td class="num good">1.207</td></tr>
+              <tr><td>기존 SJM 10%</td><td class="num">15.34%</td><td class="num">1.128</td><td class="num">−12.98%</td><td class="num">1.182</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>잠금 구간에서 층별로 생긴 변화</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>전략 층</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th>읽는 법</th></tr></thead>
+            <tbody>
+              <tr><td>No-SJM SLSQP 기초전략</td><td class="num">9.07%</td><td class="num">1.190</td><td class="num">−8.06%</td><td>기존 SJM 기초전략과 거의 같음</td></tr>
+              <tr><td>+ 균형가중 로지스틱·Vol15</td><td class="num">20.99%</td><td class="num">1.339</td><td class="num">−12.67%</td><td>수익·Sharpe 상승의 대부분이 발생</td></tr>
+              <tr class="winner"><td>+ VKOSPI 오버레이</td><td class="num">20.91%</td><td class="num">1.497</td><td class="num">−9.76%</td><td>CAGR을 거의 유지하며 낙폭 축소</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="legend"><span><i class="dot" style="background:var(--green)"></i>SJM 미사용</span><span><i class="dot" style="background:#81918a"></i>기존 SJM 10%</span></div>
+        <div class="bar-group" aria-label="잠금 구간 개선 확률">
+          <div class="bar-row"><span>CAGR 개선</span><div class="track"><div class="bar" style="width:81.84%"></div></div><strong>81.8%</strong></div>
+          <div class="bar-row"><span>Sharpe 개선</span><div class="track"><div class="bar" style="width:80.94%"></div></div><strong>80.9%</strong></div>
+          <div class="bar-row"><span>MDD 개선</span><div class="track"><div class="bar" style="width:77.32%"></div></div><strong>77.3%</strong></div>
+          <div class="bar-row"><span>세 지표 동시</span><div class="track"><div class="bar old" style="width:64.86%"></div></div><strong>64.9%</strong></div>
+        </div>
+        <p class="small muted">잠금구간 월수익률을 6개월 블록으로 묶어 5,000회 재표본추출한 결과입니다. 각 개선폭의 하위 5%가 불리한 값을 포함하므로 통계적으로 결정적인 승리로 보기는 어렵습니다.</p>
+
+        <div class="callout risk">
+          <strong>좋은 잠금 결과와 별개로, 자동 승격은 하지 않았습니다.</strong>
+          사전 보정구간에서는 CAGR과 Sharpe가 기존 전략보다 낮았고, 2013–2017 검증구간에서는 MDD가 아주 조금 나빴습니다. “두 사전구간에서 CAGR·Sharpe·MDD가 모두 개선”되어야 한다는 엄격한 기준을 통과하지 못했습니다. 또한 이번 no-SJM 비교 자체가 잠금구간의 단서를 본 뒤 요청된 사후 제거실험이라는 점도 감안해야 합니다.
+        </div>
+
+        <h3>왜 결과가 달라졌나</h3>
+        <p>SJM을 뺀 것만으로 SLSQP 기초전략이 크게 좋아진 것은 아닙니다. 기존 전략과 비교 가능한 231개 레이블 중 5개가 달라졌고, 월별 꼬리확률 상관계수는 0.88이었습니다. 이 작은 차이가 walk-forward 재학습과 월간 비중 이동을 거치며 잠금구간의 경로를 바꿨습니다. 그 뒤 VKOSPI 오버레이가 로지스틱 적용 후 MDD −12.67%를 −9.76%로 줄였습니다.</p>
+      </section>
+
+      <section id="limits">
+        <div class="section-kicker">Limits</div>
+        <h2>이 결과를 사용할 때 지켜야 할 선</h2>
+        <div class="grid-2">
+          <div class="mini"><strong>희귀사건 표본</strong><p>꼬리사건은 보정구간 10개, 잠금구간 8개뿐입니다. 분류성능의 불확실성이 큽니다.</p></div>
+          <div class="mini"><strong>예측 안정성</strong><p>잠금구간 AUC는 0.836이지만 보정구간은 0.353입니다. 한 구간의 AUC만으로 모델 우수성을 주장하면 안 됩니다.</p></div>
+          <div class="mini"><strong>OAP는 국내 대용변수</strong><p>원 논문의 개별주식 신호를 그대로 재현한 것이 아니라 KRX 업종지수로 번역한 시장 스트레스 변수입니다.</p></div>
+          <div class="mini"><strong>백테스트 비용</strong><p>매매비용 0.15%, 해외자산 비중변화 비용 0.05%, 연 4% 조달비용을 가정했습니다. 실제 상품·세금·슬리피지는 다를 수 있습니다.</p></div>
+          <div class="mini"><strong>거시자료 개정</strong><p>과거 파일이 당시 공개 빈티지를 완전히 보존하지 않으면 GDP 등 수정치가 포함될 수 있습니다.</p></div>
+          <div class="mini"><strong>후보 상태</strong><p>구현은 완료했지만 기존 배포 결과를 덮어쓰지 않았습니다. 다음 독립 기간을 더 관찰하는 편이 안전합니다.</p></div>
+        </div>
+      </section>
+
+      <section id="files">
+        <div class="section-kicker">Reproduction</div>
+        <h2>코드, 검증 결과와 산출물</h2>
+        <p>동일한 파이프라인에 기존 SJM 10% 신호를 넣었을 때 저장된 배포 결과를 최대 <code>6.0×10⁻¹⁵</code> 오차로 재현했습니다. 시점 경계와 결과 정합성을 포함한 관련 테스트 27개도 모두 통과했습니다.</p>
+        <div class="file-list">
+          <a href="../../strategies/stage06_vkospi/balanced_logistic_no_sjm_strategy.py"><strong>실행 코드</strong><br><span class="muted">balanced_logistic_no_sjm_strategy.py</span></a>
+          <a href="../../tests/test_balanced_logistic_no_sjm_strategy.py"><strong>전용 테스트</strong><br><span class="muted">test_balanced_logistic_no_sjm_strategy.py</span></a>
+          <a href="../../results/balanced_logistic_no_sjm_validation.json"><strong>전체 검증 보고서</strong><br><span class="muted">balanced_logistic_no_sjm_validation.json</span></a>
+          <a href="../../results/balanced_logistic_no_sjm_comparison.csv"><strong>기간별 성과표</strong><br><span class="muted">balanced_logistic_no_sjm_comparison.csv</span></a>
+          <a href="../../results/balanced_logistic_no_sjm_features.csv"><strong>16개 입력변수 원장</strong><br><span class="muted">balanced_logistic_no_sjm_features.csv</span></a>
+          <a href="../../results/balanced_logistic_no_sjm_factor.csv"><strong>레이블·확률·방어강도</strong><br><span class="muted">balanced_logistic_no_sjm_factor.csv</span></a>
+          <a href="../../results/balanced_logistic_no_sjm_medium_backtest.csv"><strong>월간 본체 백테스트</strong><br><span class="muted">balanced_logistic_no_sjm_medium_backtest.csv</span></a>
+          <a href="../../results/balanced_logistic_no_sjm_final_reconciled.csv"><strong>최종 조정 월간 경로</strong><br><span class="muted">balanced_logistic_no_sjm_final_reconciled.csv</span></a>
+        </div>
+        <div class="callout warn">
+          <strong>문서의 결론</strong>
+          구현 결과는 잠금구간에서 분명히 매력적이지만, 사전 승격 기준은 통과하지 못했습니다. 따라서 현재로서는 “기존 전략을 대체하는 확정판”보다 “독립적으로 실행하고 다음 표본에서 확인할 후보”로 보는 것이 정확합니다.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <button class="print-button" type="button" onclick="window.print()" aria-label="문서 인쇄 또는 PDF 저장">인쇄 · PDF</button>
+  <footer>
+    <p>균형가중 로지스틱 + SJM 미사용 + Robust VKOSPI 오버레이 기술 설명서</p>
+    <p>백테스트는 미래 수익을 보장하지 않으며, 이 문서는 투자 권유가 아닙니다.</p>
+  </footer>
+</body>
+</html>

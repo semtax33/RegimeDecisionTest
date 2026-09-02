@@ -1,0 +1,291 @@
+{
+  "stage": 42,
+  "base": "Stage36_GVZ_OVXAssetRisk",
+  "strategy": "Stage42_DynamicDD10_ExAnteSharpe11",
+  "objective": "maximize w'mu - 0.5*w'Sigma*w - current transaction cost",
+  "constraints": {
+    "ex_ante_sharpe": ">= 1.10",
+    "dynamic_tail_risk": "historical CDaR(90%) >= 0.90/(1+current realized DD)-1",
+    "weights": "sum=1 and each in [0,1]",
+    "final_validation": "realized MDD >= -10% and Sharpe >= 1.10"
+  },
+  "preserved": {
+    "stage36_mu_and_sigma_information_set": true,
+    "stage36_transaction_cost_and_execution": true,
+    "stage36_cdar_confidence": 0.9,
+    "no_leverage_long_only_sum_one": true,
+    "single_asset_majority_cap": false
+  },
+  "anti_overfit": {
+    "candidate_count": 1,
+    "threshold_search": false,
+    "lookback_search": false,
+    "objective_weight_search": false,
+    "constraint_relaxation": false,
+    "future_return_in_optimizer": false
+  },
+  "candidate_complete_full_period": false,
+  "infeasible_events": [
+    {
+      "month": "2008-11",
+      "current_drawdown": -0.11518984657414488,
+      "remaining_loss_budget": 0.017167351115187968,
+      "reason": "DrawdownFloorAlreadyBreached",
+      "message": "Current drawdown -11.518985% is already below -10%."
+    }
+  ],
+  "monthly_checks": {
+    "months": 19,
+    "all_solver_success": true,
+    "minimum_ex_ante_sharpe_slack": -3.6749669973801247e-10,
+    "minimum_dynamic_tail_budget_slack": -9.654409147130671e-10,
+    "all_history_ends_before_target": true,
+    "max_weight_sum_error": 0.0,
+    "minimum_weight": 0.0,
+    "maximum_weight": 0.9999999999999997,
+    "minimum_realized_drawdown": -0.11518984657414488
+  },
+  "validation_gates": {
+    "Stage36_Frozen": {
+      "complete_full_period": true,
+      "CAGR": 0.10499388753644401,
+      "Sharpe": 1.1049112900976705,
+      "MDD": -0.12407087222855073,
+      "mdd_at_least_minus_10pct": false,
+      "sharpe_at_least_1_1": true,
+      "full_validation_pass": false
+    },
+    "Stage42_DynamicDD10_ExAnteSharpe11": {
+      "complete_full_period": false,
+      "CAGR": null,
+      "Sharpe": null,
+      "MDD": null,
+      "mdd_at_least_minus_10pct": false,
+      "sharpe_at_least_1_1": false,
+      "full_validation_pass": false
+    }
+  },
+  "eligible_strategies": [],
+  "selected_highest_cagr_strategy": null,
+  "stage36_frozen_files_unchanged": true,
+  "performance": [
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1049938875,
+      "Volatility": 0.0947174638,
+      "Sharpe": 1.1049112901,
+      "Sortino": 2.2018564577,
+      "MDD": -0.1240708722,
+      "Calmar": 0.8462412301,
+      "FinalMultiple": 6.8911377181,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0369775517,
+      "TotalCost": 0.0265354519,
+      "CompletePeriod": true
+    },
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0923177929,
+      "Volatility": 0.087193443,
+      "Sharpe": 1.0592360313,
+      "Sortino": 2.0494518521,
+      "MDD": -0.1240708722,
+      "Calmar": 0.7440730548,
+      "FinalMultiple": 4.3246840303,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0279465684,
+      "TotalCost": 0.0180913888,
+      "CompletePeriod": true
+    },
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1262562043,
+      "Volatility": 0.1017821984,
+      "Sharpe": 1.2235051573,
+      "Sortino": 2.5377845953,
+      "MDD": -0.119311114,
+      "Calmar": 1.0582099189,
+      "FinalMultiple": 2.7747206697,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0261551454,
+      "TotalCost": 0.0086887009,
+      "CompletePeriod": true
+    },
+    {
+      "Strategy": "Stage42_DynamicDD10_ExAnteSharpe11",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2008-10",
+      "Months": 19.0,
+      "CAGR": null,
+      "Volatility": null,
+      "Sharpe": null,
+      "Sortino": null,
+      "MDD": null,
+      "Calmar": null,
+      "FinalMultiple": null,
+      "PositiveMonths": null,
+      "AvgTurnover": null,
+      "TotalCost": null,
+      "CompletePeriod": false
+    },
+    {
+      "Strategy": "Stage42_DynamicDD10_ExAnteSharpe11",
+      "Period": "common_2010_2026",
+      "Start": null,
+      "End": null,
+      "Months": 0.0,
+      "CAGR": null,
+      "Volatility": null,
+      "Sharpe": null,
+      "Sortino": null,
+      "MDD": null,
+      "Calmar": null,
+      "FinalMultiple": null,
+      "PositiveMonths": null,
+      "AvgTurnover": null,
+      "TotalCost": null,
+      "CompletePeriod": false
+    },
+    {
+      "Strategy": "Stage42_DynamicDD10_ExAnteSharpe11",
+      "Period": "locked_2018_2026",
+      "Start": null,
+      "End": null,
+      "Months": 0.0,
+      "CAGR": null,
+      "Volatility": null,
+      "Sharpe": null,
+      "Sortino": null,
+      "MDD": null,
+      "Calmar": null,
+      "FinalMultiple": null,
+      "PositiveMonths": null,
+      "AvgTurnover": null,
+      "TotalCost": null,
+      "CompletePeriod": false
+    }
+  ],
+  "partial_failure_window_performance": [
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "executable_failure_window",
+      "Start": "2007-04",
+      "End": "2008-10",
+      "Months": 19.0,
+      "CAGR": 0.1865035118,
+      "Volatility": 0.1308208131,
+      "Sharpe": 1.3775453874,
+      "Sortino": 3.0211075202,
+      "MDD": -0.055165545,
+      "Calmar": 3.3807970475,
+      "FinalMultiple": 1.3109696201,
+      "PositiveMonths": 0.6315789474,
+      "AvgTurnover": 0.1384823518,
+      "TotalCost": 0.0070921524
+    },
+    {
+      "Strategy": "Stage42_DynamicDD10_ExAnteSharpe11",
+      "Period": "executable_failure_window",
+      "Start": "2007-04",
+      "End": "2008-10",
+      "Months": 19.0,
+      "CAGR": 0.0937466624,
+      "Volatility": 0.1485571349,
+      "Sharpe": 0.6754447181,
+      "Sortino": 1.1240910581,
+      "MDD": -0.1151898466,
+      "Calmar": 0.8138448412,
+      "FinalMultiple": 1.1524395996,
+      "PositiveMonths": 0.6315789474,
+      "AvgTurnover": 0.2627390787,
+      "TotalCost": 0.0154207227
+    }
+  ],
+  "data_audit": {
+    "gvz_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\GVZCLS.csv",
+    "ovx_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\OVXCLS.csv",
+    "daily_union_rows": 5036,
+    "first_union_date": "2007-05-10",
+    "last_union_date": "2026-08-27",
+    "gvz_first_valid": "2008-06-03",
+    "gvz_last_valid": "2026-08-27",
+    "gvz_valid_observations": 4590,
+    "ovx_first_valid": "2007-05-10",
+    "ovx_last_valid": "2026-08-27",
+    "ovx_valid_observations": 4858,
+    "minimum_prior_observations": 252,
+    "prehistory_policy": "neutral variance multiplier 1.0; no backfill",
+    "directional_mu_effect": false,
+    "winsorization": false,
+    "parameter_grid": false
+  },
+  "return_audit": {
+    "rows": 320,
+    "first_month": "2000-01",
+    "last_month": "2026-08"
+  },
+  "macro_audit": {
+    "rows": 794,
+    "first_date": "1960-07-31 00:00:00",
+    "last_date": "2026-08-31 00:00:00"
+  },
+  "market_audit": {
+    "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+    "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+    "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+    "foreign_prices_converted_to_krw": true,
+    "bond_atr_uses_close_to_close_proxy": true,
+    "kodex_volume_segments_normalized_separately": true,
+    "assets": {
+      "KODEX200": {
+        "rows": 6535,
+        "start": "2000-01-04",
+        "end": "2026-08-25",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      },
+      "BOND": {
+        "rows": 7469,
+        "start": "2006-03-02",
+        "end": "2026-08-12",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 7469
+      },
+      "GLD": {
+        "rows": 5474,
+        "start": "2004-11-18",
+        "end": "2026-08-24",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      },
+      "USO": {
+        "rows": 5125,
+        "start": "2006-04-10",
+        "end": "2026-08-24",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      }
+    }
+  }
+}

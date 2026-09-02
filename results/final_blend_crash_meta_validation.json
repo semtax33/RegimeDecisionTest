@@ -1,0 +1,160 @@
+{
+  "method": {
+    "target": "next-month FinalBlend loss meta-label",
+    "features": "domestic portfolio state plus lagged VIX/credit/financial-stress auxiliaries",
+    "model": "expanding walk-forward balanced logistic regression with one-month label embargo",
+    "position_mapping": "causal top-20% risk percentile, de-risk only",
+    "calibration_end": "2017-12",
+    "locked_start": "2018-01"
+  },
+  "validation": {
+    "loss3_stress": {
+      "selected_shift": 0.1,
+      "prediction_calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.6621848739495798,
+        "average_precision": 0.20333920747786294,
+        "brier_score": 0.14869155626148103,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "prediction_locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.8139784946236559,
+        "average_precision": 0.36049456358972354,
+        "brier_score": 0.20799019921059253,
+        "recall_at_top_20pct": 0.5,
+        "precision_at_top_20pct": 0.23809523809523808
+      },
+      "locked_deltas": {
+        "CAGR": -0.005961492402656088,
+        "Sharpe": 0.008919836677155901,
+        "MDD": 0.014323223524239093,
+        "Calmar": 0.07755148937706102
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.3694,
+        "sharpe_delta_p05": -0.052060992356711557,
+        "sharpe_delta_median": -0.008798721323385272,
+        "sharpe_delta_p95": 0.03529463163797177
+      }
+    },
+    "loss4_domestic": {
+      "selected_shift": 0.15,
+      "prediction_calibration": {
+        "observations": 92,
+        "events": 5,
+        "event_rate": 0.05434782608695652,
+        "roc_auc": 0.4827586206896552,
+        "average_precision": 0.06412856143608191,
+        "brier_score": 0.16819197726701765,
+        "recall_at_top_20pct": 0.0,
+        "precision_at_top_20pct": 0.0
+      },
+      "prediction_locked": {
+        "observations": 103,
+        "events": 7,
+        "event_rate": 0.06796116504854369,
+        "roc_auc": 0.6875,
+        "average_precision": 0.2506893419330795,
+        "brier_score": 0.2524855513775884,
+        "recall_at_top_20pct": 0.2857142857142857,
+        "precision_at_top_20pct": 0.09523809523809523
+      },
+      "locked_deltas": {
+        "CAGR": -0.0025256403840787645,
+        "Sharpe": 0.030741989037015305,
+        "MDD": 0.025071707588757097,
+        "Calmar": 0.21134132601052502
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.621,
+        "sharpe_delta_p05": -0.03142638007057486,
+        "sharpe_delta_median": 0.007379642173009682,
+        "sharpe_delta_p95": 0.058110085272612653
+      }
+    },
+    "loss4_stress": {
+      "selected_shift": 0.1,
+      "prediction_calibration": {
+        "observations": 92,
+        "events": 5,
+        "event_rate": 0.05434782608695652,
+        "roc_auc": 0.4551724137931034,
+        "average_precision": 0.07565462852941883,
+        "brier_score": 0.17080146445913297,
+        "recall_at_top_20pct": 0.4,
+        "precision_at_top_20pct": 0.10526315789473684
+      },
+      "prediction_locked": {
+        "observations": 103,
+        "events": 7,
+        "event_rate": 0.06796116504854369,
+        "roc_auc": 0.7068452380952381,
+        "average_precision": 0.2500198613169608,
+        "brier_score": 0.2271337908404332,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.14285714285714285
+      },
+      "locked_deltas": {
+        "CAGR": -0.00258095018092086,
+        "Sharpe": 0.024883703822820458,
+        "MDD": 0.015534515020813155,
+        "Calmar": 0.1139783643773673
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.7268,
+        "sharpe_delta_p05": -0.02634633617539802,
+        "sharpe_delta_median": 0.01742123312704491,
+        "sharpe_delta_p95": 0.06553809616844518
+      }
+    },
+    "loss_1sigma_stress": {
+      "selected_shift": 0.0,
+      "prediction_calibration": {
+        "observations": 78,
+        "events": 8,
+        "event_rate": 0.10256410256410256,
+        "roc_auc": 0.6196428571428572,
+        "average_precision": 0.1658469679811143,
+        "brier_score": 0.22234020821515516,
+        "recall_at_top_20pct": 0.375,
+        "precision_at_top_20pct": 0.1875
+      },
+      "prediction_locked": {
+        "observations": 103,
+        "events": 8,
+        "event_rate": 0.07766990291262135,
+        "roc_auc": 0.6368421052631579,
+        "average_precision": 0.2426638869244067,
+        "brier_score": 0.2678802417933374,
+        "recall_at_top_20pct": 0.375,
+        "precision_at_top_20pct": 0.14285714285714285
+      },
+      "locked_deltas": {
+        "CAGR": 0.0,
+        "Sharpe": 0.0,
+        "MDD": 0.0,
+        "Calmar": 0.0
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.0,
+        "sharpe_delta_p05": 0.0,
+        "sharpe_delta_median": 0.0,
+        "sharpe_delta_p95": 0.0
+      }
+    }
+  }
+}

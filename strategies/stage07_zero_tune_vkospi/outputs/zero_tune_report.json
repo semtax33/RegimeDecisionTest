@@ -1,0 +1,63 @@
+{
+  "strategy": "ZeroTune_VKOSPI",
+  "definition": "Expanding empirical macro ranks, quadrant-probability asset weights, and direct expanding VKOSPI percentile risk transfer.",
+  "selection_procedure": "One predeclared deterministic specification; no candidate grid or parameter search was run.",
+  "tunable_hyperparameters": [],
+  "execution_assumptions": {
+    "domestic_trade_cost": 0.0015,
+    "foreign_weight_change_cost": 0.0005,
+    "execution": "next open-to-open return using VKOSPI through prior day",
+    "leverage": "none; asset weights sum to one",
+    "rebalance_rule": "always move to the deterministic desired weight"
+  },
+  "period_results": {
+    "full_2007_2026": {
+      "zero_tune": {
+        "Months": 232.0,
+        "CAGR": 0.0713687275831425,
+        "Sharpe": 0.8446994945896235,
+        "MDD": -0.14012928924826884,
+        "Calmar": 0.509306283975348
+      },
+      "current_robust": {
+        "Months": 232.0,
+        "CAGR": 0.15636553973863587,
+        "Sharpe": 1.1325286822772858,
+        "MDD": -0.12958799769553853,
+        "Calmar": 1.2066359733870573
+      },
+      "zero_tune_minus_current": {
+        "CAGR": -0.08499681215549337,
+        "Sharpe": -0.2878291876876623,
+        "MDD": -0.010541291552730314,
+        "Calmar": -0.6973296894117093
+      }
+    },
+    "locked_2018_2026": {
+      "zero_tune": {
+        "Months": 103.0,
+        "CAGR": 0.07038611121058924,
+        "Sharpe": 1.1336473538343195,
+        "MDD": -0.14012928924826884,
+        "Calmar": 0.5022940713406836
+      },
+      "current_robust": {
+        "Months": 103.0,
+        "CAGR": 0.20907823332988906,
+        "Sharpe": 1.4969186464577038,
+        "MDD": -0.09760421330851343,
+        "Calmar": 2.1421025408915666
+      },
+      "zero_tune_minus_current": {
+        "CAGR": -0.13869212211929982,
+        "Sharpe": -0.3632712926233843,
+        "MDD": -0.04252507593975541,
+        "Calmar": -1.639808469550883
+      }
+    }
+  },
+  "causality_checks": {
+    "macro_signal_precedes_target": true,
+    "vkospi_signal_precedes_action": true
+  }
+}

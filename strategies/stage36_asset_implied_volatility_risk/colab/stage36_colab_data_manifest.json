@@ -1,0 +1,91 @@
+{
+  "bundle": "Stage36_GVZ_OVX_Colab_Data",
+  "schema_version": 1,
+  "root_directory": "stage36_data",
+  "code_included": false,
+  "files": [
+    {
+      "path": "cache/market_daily.csv",
+      "bytes": 1087825,
+      "sha256": "2433ce9cf78e8415c6b9f99bf5605cda2628097895e909f7e29cb682be9dd605"
+    },
+    {
+      "path": "cache/regime_lightgbm_ohlcv.csv",
+      "bytes": 7698389,
+      "sha256": "756ff16b888178004050a1d5d6d2077d07fe6212c3fdb5afb3528a9f05fdb657"
+    },
+    {
+      "path": "raw_data/compass.db",
+      "bytes": 10903552,
+      "sha256": "e21ac5fcf6694738fecb87d92b6acee4095687b8c12d24e7b529f26913b9f94a"
+    },
+    {
+      "path": "raw_data/krx_bond_index.csv",
+      "bytes": 134453,
+      "sha256": "f401077c5f4c441b10608ce5c844ae22e75a39b90f61efb1aafdaff6664b958d"
+    },
+    {
+      "path": "raw_data/GDP 성장률.xlsx",
+      "bytes": 12569,
+      "sha256": "be14e02cb58a0bb3d59ea46e7c7188dd7f38df7c39db6d9acb7448f04caa7c5e"
+    },
+    {
+      "path": "raw_data/수출입 총괄_20260816.xlsx",
+      "bytes": 46481,
+      "sha256": "81c25619195b2c4414e6896a2c5a12c5805a1c3893f4f3a08847528f0c6b2fd2"
+    },
+    {
+      "path": "raw_data/기업경기조사(전망).csv",
+      "bytes": 1874613,
+      "sha256": "4dc5256530089598a35a13e64ae38ba9fde17cd91785ec1cfe26c14225e74b37"
+    },
+    {
+      "path": "raw_data/소비자물가 상승률.xlsx",
+      "bytes": 19991,
+      "sha256": "1e0da20295d85a249c63c7885850999cc21a073f085de4dcd9701abf13069f37"
+    },
+    {
+      "path": "raw_data/생산자물가 상승률.xlsx",
+      "bytes": 20032,
+      "sha256": "4636af0310b07b1075f6d570df68b9fee2d14f52f4d39c47fd6b044fc56bbda3"
+    },
+    {
+      "path": "raw_data/수출입물가 상승률.xlsx",
+      "bytes": 19523,
+      "sha256": "4664b498833c17d958217899afbcaa972fb69464cef4fbb957b7e9f16068727f"
+    },
+    {
+      "path": "raw_data/VKOSPIData.csv",
+      "bytes": 326885,
+      "sha256": "8083aa5c5b856f62fdb5ed2c3281474b595dc61aaf4fc0c7fe3b5fc3eb65db6e"
+    },
+    {
+      "path": "results/vix6_case1_features_daily.csv",
+      "bytes": 3216261,
+      "sha256": "917197672455adf3fb7c466febdb9fd75a4ae540d60895be4c5ea6da045487be"
+    },
+    {
+      "path": "raw_data/260829_fwdPE.EPS.rev.xlsx",
+      "bytes": 264194,
+      "sha256": "36a65e5cf1bf060f74544e49a38ee72bcab6c989d0a1772bce4bffad53ce23fe"
+    },
+    {
+      "path": "raw_data/260829_국고채.회사채.xlsx",
+      "bytes": 580123,
+      "sha256": "8bd43c6737db28b7d3c431035a21f5bebedeb7d57c442e3bc9b39c11bc1a1e34"
+    },
+    {
+      "path": "raw_data/GVZCLS.csv",
+      "bytes": 80010,
+      "sha256": "57ed6220e310eda54752ff115c31df7511306a352ce607e935fc43ac318a84be"
+    },
+    {
+      "path": "raw_data/OVXCLS.csv",
+      "bytes": 84794,
+      "sha256": "b0fcc2c9120b66bbcc084a8aecdcddf42476f5ad61342e656f0892ebd4b73bd6"
+    }
+  ],
+  "output_zip": "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage36_asset_implied_volatility_risk\\colab\\stage36_colab_data.zip",
+  "zip_bytes": 7500782,
+  "zip_sha256": "c2b7601be8d4b95beed47902b98313bbcd180b9b68fb658a4b606be1f82bb629"
+}

@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage13 거시·VKOSPI·VIX6 조건부 SLSQP 설계 보고서</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #5b6977;
+      --paper: #f4f1e8;
+      --card: #fffdf7;
+      --line: #d9d2c2;
+      --navy: #153a52;
+      --teal: #18766f;
+      --amber: #b36b1f;
+      --red: #a94336;
+      --green-bg: #e8f3ef;
+      --amber-bg: #fbefdc;
+      --red-bg: #f8e8e5;
+      --mono: "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      line-height: 1.75;
+    }
+    header {
+      padding: 72px 24px 54px;
+      color: white;
+      background:
+        linear-gradient(115deg, rgba(21,58,82,.98), rgba(24,118,111,.92)),
+        radial-gradient(circle at 80% 20%, #d7a24d, transparent 35%);
+    }
+    header .wrap, main, footer { max-width: 1120px; margin: 0 auto; }
+    .eyebrow { font-size: .82rem; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+    h1 { max-width: 850px; margin: 10px 0 12px; font-size: clamp(2rem, 5vw, 3.65rem); line-height: 1.13; }
+    header p { max-width: 800px; margin: 0; font-size: 1.08rem; color: #e9f4f3; }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      overflow-x: auto;
+      white-space: nowrap;
+      background: rgba(255,253,247,.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    nav .wrap { max-width: 1120px; margin: 0 auto; padding: 10px 20px; }
+    nav a { margin-right: 20px; color: var(--navy); font-size: .9rem; text-decoration: none; }
+    main { padding: 34px 20px 76px; }
+    section { scroll-margin-top: 64px; margin: 0 0 54px; }
+    h2 { margin: 0 0 18px; color: var(--navy); font-size: 1.75rem; line-height: 1.3; }
+    h3 { margin: 28px 0 9px; color: var(--teal); font-size: 1.16rem; }
+    p { margin: 9px 0; }
+    .lead { font-size: 1.08rem; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card {
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 7px 24px rgba(36, 47, 56, .05);
+    }
+    .metric strong { display: block; color: var(--navy); font-size: 1.65rem; line-height: 1.2; }
+    .metric small { color: var(--muted); }
+    .callout { padding: 18px 20px; border-left: 5px solid var(--teal); border-radius: 8px; background: var(--green-bg); }
+    .callout.warn { border-left-color: var(--amber); background: var(--amber-bg); }
+    .callout.stop { border-left-color: var(--red); background: var(--red-bg); }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+    .node { position: relative; padding: 16px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); }
+    .node:not(:last-child)::after { content: "→"; position: absolute; right: -13px; top: 38%; z-index: 2; color: var(--amber); font-size: 1.3rem; }
+    .node b { display: block; color: var(--navy); }
+    .node span { color: var(--muted); font-size: .88rem; }
+    .formula { overflow-x: auto; margin: 14px 0; padding: 16px 18px; border-radius: 10px; color: #eff8f7; background: #173444; font-family: var(--mono); white-space: pre; }
+    table { width: 100%; margin: 14px 0 22px; border-collapse: collapse; background: var(--card); font-size: .93rem; }
+    th, td { padding: 11px 12px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--navy); background: #e9eee9; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    code { padding: .12em .35em; border-radius: 4px; color: #12495a; background: #e7efef; font-family: var(--mono); font-size: .9em; }
+    ul, ol { padding-left: 1.25rem; }
+    li { margin: 5px 0; }
+    .tag { display: inline-block; margin: 2px 4px 2px 0; padding: 3px 8px; border: 1px solid #b8cbc7; border-radius: 99px; color: var(--teal); background: #edf6f3; font-size: .78rem; }
+    .good { color: var(--teal); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .muted { color: var(--muted); }
+    footer { padding: 28px 20px 50px; color: var(--muted); border-top: 1px solid var(--line); }
+    @media (max-width: 820px) {
+      .grid, .grid.two, .flow { grid-template-columns: 1fr; }
+      .node:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -20px; }
+      header { padding-top: 50px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="eyebrow">Stage10 feedback implementation · 2026-08-29</div>
+      <h1>거시 “계절”과 옵션시장 “오늘의 폭풍”을 한 SLSQP 안에 넣는 방법</h1>
+      <p>Hard 국면 비중과 사후 VKOSPI overlay를 없애고, 네 국면의 조건부 기대수익·공분산과 VKOSPI/VIX6의 연속 스트레스를 통해 최종 무레버리지 비중을 계산한 Stage13 연구 보고서다.</p>
+    </div>
+  </header>
+
+  <nav>
+    <div class="wrap">
+      <a href="#summary">결론</a><a href="#architecture">구조</a><a href="#inputs">입력변수</a><a href="#moments">조건부 모멘트</a><a href="#optimizer">SLSQP</a><a href="#results">성과</a><a href="#attribution">귀속</a><a href="#code">코드 안내</a><a href="#limits">한계</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="summary">
+      <h2>1. 결론: 구조는 더 명확해졌지만 Stage10을 자동 대체하지는 않는다</h2>
+      <p class="lead">새 버전은 2007-04부터 2026-07까지 레버리지 없이 CAGR 11.50%를 기록했다. Stage10보다 4.64%p 높다. 그러나 Sharpe는 1.329에서 0.901로 낮아졌고 MDD는 -6.88%에서 -21.32%로 커졌다.</p>
+      <div class="grid">
+        <div class="card metric"><small>Stage13 CAGR</small><strong>11.50%</strong><small>Stage10 대비 +4.64%p</small></div>
+        <div class="card metric"><small>Stage13 Sharpe</small><strong>0.901</strong><small>Stage10 대비 -0.428</small></div>
+        <div class="card metric"><small>Stage13 MDD</small><strong>-21.32%</strong><small>Stage10 대비 -14.44%p</small></div>
+      </div>
+      <div class="callout stop" style="margin-top:18px">
+        <strong>승격 판단</strong><br>
+        Stage13은 성과표의 세 항목을 동시에 개선한 최종 운영안이 아니다. Stage10은 그대로 보존했다. 이번 결과의 핵심은 기대수익 80:20 혼합, 50:50 목적함수, 직접 비중 overlay를 경제적으로 추적 가능한 구조로 교체한 데 있다.
+      </div>
+      <p>반면 같은 Stage13 거시 모형끼리 비교하면 단기 스트레스 정보는 최근 구간의 Sharpe와 MDD를 개선했다. 이 비교가 VKOSPI/VIX6 효과를 보는 올바른 attribution이다.</p>
+    </section>
+
+    <section id="architecture">
+      <h2>2. 전체 알고리즘</h2>
+      <div class="flow" aria-label="알고리즘 흐름">
+        <div class="node"><b>거시 원자료</b><span>GDP·수출·BSI<br>CPI·PPI·수입물가</span></div>
+        <div class="node"><b>네 연속 국면</b><span>Goldilocks·Overheating<br>Slowdown·Stagflation</span></div>
+        <div class="node"><b>조건부 모멘트</b><span>국면별 기대수익<br>국면별 공분산</span></div>
+        <div class="node"><b>단기 위험 수정</b><span>VKOSPI level·shock<br>VIX6 tail·recovery</span></div>
+        <div class="node"><b>SLSQP 100%</b><span>합계 1·long only<br>레버리지 없음</span></div>
+      </div>
+
+      <h3>서로 다른 두 시간축</h3>
+      <div class="grid two">
+        <div class="card"><strong>거시확률 = 계절</strong><p>성장과 물가가 어느 사분면에 가까운지를 월 단위로 말한다. 자산의 중기 기대수익과 상관구조를 바꾼다.</p></div>
+        <div class="card"><strong>VKOSPI/VIX6 = 오늘의 폭풍</strong><p>현재 변동성 수준, 갑작스러운 재평가, 왼쪽 꼬리 수요, 회복 방향을 말한다. 단기 beta·공분산·하방위험 회피강도를 바꾼다.</p></div>
+      </div>
+
+      <h3>없앤 구조</h3>
+      <p><span class="tag">Hard regime 0%</span><span class="tag">post-SLSQP overlay 0%</span><span class="tag">leverage 1.0x</span><span class="tag">SJM 없음</span><span class="tag">logistic 없음</span><span class="tag">grid search 없음</span></p>
+      <p>국면확률과 스트레스는 최종 비중표를 제공하지 않는다. 오직 SLSQP가 읽는 기대수익과 위험 추정치를 제공한다. 이 때문에 “신호가 몇 %를 옮겼는가”가 아니라 “신호가 어떤 추정치를 어떻게 바꿨고, 최적화가 왜 그 비중을 선택했는가”로 설명할 수 있다.</p>
+    </section>
+
+    <section id="inputs">
+      <h2>3. 사용한 입력변수 전부</h2>
+      <h3>거시 원자료와 네 국면확률</h3>
+      <table>
+        <thead><tr><th>축</th><th>원자료</th><th>가공</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3">성장</td><td>GDP 전년비</td><td>causal expanding percentile</td><td rowspan="3"><code>p_growth_high</code></td></tr>
+          <tr><td>수출 전년비</td><td>causal expanding percentile</td></tr>
+          <tr><td>제조업 전망 BSI</td><td>causal expanding percentile</td></tr>
+          <tr><td rowspan="3">물가</td><td>CPI 전년비</td><td>causal expanding percentile</td><td rowspan="3"><code>p_inflation_high</code></td></tr>
+          <tr><td>PPI 전년비</td><td>causal expanding percentile</td></tr>
+          <tr><td>수입물가 전년비</td><td>causal expanding percentile</td></tr>
+        </tbody>
+      </table>
+      <div class="formula">p_Goldilocks  = growth × (1 - inflation)
+p_Overheating = growth × inflation
+p_Slowdown    = (1 - growth) × (1 - inflation)
+p_Stagflation = (1 - growth) × inflation</div>
+      <p>네 확률은 항상 합이 1이다. 가장 큰 확률 하나를 Hard label로 바꾸지 않고 네 값 모두를 조건부 모멘트의 가중치로 쓴다.</p>
+
+      <h3>VKOSPI와 VIX6 decomposition</h3>
+      <table>
+        <thead><tr><th>구분</th><th>변수</th><th>경제적 의미</th></tr></thead>
+        <tbody>
+          <tr><td>VKOSPI</td><td><code>vkospi_close</code></td><td>한국 주식시장의 옵션 내재변동성 수준</td></tr>
+          <tr><td>VKOSPI</td><td><code>vkospi_log_change_5</code></td><td>한 거래주에 가까운 변동성 충격</td></tr>
+          <tr><td>VIX6 ①</td><td><code>sticky_strike</code></td><td>기초자산 이동만으로 예상되는 고정행사가 IV 변화</td></tr>
+          <tr><td>VIX6 ②</td><td><code>parallel_shift</code></td><td>실제 ATM IV 변화에서 sticky-strike 효과를 뺀 공통 재평가</td></tr>
+          <tr><td>VIX6 ③</td><td><code>put_skew</code></td><td>풋 shoulder skew 변화</td></tr>
+          <tr><td>VIX6 ④</td><td><code>call_skew</code></td><td>콜 shoulder skew 변화</td></tr>
+          <tr><td>VIX6 ⑤</td><td><code>downside_convexity</code></td><td>왼쪽 꼬리 convexity 변화</td></tr>
+          <tr><td>VIX6 ⑥</td><td><code>upside_convexity</code></td><td>오른쪽 꼬리 convexity 변화</td></tr>
+        </tbody>
+      </table>
+
+      <h3>연속 스트레스 블록</h3>
+      <ol>
+        <li><strong>level</strong>: VKOSPI 종가의 expanding percentile</li>
+        <li><strong>shock</strong>: VKOSPI 5관측치 충격 rank와 VIX6 parallel-shift rank의 동일가중 평균</li>
+        <li><strong>tail</strong>: <code>put_skew + downside_convexity</code>와, 이것에서 오른쪽 꼬리 충격을 뺀 값의 rank를 동일가중</li>
+        <li><strong>persistence</strong>: 앞의 세 블록을 21관측치 동안 평균</li>
+        <li><strong>stress_raw</strong>: level·shock·tail·persistence의 동일가중 평균</li>
+        <li><strong>stress_score</strong>: 현재 raw와 5관측치 평균 중 큰 값. 상승은 즉시, 하락은 한 주 확인</li>
+        <li><strong>recovery_score</strong>: 현재 raw가 5관측치 평균보다 내려온 양의 expanding rank</li>
+      </ol>
+      <div class="callout"><strong>왜 동일가중인가?</strong> 어느 블록이 더 중요하다는 외부 사전근거나 구조적 추정식이 없기 때문이다. 성과가 좋은 조합을 탐색하지 않고, 정보 블록마다 한 표를 줬다.</div>
+    </section>
+
+    <section id="moments">
+      <h2>4. 국면 조건부 기대수익과 공분산</h2>
+      <p>투자월보다 앞선 모든 월을 expanding history로 사용한다. 과거 월 <em>s</em>의 수익률은 당시 사전에 계산돼 있던 국면확률만큼 각 국면 표본에 기여한다.</p>
+      <div class="formula">mu(r,t)    = Σ[s&lt;t] P(r,s) R(s) / Σ[s&lt;t] P(r,s)
+mu_macro(t) = Σ[r] P(r,t) mu(r,t)
+
+Sigma_macro(t) = Σ[r] P(r,t) Sigma(r,t)</div>
+      <p>단기 스트레스의 기대수익 효과는 국면별 확률가중 OLS로 구한다. 분류모형은 없다.</p>
+      <div class="formula">beta_stress(i,r)   = Cov_r(S, R_i) / Var_r(S)
+beta_recovery(i,r) = Cov_r(Recovery, R_i) / Var_r(Recovery)
+
+mu(t) = mu_macro(t)
+      + Σ[r] P(r,t) beta_stress(r)   [S(t) - mean_r(S)]
+      + Σ[r] P(r,t) beta_recovery(r) [Q(t) - mean_r(Q)]</div>
+      <h3>불안정한 beta를 막는 두 장치</h3>
+      <ul>
+        <li><strong>R² reliability</strong>: 각 OLS 기울기에 그 회귀의 R²를 곱한다. 설명력이 낮은 관계는 연속적으로 0에 가까워진다. ridge 강도나 p-value 기준을 고를 필요가 없다.</li>
+        <li><strong>경제적 부호 prior</strong>: 주식·원유의 stress beta는 0 이하, recovery beta는 0 이상이다. 위기 후 반등이 많았다는 이유로 위기 진행 중 위험자산 기대수익을 올리는 오류를 막는다. 채권·금은 인플레이션과 디플레이션의 방향이 달라 부호를 데이터에 맡긴다.</li>
+      </ul>
+      <p>국면 평균과 공분산은 각 국면의 유효표본수와 12개월 사전표본을 이용해 expanding 전체 모멘트 쪽으로 축소한다. 유효표본이 적을 때는 전체 시장 이력을 더 믿고, 표본이 쌓이면 국면 고유 추정치가 자동으로 커진다. 12개월은 최초 투자에도 요구하는 한 연간계절과 같은 경제 시간단위다.</p>
+      <p>공분산은 과거를 crisis/non-crisis로 자르지 않는다. 과거 스트레스 점수를 그대로 관측가중치로 쓴 뒤 현재 점수만큼 거시 공분산과 혼합한다.</p>
+      <div class="formula">Sigma(t) = [1 - S(t)] Sigma_macro(t)
+         + S(t) Sigma_high_stress(t)</div>
+    </section>
+
+    <section id="optimizer">
+      <h2>5. SLSQP 목적함수와 제약</h2>
+      <div class="formula">maximize U(w) = mu_p - 0.5 variance_p
+                         - S(t) downside_semivariance_p
+                         - transaction_cost(w, pretrade_w)
+
+subject to Σw = 1,  0 ≤ w_i ≤ 0.50
+           expected annual volatility ≤ 0.13
+           historical CDaR(90%) ≥ -0.16</div>
+      <p><code>mu - 0.5 variance</code>는 월 기대 로그성장률, 즉 기대 CAGR 근사다. Sharpe를 직접 최대화하지 않는다. 하방 반분산은 과거 포트폴리오 월수익 중 음수만 제곱한 평균이며, 현재 스트레스 percentile이 동적 위험회피계수다.</p>
+      <p>turnover 벌점에는 임의의 <code>kappa</code>가 없다. 실제 수익에서 차감하는 국내 거래비용 15bp와 해외자산 변경비용 5bp를 목적함수에도 동일하게 넣었다.</p>
+      <table>
+        <thead><tr><th>값</th><th>정체</th><th>이유</th></tr></thead>
+        <tbody>
+          <tr><td>5관측치</td><td>경제 시간단위</td><td>한 거래주</td></tr>
+          <tr><td>21관측치</td><td>경제 시간단위</td><td>한 거래월</td></tr>
+          <tr><td>12개월</td><td>최소 이력</td><td>연간 계절 한 번을 본 뒤 시작</td></tr>
+          <tr><td>13%</td><td>catastrophe volatility guard</td><td>피드백의 12~13% 중 넓은 쪽. 평시 목표변동성이 아님</td></tr>
+          <tr><td>16%, 90%</td><td>catastrophe CDaR guard</td><td>Stage10의 비상 제약을 유지</td></tr>
+          <tr><td>50%</td><td>대칭 집중도 상한</td><td>어떤 단일자산도 포트폴리오 과반 금지</td></tr>
+          <tr><td>300회, 1e-9</td><td>수치 설정</td><td>solver 반복상한과 허용오차. 신호 세기와 무관</td></tr>
+        </tbody>
+      </table>
+      <div class="callout warn">13% 변동성 guard는 31/232개월, CDaR guard는 82/232개월 구속됐다. Stage10의 저변동성 상한처럼 대부분의 달을 결정하지는 않지만, CDaR은 아직 자주 작동한다. 다음 개선은 상한을 느슨하게 숫자 조정하기보다 조건부 공분산의 보수성을 감사하는 쪽이 맞다.</div>
+    </section>
+
+    <section id="results">
+      <h2>6. 백테스트 결과</h2>
+      <h3>2007-04~2026-07 · 232개월</h3>
+      <table>
+        <thead><tr><th>전략</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th class="num">변동성</th><th class="num">turnover</th></tr></thead>
+        <tbody>
+          <tr><td>Stage10 Sharpe+CAGR SLSQP100</td><td class="num">6.86%</td><td class="num good">1.329</td><td class="num good">-6.88%</td><td class="num">5.10%</td><td class="num">3.05%</td></tr>
+          <tr><td>Stage13 Macro Conditional</td><td class="num good">11.69%</td><td class="num">0.887</td><td class="num bad">-21.22%</td><td class="num">13.53%</td><td class="num">2.56%</td></tr>
+          <tr><td>Stage13 Macro + Stress Conditional</td><td class="num">11.50%</td><td class="num">0.901</td><td class="num bad">-21.32%</td><td class="num">13.07%</td><td class="num">2.70%</td></tr>
+        </tbody>
+      </table>
+      <h3>2018-01~2026-07 · 103개월</h3>
+      <table>
+        <thead><tr><th>전략</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th class="num">변동성</th></tr></thead>
+        <tbody>
+          <tr><td>Stage10 Sharpe+CAGR SLSQP100</td><td class="num">6.99%</td><td class="num good">1.177</td><td class="num good">-6.88%</td><td class="num">5.89%</td></tr>
+          <tr><td>Stage13 Macro Conditional</td><td class="num good">16.77%</td><td class="num">1.092</td><td class="num">-16.86%</td><td class="num">15.33%</td></tr>
+          <tr><td>Stage13 Macro + Stress Conditional</td><td class="num">16.29%</td><td class="num">1.118</td><td class="num">-15.90%</td><td class="num">14.49%</td></tr>
+        </tbody>
+      </table>
+      <p>Stage13의 기대수익 모형은 Stage10보다 금과 주식의 장기 조건부 프리미엄을 더 많이 반영한다. 그래서 CAGR이 높아졌지만 실현 위험도 함께 커졌다. 이 결과는 “레버리지 없이 CAGR을 높일 수 있다”는 점은 보여주지만 “Sharpe와 MDD를 그대로 유지했다”는 뜻은 아니다.</p>
+    </section>
+
+    <section id="attribution">
+      <h2>7. VKOSPI/VIX6 Risk Overlay Attribution</h2>
+      <p>여기서 base는 Stage13 Macro Conditional, overlay는 Stage13 Macro + Stress Conditional이다. 최종 비중을 사후 이동한 overlay가 아니라 단기 조건부 입력의 증분효과라는 의미다.</p>
+      <div class="grid two">
+        <div class="card">
+          <strong>전체기간</strong>
+          <ul>
+            <li>CAGR 변화: <span class="bad">-0.19%p</span></li>
+            <li>Sharpe 변화: <span class="good">+0.014</span></li>
+            <li>MDD 변화: <span class="bad">-0.10%p</span></li>
+            <li>위험자산 감소: 155/232개월</li>
+            <li>하위 10% 주식월 포착: 12/24개월</li>
+            <li>놓친 crash: 12/24개월</li>
+            <li>false positive: 93개월</li>
+          </ul>
+        </div>
+        <div class="card">
+          <strong>2018년 이후</strong>
+          <ul>
+            <li>CAGR 변화: <span class="bad">-0.48%p</span></li>
+            <li>Sharpe 변화: <span class="good">+0.026</span></li>
+            <li>MDD 변화: <span class="good">+0.97%p</span></li>
+            <li>위험자산 감소: 91/103개월</li>
+            <li>하위 10% 주식월 포착: 7/11개월</li>
+            <li>놓친 crash: 4/11개월</li>
+            <li>false positive: 52개월</li>
+          </ul>
+        </div>
+      </div>
+      <p>전체기간에서 overlay alpha는 음수이고 최근 구간에서는 위험조정성과가 나아졌다. 따라서 “VKOSPI/VIX6가 검증됐다”고 일반화하기보다, 최근 시장구조에서 방어효과가 강했고 과거 전체에는 기회비용이 있었다고 읽어야 한다.</p>
+      <p>스트레스 점수와 위험자산(KODEX200+USO) 감소량의 상관은 양(+)이다. 스트레스 상위 20% 구간의 평균 위험자산 감소량도 다섯 구간 중 가장 컸다. 비중을 직접 덮어쓰지 않아도 기대수익·공분산·하방위험을 통해 risk-off 방향이 나타났다는 뜻이다.</p>
+    </section>
+
+    <section id="code">
+      <h2>8. 코드를 어디서부터 보면 되나</h2>
+      <table>
+        <thead><tr><th>순서</th><th>함수·파일</th><th>읽어야 할 내용</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>build_daily_stress_features()</code></td><td>VKOSPI와 VIX6 여섯 분해값이 level·shock·tail·persistence·recovery로 바뀌는 과정</td></tr>
+          <tr><td>2</td><td><code>build_monthly_stress_signals()</code></td><td>투자월보다 앞선 마지막 관측치만 가져오는 시점 규칙</td></tr>
+          <tr><td>3</td><td><code>estimate_conditional_moments()</code></td><td>네 국면 확률가중 평균·공분산, R² beta, 경제적 부호 prior</td></tr>
+          <tr><td>4</td><td><code>solve_conditional_weights()</code></td><td>로그성장·하방 반분산·실제 비용 목적함수와 catastrophe guard</td></tr>
+          <tr><td>5</td><td><code>run_conditional_backtest()</code></td><td>월별 walk-forward, 비용, pre-trade 비중, 무레버리지 실행</td></tr>
+          <tr><td>6</td><td><code>build_overlay_attribution()</code></td><td>base 대비 alpha, risk-off, false positive, missed crash</td></tr>
+          <tr><td>7</td><td><code>run_research()</code></td><td>Stage10·macro-only·stress-aware 비교와 모든 산출물 저장</td></tr>
+          <tr><td>8</td><td><code>tests/test_stage13_conditional_moments_slsqp.py</code></td><td>시점, 비중합, long-only, 제약, 성과 회귀 테스트</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>가장 중요한 CSV 세 개</strong><br>
+        <code>outputs/monthly_stress_signals.csv</code>는 실제 입력, <code>outputs/macro_stress_conditional_monthly.csv</code>는 월별 결정과 결과, <code>outputs/risk_overlay_attribution.csv</code>는 단기 스트레스의 증분효과다.
+      </div>
+    </section>
+
+    <section id="limits">
+      <h2>9. 과적합 의심에 어떻게 답할 것인가</h2>
+      <h3>이번 코드에서 하지 않은 것</h3>
+      <ul>
+        <li>CAGR·Sharpe·MDD를 보고 stress 블록 가중치를 고르지 않았다.</li>
+        <li>VKOSPI threshold나 crisis label을 만들지 않았다.</li>
+        <li>regime별 목표비중을 만들지 않았다.</li>
+        <li>beta ridge 강도, lookback, clipping 상한을 탐색하지 않았다.</li>
+        <li>실현수익을 보고 월별 비중을 사후 수정하지 않았다.</li>
+      </ul>
+      <h3>그래도 남는 모형 선택</h3>
+      <p>신호 조합을 탐색하지 않았다고 과적합이 사라지는 것은 아니다. 자산 네 개, 국면 정의, 13%·16% catastrophe guard, 한 주·한 달 시간단위, 단일자산 과반금지 모두 연구자의 선택이다. 특히 전체 MDD가 크고 최근 구간과 전체 구간의 overlay 효과가 다르므로 운영 전 추가 검증이 필요하다.</p>
+      <ol>
+        <li>시작월을 이동한 안정성 검사</li>
+        <li>거래비용 2배 검사</li>
+        <li>2008·2020·2022·2026 위기별 수익 기여도</li>
+        <li>stress beta를 제거하고 공분산·위험회피 효과만 남긴 ablation</li>
+        <li>catastrophe guard 구속월의 공분산 과소추정 여부</li>
+      </ol>
+      <div class="callout warn"><strong>권하지 않는 다음 행동</strong><br>Sharpe와 MDD가 좋아질 때까지 5·21·13%·50%를 조합 탐색하는 것. 그 경우 코드는 다시 “왜 이 숫자인가”를 설명하기 어려운 Stage10식 점수 튜닝으로 돌아간다.</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>관련 코드: <code>strategies/stage13_conditional_moments_slsqp/economic_conditional_slsqp.py</code></p>
+    <p>본 문서는 저장된 2007-04~2026-07 백테스트 결과를 설명하며 미래 성과를 보장하지 않는다.</p>
+  </footer>
+</body>
+</html>

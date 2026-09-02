@@ -1,0 +1,10 @@
+{
+  "calm_target": 0.1,
+  "stress_target": 0.055,
+  "trend_window": 12,
+  "normal_target": 0.08,
+  "dd_stress": -0.025,
+  "dd_calm": -0.01,
+  "calm_vol_ratio": 1.1,
+  "stress_vol_ratio": 1.35
+}

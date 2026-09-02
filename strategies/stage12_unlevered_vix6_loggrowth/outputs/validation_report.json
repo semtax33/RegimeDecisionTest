@@ -1,0 +1,75 @@
+{
+  "selected_strategy": "UnleveredVIX6LogGrowth_NoOption",
+  "objective": "maximize causal expected log growth subject to a forecast Sharpe floor, historical CDaR floor, VIX6/VKOSPI risk caps, and zero leverage",
+  "allocation": {
+    "leverage_allowed": false,
+    "maximum_observed_selected_gross_exposure": 1.0,
+    "maximum_observed_growth_daily_gross_exposure": 1.0000000000000002,
+    "maximum_source_router_exposure_before_normalization": 1.586226173780873,
+    "average_selected_weights": {
+      "w_stage10_core": 0.46120689655172414,
+      "w_unlevered_vix6_growth": 0.5387931034482759,
+      "w_option": 0.0
+    }
+  },
+  "fixed_constraints": {
+    "forecast_sharpe_floor": 1.05,
+    "historical_cdar_floor": -0.13,
+    "normal_growth_cap": 1.0,
+    "alert_growth_cap": 0.75,
+    "crisis_growth_cap": 0.25,
+    "negative_momentum_cap": 0.5,
+    "monthly_growth_change_cap": 0.25
+  },
+  "option_gate": {
+    "periods": {
+      "calibration_2007_2012": {
+        "deltas": {
+          "CAGR": -0.0007036430157063567,
+          "Sharpe": -0.007877956423795407,
+          "MDD": -2.220446049250313e-16
+        },
+        "passes_all_three": false
+      },
+      "validation_2013_2017": {
+        "deltas": {
+          "CAGR": -0.0020386518150323774,
+          "Sharpe": -0.05289451892627872,
+          "MDD": -0.0005004416090175212
+        },
+        "passes_all_three": false
+      }
+    },
+    "promoted": false
+  },
+  "option_selected": false,
+  "full_selected": {
+    "CAGR": 0.10196019751706653,
+    "Volatility": 0.07693617667807916,
+    "Sharpe": 1.3050287975008488,
+    "MDD": -0.11002752357755297,
+    "Calmar": 0.9266790181385827
+  },
+  "full_stage11_reference": {
+    "CAGR": 0.08121806130709985,
+    "Volatility": 0.07645294444088416,
+    "Sharpe": 1.0624780061773778,
+    "MDD": -0.13374718398394403,
+    "Calmar": 0.6072506268008593
+  },
+  "target_checks": {
+    "cagr_at_least_10pct": true,
+    "sharpe_at_least_stage11": true,
+    "mdd_no_worse_than_stage11": true
+  },
+  "causality_and_solver": {
+    "daily_router_signal_precedes_action": true,
+    "monthly_risk_signal_precedes_target": true,
+    "optimized_months": 220,
+    "solver_successes": 220,
+    "grid_fallbacks": 0,
+    "minimum_forecast_sharpe_slack": 0.04359546957329585,
+    "minimum_historical_cdar_slack": 0.019890086556262565
+  },
+  "development_status": "post-lock exploratory research; 2018-2026 outcomes were already visible elsewhere in the project, so they are not an untouched holdout"
+}

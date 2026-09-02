@@ -1,0 +1,69 @@
+{
+  "objective": "Improve the existing VKOSPI dynamic overlay with robust daily transformations",
+  "processing": {
+    "level": "causal 126/252-day percentiles and rolling median/MAD z-scores",
+    "shock": "5/10/21-day log changes normalized by trailing 63-day volatility",
+    "path": "acceleration, 21-day high distance, close location and fast-minus-slow change",
+    "states": "confirmation and exhaustion-adjusted continuous stress variants"
+  },
+  "calibration_end": "2017-12",
+  "locked_start": "2018-01",
+  "candidate_count": 810,
+  "strict_eligible_count": 2,
+  "selection_rule": "all three improve versus existing dynamic in 2007-2017 and 2013-2017",
+  "winner": {
+    "mode": "acceleration",
+    "level_threshold": 0.9,
+    "shock_threshold": 1.0,
+    "max_risk_transfer": 0.35,
+    "bond_share": 0.0,
+    "rebalance_band": 0.2,
+    "financing_rate": 0.04
+  },
+  "locked": {
+    "existing": {
+      "Months": 103.0,
+      "CAGR": 0.18298446144639158,
+      "Volatility": 0.13389120459522738,
+      "Sharpe": 1.3289531274434303,
+      "Sortino": 2.705242424492421,
+      "MDD": -0.11289722654519829,
+      "Calmar": 1.6208056393053547,
+      "FinalMultiple": 4.230614253711762,
+      "PositiveMonths": 0.6310679611650486
+    },
+    "robust": {
+      "Months": 103.0,
+      "CAGR": 0.18440771587188687,
+      "Volatility": 0.1311874079360174,
+      "Sharpe": 1.3630158205660192,
+      "Sortino": 2.8037359571948715,
+      "MDD": -0.11134481013746977,
+      "Calmar": 1.656186001343137,
+      "FinalMultiple": 4.274502150893456,
+      "PositiveMonths": 0.6310679611650486
+    },
+    "deltas": {
+      "CAGR": 0.0014232544254952906,
+      "Sharpe": 0.034062693122588916,
+      "MDD": 0.0015524164077285185,
+      "Calmar": 0.03538036203778239
+    },
+    "passes_all_three": true,
+    "bootstrap": {
+      "probability_cagr_improves": 0.5748,
+      "probability_sharpe_improves": 0.868,
+      "probability_mdd_improves": 0.6438,
+      "probability_all_three_improve": 0.404,
+      "cagr_delta_p05": -0.005050286185517105,
+      "cagr_delta_median": 0.0007678814802936085,
+      "cagr_delta_p95": 0.007818952638349952,
+      "sharpe_delta_p05": -0.007863806710123277,
+      "sharpe_delta_median": 0.03375132049083884,
+      "sharpe_delta_p95": 0.10119500526590004,
+      "mdd_delta_p05": -0.003350845454909157,
+      "mdd_delta_median": 0.0005830550756168451,
+      "mdd_delta_p95": 0.02116328305169146
+    }
+  }
+}

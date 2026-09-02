@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage 36까지의 실험 여정</title>
+  <style>
+    :root {
+      --paper: #f4f0e8;
+      --paper-deep: #e9e2d5;
+      --ink: #17282d;
+      --muted: #607075;
+      --line: #c9c2b6;
+      --navy: #173c46;
+      --teal: #1f756e;
+      --coral: #d46d4c;
+      --gold: #b8842e;
+      --plum: #765268;
+      --blue: #3d6b91;
+      --soft-teal: #dcebe6;
+      --soft-coral: #f3dfd7;
+      --soft-gold: #efe3c9;
+      --soft-plum: #e9dee5;
+      --soft-blue: #dce7ef;
+      --shadow: 0 18px 42px rgba(24, 45, 49, .10);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 92% 4%, rgba(212,109,76,.11), transparent 25rem),
+        linear-gradient(180deg, #f8f5ef 0%, var(--paper) 38%, #eee8dc 100%);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; }
+    button, select { font: inherit; }
+    button:focus-visible, select:focus-visible, a:focus-visible {
+      outline: 3px solid rgba(31,117,110,.35);
+      outline-offset: 3px;
+    }
+
+    .page-shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; }
+    .hero { padding: 72px 0 46px; border-bottom: 1px solid var(--line); }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--coral);
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 880px;
+      margin-bottom: 18px;
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", serif;
+      font-size: clamp(2.45rem, 6.4vw, 5.65rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+      font-weight: 700;
+    }
+    .hero-copy {
+      max-width: 790px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.22rem);
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 34px;
+      max-width: 860px;
+    }
+    .hero-stat {
+      padding: 15px 17px;
+      border-top: 3px solid var(--navy);
+      background: rgba(255,255,255,.43);
+    }
+    .hero-stat strong { display: block; font-size: 1.45rem; line-height: 1.1; }
+    .hero-stat span { color: var(--muted); font-size: .84rem; }
+
+    .section { padding: 54px 0; border-bottom: 1px solid var(--line); }
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(220px, .72fr) minmax(300px, 1.28fr);
+      gap: 34px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+    h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", serif;
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      line-height: 1.05;
+      letter-spacing: -.035em;
+    }
+    .section-heading p { margin-bottom: 2px; color: var(--muted); }
+
+    .thesis {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .thesis-main, .thesis-aside {
+      padding: 26px;
+      background: var(--navy);
+      color: #f6f1e8;
+      box-shadow: var(--shadow);
+    }
+    .thesis-main h2 { color: #f6f1e8; max-width: 710px; }
+    .thesis-main p { color: rgba(246,241,232,.78); margin: 20px 0 0; max-width: 760px; }
+    .thesis-aside { background: var(--coral); }
+    .thesis-aside .big { font-family: Georgia, serif; font-size: 3rem; line-height: 1; }
+    .thesis-aside p { margin: 12px 0 0; }
+
+    .route {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 22px 14px;
+      position: relative;
+    }
+    .route-node {
+      position: relative;
+      min-height: 122px;
+      padding: 14px 14px 16px;
+      border-top: 4px solid var(--teal);
+      background: rgba(255,255,255,.54);
+      box-shadow: 0 8px 22px rgba(23,60,70,.07);
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .route-node:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .route-node:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -19px;
+      top: 44px;
+      color: var(--coral);
+      font-weight: 800;
+      z-index: 2;
+    }
+    .route-node:nth-child(6n)::after { display: none; }
+    .route-stage { color: var(--teal); font-size: .76rem; font-weight: 800; letter-spacing: .08em; }
+    .route-node strong { display: block; margin: 5px 0 4px; line-height: 1.25; }
+    .route-node span:last-child { color: var(--muted); font-size: .79rem; line-height: 1.38; display: block; }
+    .route-note { margin: 22px 0 0; color: var(--muted); font-size: .9rem; }
+
+    .lesson-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .lesson {
+      min-height: 210px;
+      padding: 22px;
+      background: rgba(255,255,255,.48);
+      border-top: 5px solid var(--teal);
+    }
+    .lesson:nth-child(2) { border-color: var(--coral); }
+    .lesson:nth-child(3) { border-color: var(--gold); }
+    .lesson:nth-child(4) { border-color: var(--plum); }
+    .lesson-number { color: var(--muted); font: 700 1.5rem Georgia, serif; }
+    .lesson h3 { margin: 24px 0 8px; font-size: 1.05rem; }
+    .lesson p { margin: 0; color: var(--muted); font-size: .88rem; }
+
+    .chart-wrap { position: relative; }
+    .chart-frame {
+      background: rgba(255,255,255,.35);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 6px 0;
+    }
+    #risk-return-chart { display: block; width: 100%; min-height: 430px; }
+    .chart-detail {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      min-height: 72px;
+      padding: 14px 2px;
+      border-bottom: 1px solid var(--line);
+    }
+    .chart-detail .stage-dot {
+      width: 14px; height: 14px; border-radius: 50%; background: var(--teal);
+    }
+    .chart-detail strong { display: block; }
+    .chart-detail span { color: var(--muted); font-size: .86rem; }
+    .chart-detail .metrics { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .chart-caution { margin: 12px 0 0; color: var(--muted); font-size: .82rem; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .filter-button, .phase-select {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.48);
+      color: var(--ink);
+      padding: 9px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .filter-button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .phase-select { margin-left: auto; border-radius: 7px; }
+    .timeline-status { color: var(--muted); font-size: .86rem; margin-left: 4px; }
+
+    .phase-block { margin: 0 0 42px; }
+    .phase-header {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .phase-number {
+      font: 700 2.3rem Georgia, serif;
+      color: var(--coral);
+      line-height: 1;
+    }
+    .phase-header h3 { margin: 0; font-size: 1.22rem; }
+    .phase-header p { margin: 3px 0 0; color: var(--muted); font-size: .88rem; }
+    .stage-list { border-top: 1px solid var(--line); }
+    .stage-card {
+      display: grid;
+      grid-template-columns: 82px minmax(170px, .72fr) minmax(250px, 1.3fr) minmax(170px, .78fr) 34px;
+      gap: 16px;
+      align-items: center;
+      padding: 18px 4px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+    }
+    .stage-card:hover { background: rgba(255,255,255,.33); }
+    .stage-card[hidden] { display: none; }
+    .stage-no { font: 700 1.18rem Georgia, serif; color: var(--navy); }
+    .stage-title strong { display: block; line-height: 1.26; }
+    .stage-folder { color: var(--muted); font-size: .72rem; word-break: break-all; }
+    .stage-question { color: var(--muted); font-size: .88rem; }
+    .stage-result { font-size: .85rem; }
+    .stage-result strong { display: block; margin-bottom: 2px; }
+    .status-chip {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .status-adopted { background: var(--soft-teal); color: #15534f; }
+    .status-milestone { background: var(--soft-blue); color: #2d5677; }
+    .status-tradeoff { background: var(--soft-gold); color: #735318; }
+    .status-rejected { background: var(--soft-coral); color: #8c402b; }
+    .status-validation { background: var(--soft-plum); color: #654456; }
+    .stage-toggle {
+      border: 0; background: none; color: var(--muted); cursor: pointer;
+      font-size: 1.2rem; padding: 6px;
+    }
+    .stage-detail {
+      display: none;
+      grid-column: 2 / -1;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 0 0 6px;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+    .stage-card.is-open .stage-detail { display: grid; }
+    .stage-card.is-open .stage-toggle { transform: rotate(45deg); }
+    .detail-label { color: var(--ink); font-weight: 800; }
+    .source-link { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+    .final-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .compare-card { padding: 25px; background: rgba(255,255,255,.5); border-top: 5px solid var(--gold); }
+    .compare-card.final { border-color: var(--teal); background: var(--soft-teal); }
+    .compare-title { display: flex; justify-content: space-between; gap: 14px; align-items: baseline; }
+    .compare-title h3 { margin: 0; }
+    .compare-title span { color: var(--muted); font-size: .78rem; }
+    .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 24px; }
+    .metric-row div { border-top: 1px solid rgba(23,40,45,.23); padding-top: 8px; }
+    .metric-row strong { display: block; font-size: 1.18rem; font-variant-numeric: tabular-nums; }
+    .metric-row span { color: var(--muted); font-size: .7rem; }
+    .delta-story {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .method-note {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: 30px;
+      padding: 36px 0 62px;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .method-note h2 { color: var(--ink); }
+    .method-note ul { margin: 0; padding-left: 1.2rem; }
+    .method-note li + li { margin-top: 8px; }
+    .empty-state { padding: 28px 0; color: var(--muted); }
+
+    @media (max-width: 980px) {
+      .route { grid-template-columns: repeat(3, 1fr); }
+      .route-node:nth-child(3n)::after { display: none; }
+      .lesson-grid { grid-template-columns: 1fr 1fr; }
+      .stage-card { grid-template-columns: 68px minmax(160px, .8fr) 1.4fr 34px; }
+      .stage-result { grid-column: 2 / 4; }
+      .stage-detail { grid-column: 2 / -1; }
+    }
+    @media (max-width: 700px) {
+      .page-shell { width: min(100% - 24px, 1180px); }
+      .hero { padding-top: 48px; }
+      .hero-stats, .lesson-grid, .thesis, .final-comparison, .section-heading, .method-note { grid-template-columns: 1fr; }
+      .route { grid-template-columns: 1fr 1fr; }
+      .route-node::after { display: none; }
+      .phase-select { margin-left: 0; width: 100%; }
+      .stage-card { grid-template-columns: 56px 1fr 34px; gap: 10px; }
+      .stage-question, .stage-result { grid-column: 2 / -1; }
+      .stage-toggle { grid-column: 3; grid-row: 1; }
+      .stage-detail { grid-column: 2 / -1; grid-template-columns: 1fr; }
+      .chart-detail { grid-template-columns: auto 1fr; }
+      .chart-detail .metrics { grid-column: 2; text-align: left; }
+      .metric-row { grid-template-columns: 1fr 1fr; }
+      #risk-return-chart { min-height: 360px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .route-node { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="page-shell">
+      <p class="eyebrow">Regime Decision Research · 2007-04—2026-07</p>
+      <h1>Stage 36까지,<br>무엇을 배우며 왔나</h1>
+      <p class="hero-copy">수익률을 높이는 실험에서 출발해, 과도한 집중과 방어 비용을 해부하고, 옵션·선물·수급 신호를 차례로 검증한 뒤 기업 펀더멘털과 자산별 내재변동성으로 마무리한 36단계 연구 기록.</p>
+      <div class="hero-stats" aria-label="연구 요약">
+        <div class="hero-stat"><strong>36</strong><span>번호가 매겨진 Stage</span></div>
+        <div class="hero-stat"><strong>42</strong><span>병렬 실험·검증 폴더</span></div>
+        <div class="hero-stat"><strong>5</strong><span>연구 시대</span></div>
+        <div class="hero-stat"><strong>Stage 36</strong><span>GVZ·OVX 위험 계층</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="page-shell thesis">
+        <article class="thesis-main">
+          <p class="eyebrow">한 문장 결론</p>
+          <h2>좋은 아이디어를 계속 더한 여정이 아니라, 독립 정보만 남기고 나머지를 기각한 여정이다.</h2>
+          <p>ML, 옵션 방향성, 프로그램 수급, 선물 basis는 대부분 승격되지 않았다. 최종적으로 남은 것은 인과적 거시 조건부 모멘트, 일별 기술 위험, 기업이익·가치·신용, 그리고 GVZ·OVX의 자산별 위험 정보다.</p>
+        </article>
+        <aside class="thesis-aside">
+          <div class="big">10.499%</div>
+          <p><strong>Stage 36 CAGR</strong><br>Sharpe 1.105 · MDD -12.407%<br><br>Stage 35보다 수익은 0.108%p 낮지만, Sharpe +0.048과 MDD +1.336%p를 얻은 방어적 종착점.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="route-section">
+      <div class="page-shell">
+        <div class="section-heading">
+          <h2>최종 전략으로 이어진 핵심 계보</h2>
+          <p>아래는 모든 실험의 단순 승자 목록이 아니라, Stage 36 코드와 설계에 실제로 지식이 이어진 주 경로다. 중간 성과가 나빴던 Stage도 다음 문제를 정확히 정의했다면 전환점으로 표시했다.</p>
+        </div>
+        <nav class="route" aria-label="Stage 36 핵심 계보">
+          <a class="route-node" href="#stage-01-baseline"><span class="route-stage">STAGE 01</span><strong>거시 베이스라인</strong><span>성장×물가 4국면과 방어배분의 출발점</span></a>
+          <a class="route-node" href="#stage-03-tail"><span class="route-stage">STAGE 03</span><strong>꼬리위험 제약</strong><span>MDD 15% 안에서 수익을 높이는 첫 이정표</span></a>
+          <a class="route-node" href="#stage-06-vkospi"><span class="route-stage">STAGE 06</span><strong>Robust VKOSPI</strong><span>한국 변동성으로 일별 위험예산을 조절</span></a>
+          <a class="route-node" href="#stage-07-zero"><span class="route-stage">STAGE 07</span><strong>Zero-Tune 감사</strong><span>조절값을 제거해 구조의 최소 비교 끝점 확보</span></a>
+          <a class="route-node" href="#stage-09-strict"><span class="route-stage">STAGE 09</span><strong>Hard와 SLSQP 분해</strong><span>SLSQP가 수익보다 분산·낙폭을 개선함을 확인</span></a>
+          <a class="route-node" href="#stage-10-slsqp"><span class="route-stage">STAGE 10</span><strong>SLSQP 100%</strong><span>Hard·레버리지 없이 목적함수와 제약을 분리</span></a>
+          <a class="route-node" href="#stage-13-conditional"><span class="route-stage">STAGE 13</span><strong>조건부 모멘트</strong><span>신호를 비중이 아닌 μ·Σ·하방위험으로 번역</span></a>
+          <a class="route-node" href="#stage-14-risk"><span class="route-stage">STAGE 14</span><strong>수학적 일관성</strong><span>완전투자에서 무의미한 일괄 RiskScale 제거</span></a>
+          <a class="route-node" href="#stage-20-technical"><span class="route-stage">STAGE 20</span><strong>일별 기술 위험</strong><span>K-Ratio·ATR로 집중과 MDD를 크게 완화</span></a>
+          <a class="route-node" href="#stage-35-fundamental"><span class="route-stage">STAGE 35</span><strong>독립 펀더멘털</strong><span>이익·가치·신용이 처음으로 승격 게이트 통과</span></a>
+          <a class="route-node" href="#stage-36-iv"><span class="route-stage">STAGE 36</span><strong>자산별 IV 위험</strong><span>GVZ→금, OVX→원유의 위험축만 보강</span></a>
+        </nav>
+        <p class="route-note">Stage 07·08·09·10·20·30에는 같은 번호의 병렬 폴더가 있다. 그래서 번호는 36이지만 실제 연구 기록은 42개다.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="page-shell">
+        <div class="section-heading">
+          <h2>여정이 남긴 네 가지 원칙</h2>
+          <p>Stage 36의 형태는 성과 숫자 하나보다 반복된 실패에서 더 잘 설명된다.</p>
+        </div>
+        <div class="lesson-grid">
+          <article class="lesson"><div class="lesson-number">01</div><h3>신호는 역할을 가져야 한다</h3><p>방향 신호와 위험 신호를 섞지 않았다. 거시는 μ·Σ, VIX6는 공통 스트레스, GVZ·OVX는 자기자산 위험만 담당한다.</p></article>
+          <article class="lesson"><div class="lesson-number">02</div><h3>좋아 보인 구간만 믿지 않는다</h3><p>2018년 이후 좋아진 옵션 ODS도 2007~2017과 통제회귀에서 무너지면 승격하지 않았다.</p></article>
+          <article class="lesson"><div class="lesson-number">03</div><h3>집중은 숨은 비용이다</h3><p>금 낙폭을 줄인 필터가 채권 80~90% 집중을 만들 수 있었다. MDD·Sharpe·CAGR을 함께 봐야 했다.</p></article>
+          <article class="lesson"><div class="lesson-number">04</div><h3>독립 정보가 마지막에 남았다</h3><p>옵션·수급·선물 파생신호보다 기업이익·밸류에이션·신용, 그리고 금·원유 고유 IV가 더 설득력 있게 생존했다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="performance-landmarks">
+      <div class="page-shell">
+        <div class="section-heading">
+          <h2>성과 전환점 지도</h2>
+          <p>가로축은 최대낙폭의 절댓값(왼쪽일수록 방어적), 세로축은 CAGR이다. 점을 선택하면 해당 Stage의 Sharpe와 역할을 확인할 수 있다.</p>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-frame">
+            <svg id="risk-return-chart" viewBox="0 0 1040 470" role="img" aria-labelledby="chart-title chart-desc">
+              <title id="chart-title">주요 Stage의 CAGR과 최대낙폭 비교</title>
+              <desc id="chart-desc">Stage 1부터 36까지 주요 전환점의 CAGR과 최대낙폭을 산점도로 비교한다.</desc>
+            </svg>
+          </div>
+          <div class="chart-detail" id="chart-detail" aria-live="polite">
+            <span class="stage-dot"></span>
+            <div><strong>Stage 36 · GVZ+OVX</strong><span>독립 방향 알파가 아니라 위험효율을 보강한 최종 방어 계층</span></div>
+            <div class="metrics">CAGR 10.499% · Sharpe 1.105 · MDD -12.407%</div>
+          </div>
+          <p class="chart-caution">주의: Stage 03·06에는 이후 제거된 레버리지·일별 오버레이가 포함되어 있고, Stage별 기준선과 연구 목적도 달라 완전한 동일조건 순위표가 아니다. 이 그림은 성과의 우열보다 연구 방향의 전환을 읽기 위한 지도다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="full-timeline">
+      <div class="page-shell">
+        <div class="section-heading">
+          <h2>Stage별 전체 실험 로그</h2>
+          <p>42개 폴더를 시간순으로 정리했다. 각 행을 누르면 다음 단계에 남긴 교훈과 원본 README 경로를 볼 수 있다.</p>
+        </div>
+        <div class="controls" aria-label="타임라인 필터">
+          <button class="filter-button" type="button" data-filter="all" aria-pressed="true">전체</button>
+          <button class="filter-button" type="button" data-filter="main" aria-pressed="false">핵심 계보</button>
+          <button class="filter-button" type="button" data-filter="adopted" aria-pressed="false">승격·채택</button>
+          <button class="filter-button" type="button" data-filter="tradeoff" aria-pressed="false">상충·보존</button>
+          <button class="filter-button" type="button" data-filter="rejected" aria-pressed="false">미승격</button>
+          <button class="filter-button" type="button" data-filter="validation" aria-pressed="false">검증·감사</button>
+          <select class="phase-select" id="phase-select" aria-label="연구 시대 선택">
+            <option value="all">모든 시대</option>
+            <option value="1">I · 기반 구축</option>
+            <option value="2">II · 구조 분해</option>
+            <option value="3">III · 경제적 SLSQP</option>
+            <option value="4">IV · 독립 신호 검증</option>
+            <option value="5">V · 최종 위험 계층</option>
+          </select>
+          <span class="timeline-status" id="timeline-status" aria-live="polite"></span>
+        </div>
+        <div id="timeline"></div>
+      </div>
+    </section>
+
+    <section class="section" id="final-comparison">
+      <div class="page-shell">
+        <div class="section-heading">
+          <h2>Stage 35에서 36으로</h2>
+          <p>마지막 변화는 수익 예측을 더한 것이 아니다. 기대수익 엔진을 동결하고, 금·원유의 옵션시장이 알려주는 자기자산 위험만 공분산에 반영했다.</p>
+        </div>
+        <div class="final-comparison">
+          <article class="compare-card">
+            <div class="compare-title"><h3>Stage 35</h3><span>FundamentalDualRole</span></div>
+            <div class="metric-row"><div><strong>10.608%</strong><span>CAGR</span></div><div><strong>1.057</strong><span>Sharpe</span></div><div><strong>-13.743%</strong><span>MDD</span></div><div><strong>10.043%</strong><span>변동성</span></div></div>
+            <p class="delta-story">EPS revision과 earnings-yield gap은 주식 기대수익, AA− 신용스프레드는 위험 확인에 사용. Stage 20 대비 세 핵심 지표를 모두 개선해 승격됐다.</p>
+          </article>
+          <article class="compare-card final">
+            <div class="compare-title"><h3>Stage 36</h3><span>GVZ+OVX Asset Risk</span></div>
+            <div class="metric-row"><div><strong>10.499%</strong><span>CAGR</span></div><div><strong>1.105</strong><span>Sharpe</span></div><div><strong>-12.407%</strong><span>MDD</span></div><div><strong>9.472%</strong><span>변동성</span></div></div>
+            <p class="delta-story">CAGR -0.108%p를 지불하고 Sharpe +0.048, MDD +1.336%p, 변동성 -0.571%p를 얻었다. Stage 35의 절대 대체재가 아니라 위험을 더 낮게 선호할 때의 방어적 변형이다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-shell method-note">
+      <h2>읽는 법과 근거</h2>
+      <ul>
+        <li>각 단계의 설명과 수치는 해당 <code>strategies/stage*/README.md</code>, <code>outputs/performance_comparison.csv</code>, <code>outputs/validation_report.json</code>을 기준으로 정리했다.</li>
+        <li>‘승격’은 그 시점의 사전 게이트를 통과했다는 뜻이며 미래성과를 보장하지 않는다. ‘전환점’은 최종 코드에 직접 남았거나 다음 문제를 정의한 단계다.</li>
+        <li>전체 성과는 대체로 2007-04~2026-07이지만 Stage 01은 232개월 표기, Stage 15는 HYG 공통기간 2008-04 시작 등 표본 차이가 있다.</li>
+        <li>최종 Stage 36은 long-only·완전투자, 연 13% ex-ante 변동성 및 CDaR -16% catastrophe guard, 거래비용, 인과적 신호 정렬을 유지한다.</li>
+      </ul>
+    </footer>
+  </main>
+
+  <script>
+    const phases = {
+      1: { title: "기반 구축", subtitle: "거시 국면, 수익 확대, 꼬리위험, VKOSPI까지 — 무엇을 예측하고 무엇을 방어할지 정의" },
+      2: { title: "구조 분해와 목적함수 재설계", subtitle: "제로튜닝·팩토리얼·Hard/SLSQP 분해로 성과의 원천과 숨은 레버리지를 감사" },
+      3: { title: "경제적으로 일관된 SLSQP", subtitle: "신호를 직접 비중으로 쓰지 않고 기대수익·공분산·하방위험으로 번역, 집중 문제를 해부" },
+      4: { title: "독립 신호의 생존 시험", subtitle: "기술·옵션·수급·선물 신호를 한 번에 하나씩 검증하고 성과·메커니즘 게이트로 선별" },
+      5: { title: "독립 펀더멘털과 자산별 위험", subtitle: "기업이익·가치·신용을 승격한 뒤 GVZ·OVX로 금·원유 위험축을 보강" }
+    };
+
+    const statusLabel = {
+      adopted: "승격·채택",
+      milestone: "핵심 전환점",
+      tradeoff: "상충·연구보존",
+      rejected: "미승격",
+      validation: "검증·감사"
+    };
+
+    const stages = [
+      {id:"stage-01-baseline",no:"01",phase:1,title:"거시 국면 베이스라인",folder:"stage01_baseline",status:"milestone",main:true,question:"성장×물가 4국면으로 방어적 4자산 기준선을 만들 수 있는가?",finding:"CAGR 8.12% · Sharpe 1.144 · MDD -8.93%",lesson:"이후 모든 실험이 비교할 최초의 거시·SLSQP 기준선을 세웠다."},
+      {id:"stage-02-return",no:"02",phase:1,title:"CAGR·Hard 배분 강화",folder:"stage02_return_enhancement",status:"tradeoff",question:"목표변동성·모멘텀·Hard 배분·레버리지로 수익을 높일 수 있는가?",finding:"수익 확대 가능성 확인, 이후 MDD 15% 제약으로 통합",lesson:"수익만 높이면 낙폭이 커진다는 다음 문제를 만들었다."},
+      {id:"stage-03-tail",no:"03",phase:1,title:"꼬리위험·MDD 15% 제약",folder:"stage03_tail_risk",status:"milestone",main:true,question:"Crash feature·stop-loss·synthetic put·blend 중 무엇이 MDD 15% 안에서 수익을 지키는가?",finding:"Final blend: CAGR 14.30% · Sharpe 1.024 · MDD -14.90%",lesson:"수익과 tail-risk를 동시에 게이트로 관리하는 연구 습관이 생겼다."},
+      {id:"stage-04-ml",no:"04",phase:1,title:"LightGBM·시장구조 피드백",folder:"stage04_ml_feedback",status:"rejected",question:"ML이 거시 확률과 tail meta를 안정적으로 개선하는가?",finding:"최종 max_shift=0; 잠금 구간 개선 실패",lesson:"복잡한 예측모델은 성과가 아니라 미사용 구간 게이트를 통과해야 한다."},
+      {id:"stage-05-oap",no:"05",phase:1,title:"Open Asset Pricing 입력",folder:"stage05_openassetpricing",status:"adopted",question:"OAP 아이디어를 한국 시장 시계열 합성변수로 옮길 수 있는가?",finding:"4개 OAP 합성 입력을 16변수 균형 L2 로지스틱에 편입",lesson:"외부 팩터는 그대로 복사하지 않고 로컬 시계열 역할로 번역했다."},
+      {id:"stage-06-vkospi",no:"06",phase:1,title:"Robust VKOSPI 위험예산",folder:"stage06_vkospi",status:"milestone",main:true,question:"VKOSPI 수준·충격·가속으로 일별 위험예산을 조절할 수 있는가?",finding:"CAGR 15.64% · Sharpe 1.133 · MDD -12.96%",lesson:"강한 성장 기준이 됐지만, 뒤에서 레버리지와 모듈 기여도를 다시 감사했다."},
+
+      {id:"stage-07-regime",no:"07A",phase:2,title:"CJM·TVTP-HMM·CJM+LightGBM",folder:"stage07_regime_models",status:"rejected",question:"Hard 전환을 연속확률 국면모델로 대체하면 세 지표가 함께 좋아지는가?",finding:"세 후보 모두 CAGR·Sharpe·MDD 동시 개선 실패",lesson:"모델 정교함 자체는 승격 근거가 아니었다."},
+      {id:"stage-07-zero",no:"07B",phase:2,title:"Zero-Tune VKOSPI",folder:"stage07_zero_tune_vkospi",status:"validation",main:true,question:"조절 파라미터를 모두 없애면 성과가 얼마나 남는가?",finding:"CAGR 7.14% · Sharpe 0.845 · MDD -14.01%",lesson:"제로튜닝이 자동으로 더 robust하지 않으며, 현 구조의 최소 비교 끝점을 제공했다."},
+      {id:"stage-08-options",no:"08A",phase:2,title:"VIX6·KOSPI200 옵션",folder:"stage08_options",status:"rejected",question:"VIX6 decomposition으로 옵션 매수·청산·비중을 정하면 개선되는가?",finding:"기본·보수 슬리피지 모두 개선 옵션 비중 0개",lesson:"옵션은 0%가 최선이라는 안전 폴백을 남겼다."},
+      {id:"stage-08-factorial",no:"08B",phase:2,title:"Zero→Robust 128조합 팩토리얼",folder:"stage08_vkospi_factorial",status:"validation",question:"Robust VKOSPI의 7개 모듈 중 실제 기여원은 무엇인가?",finding:"기본배분과 오버레이가 Sharpe·CAGR의 핵심; tail logistic 기여 미미",lesson:"단일 모듈 효과보다 상호작용이 크며, 최고 조합 사후선택을 금지했다."},
+      {id:"stage-09-hysteresis",no:"09A",phase:2,title:"히스테리시스·레버리지 상한",folder:"stage09_hysteresis",status:"rejected",question:"±0.2 히스테리시스와 레버리지 상한이 경로를 안정화하는가?",finding:"상한 1.0은 Sharpe·MDD 개선, CAGR 하락; 사전 gate 실패",lesson:"방어력만 좋아지는 후보를 자동 승격하지 않았다."},
+      {id:"stage-09-strict",no:"09B",phase:2,title:"Strict Hard 100/0 + SLSQP",folder:"stage09_strict_hard_slsqp",status:"milestone",main:true,question:"Hard 배분과 SLSQP의 역할을 분리하면 무엇이 보이는가?",finding:"Hard+SLSQP: CAGR 9.60% · Sharpe 1.049 · MDD -11.45%",lesson:"SLSQP는 최고수익이 아니라 집중위험·변동성·낙폭을 낮추는 계층이었다."},
+      {id:"stage-10-slsqp",no:"10A",phase:2,title:"Sharpe+CAGR SLSQP 100%",folder:"stage10_slsqp_sharpe100",status:"milestone",main:true,question:"Hard와 레버리지 없이 SLSQP만으로 위험조정성과를 높일 수 있는가?",finding:"CAGR 6.86% · Sharpe 1.329 · MDD -6.88%",lesson:"극단적으로 방어적인 코어를 얻었지만 낮은 CAGR이라는 새 과제를 남겼다."},
+      {id:"stage-10-router",no:"10B",phase:2,title:"VIX6 조건부 위기 라우터",folder:"stage10_vix6_router",status:"rejected",question:"VIX6가 위기의 종류와 피난 방향, 옵션 구조까지 고를 수 있는가?",finding:"24개 라우팅 후보·옵션 후보 모두 사전 두 구간 gate 실패",lesson:"위기 분류 구조는 보존하되 Robust VKOSPI 경로로 폴백했다."},
+      {id:"stage-11-mse",no:"11",phase:2,title:"MSE·기대 로그성장률",folder:"stage11_mse_log_growth_slsqp100",status:"tradeoff",question:"MSE와 로그성장 목적이 CAGR을 회복하는가?",finding:"CAGR 8.12% · Sharpe 1.062 · MDD -13.37%",lesson:"두 목적은 수학적으로 거의 같은 해를 냈고, CAGR 대가로 위험이 커졌다."},
+      {id:"stage-12-unlevered",no:"12",phase:2,title:"비레버리지 VIX6 로그성장 통합",folder:"stage12_unlevered_vix6_loggrowth",status:"milestone",question:"숨은 레버리지를 제거하고 방어 코어와 성장 슬리브를 결합할 수 있는가?",finding:"CAGR 10.20% · Sharpe 1.305 · MDD -11.00%",lesson:"총 익스포저 1배를 강제하면서 성장과 방어의 결합 가능성을 확인했다."},
+
+      {id:"stage-13-conditional",no:"13",phase:3,title:"거시·스트레스 조건부 모멘트",folder:"stage13_conditional_moments_slsqp",status:"milestone",main:true,question:"신호가 비중을 직접 덮지 않고 μ·Σ·하방위험을 바꾸게 할 수 있는가?",finding:"스트레스형: CAGR 11.50% · Sharpe 0.901 · MDD -21.32%",lesson:"성과는 약했지만 Stage 36까지 이어지는 설명 가능한 단일 SLSQP 구조를 만들었다."},
+      {id:"stage-14-risk",no:"14",phase:3,title:"무상한·동적 위험회피 SLSQP",folder:"stage14_unconstrained_dynamic_risk_slsqp",status:"milestone",main:true,question:"완전투자에서 무의미한 RiskScale을 제거하고 위험벌점으로 바꿀 수 있는가?",finding:"동적 λ: CAGR 10.76% · Sharpe 0.846 · MDD -22.97%",lesson:"수학적 일관성을 얻었지만 단일자산 상한 해제가 집중위험을 키웠다."},
+      {id:"stage-15-hyg",no:"15",phase:3,title:"HYG 채권 대체",folder:"stage15_hyg_substitution",status:"tradeoff",question:"국내 채권을 HYG로 바꾸면 수익·위험이 동시에 좋아지는가?",finding:"실행교체는 CAGR 상승·MDD 악화, 재최적화는 Sharpe·MDD 개선·CAGR 하락",lesson:"자산 교체와 모형 재추정은 다른 가설이며 결과도 반대였다."},
+      {id:"stage-16-crash",no:"16",phase:3,title:"확인된 Crash 위험",folder:"stage16_confirmed_crash_risk",status:"tradeoff",question:"항상 켜진 stress λ를 경제적 확인 게이트로 줄이면 과잉방어가 줄어드는가?",finding:"CAGR 10.93% · Sharpe 0.851 · MDD -23.19%",lesson:"과잉방어 일부를 회수했지만 미래 폭락 분류력은 충분하지 않았다."},
+      {id:"stage-17-shape",no:"17",phase:3,title:"Dynamic Sigma·ES 위험형태",folder:"stage17_dynamic_risk_shape",status:"tradeoff",question:"위험의 크기보다 공분산 구조와 꼬리 형태를 동적으로 바꾸면 나아지는가?",finding:"Dynamic ES: CAGR 9.32% · Sharpe 0.856 · MDD -17.01%",lesson:"MDD를 크게 줄였지만 CAGR 10.5% 조건을 잃은 방어 연구 후보였다."},
+      {id:"stage-18-flow",no:"18",phase:3,title:"프로그램 수급 스트레스",folder:"stage18_program_flow_stress",status:"rejected",question:"차익·비차익 매도압력이 VIX6와 다른 미래위험을 알려주는가?",finding:"CAGR·Sharpe·MDD 모두 Stage 14보다 소폭 악화",lesson:"새 정보였지만 다음 달 주식 하락을 예고하지 못했다."},
+      {id:"stage-19-trend",no:"19",phase:3,title:"자산 자체 추세 신뢰도",folder:"stage19_asset_trend_confidence",status:"tradeoff",question:"거시 전망과 6·12개월 자체 추세가 충돌할 때 확신을 낮추면 금 낙폭을 고치는가?",finding:"CAGR 9.76% · Sharpe 0.839 · MDD -15.90%",lesson:"금 문제는 해결했지만 기대수익 중립화가 채권 80~90% 집중을 만들었다."},
+
+      {id:"stage-20-technical",no:"20A",phase:4,title:"일별 K-Ratio·ATR 기술 신뢰도",folder:"stage20_daily_technical_confidence",status:"adopted",main:true,question:"추세의 일관성과 최신 자산별 변동성으로 집중을 낮출 수 있는가?",finding:"CAGR 9.40% · Sharpe 0.987 · MDD -14.01%",lesson:"Stage 14 대비 Sharpe·MDD·집중도를 크게 개선해 Stage 35 전까지 공식 기준이 됐다."},
+      {id:"stage-20-review",no:"20B",phase:4,title:"Stage 20 개선안 종합 판정",folder:"stage20_improvement_review",status:"validation",question:"Stage 21~27 중 CAGR 10%·Sharpe 1·MDD 유지 조건을 모두 통과한 후보가 있는가?",finding:"통과 후보 0; Stage 24만 유일한 파레토 개선",lesson:"절대 게이트와 상대 파레토 개선을 구분했다."},
+      {id:"stage-21-one-sided",no:"21",phase:4,title:"단방향 기대수익 필터",folder:"stage21_one_sided_confidence",status:"rejected",question:"좋은 전망만 기술신호로 삭감하면 수익을 보존하는가?",finding:"CAGR 9.60% · Sharpe 0.961 · MDD -18.05%",lesson:"CAGR은 늘었지만 MDD가 4.03%p 악화돼 기각했다."},
+      {id:"stage-22-kratio",no:"22",phase:4,title:"K-Ratio 중심·RSI 확인",folder:"stage22_k_ratio_primary",status:"tradeoff",question:"RSI가 K-Ratio 방향을 뒤집지 못하게 하면 방어력이 좋아지는가?",finding:"CAGR 9.35% · Sharpe 0.999 · MDD -13.20%",lesson:"Sharpe·MDD는 좋아졌지만 CAGR이 낮아 방어 후보로만 남았다."},
+      {id:"stage-23-atr",no:"23",phase:4,title:"상대 ATR 공분산",folder:"stage23_relative_atr",status:"rejected",question:"절대 위험 회피 없이 자산 간 상대 ATR만 쓰면 수익을 회복하는가?",finding:"CAGR 9.64% · Sharpe 0.866 · MDD -16.12%",lesson:"위험예산이 과도하게 풀려 Sharpe와 MDD가 악화됐다."},
+      {id:"stage-24-equity",no:"24",phase:4,title:"KODEX200 K-Ratio 단독 방향",folder:"stage24_equity_k_ratio_only",status:"tradeoff",question:"예측 IC가 약한 가격·거래량 RSI의 투표권을 빼면 나아지는가?",finding:"CAGR 9.52% · Sharpe 0.997 · MDD -13.63%",lesson:"Stage 20 대비 유일한 세 지표 파레토 개선이지만 절대 목표와 독립 검증은 미달했다."},
+      {id:"stage-25-veto",no:"25",phase:4,title:"전 자산 충돌 거부권",folder:"stage25_conflict_only_veto",status:"rejected",question:"기술·거시가 충돌할 때만 기대수익을 줄이면 CAGR 10%를 넘는가?",finding:"CAGR 10.13% · Sharpe 0.975 · MDD -17.79%",lesson:"10%를 넘겼지만 위험 악화가 너무 컸다."},
+      {id:"stage-26-equity-veto",no:"26",phase:4,title:"주식만 충돌 거부권",folder:"stage26_equity_conflict_veto",status:"rejected",question:"주식 위험 프리미엄만 선택적으로 복구하면 더 안정적인가?",finding:"CAGR 10.23% · Sharpe 0.975 · MDD -16.36%",lesson:"후보 중 CAGR은 최고였지만 채권 축소가 2012~2013 MDD를 키웠다."},
+      {id:"stage-27-combined",no:"27",phase:4,title:"K-Ratio + 주식 거부권",folder:"stage27_k_ratio_equity_veto",status:"rejected",question:"Stage 24와 26을 합치면 각각의 약점이 사라지는가?",finding:"CAGR 10.00% · Sharpe 0.974 · MDD -15.95%",lesson:"결합이 약점을 상쇄하지 못했다."},
+      {id:"stage-28-ods",no:"28",phase:4,title:"옵션 Directional Surface",folder:"stage28_option_directional_surface",status:"rejected",question:"VKOSPI는 위험, 옵션 스큐·IVA는 주식 방향으로 역할을 분리하면 되는가?",finding:"CAGR 10.03% · Sharpe 0.978 · MDD -18.08%",lesson:"2018+는 강했지만 2007~2017이 크게 나빠 기간 의존성이 확인됐다."},
+      {id:"stage-29-two-axis",no:"29",phase:4,title:"Bear Pressure × Option ERP",folder:"stage29_option_two_axis_confirmation",status:"rejected",question:"공포와 보상을 두 축으로 확인하면 Stage 28의 꼬리위험 매수를 막는가?",finding:"CAGR 9.63% · Sharpe 0.972 · MDD -15.33%",lesson:"Stage 28의 MDD는 줄였지만 Stage 20을 넘지 못했다."},
+      {id:"stage-30-ods",no:"30A",phase:4,title:"비정상 Surface·인과적 μ 보정",folder:"stage30_abnormal_surface_erp",status:"tradeoff",question:"풋 스큐·IVA의 비정상 변화만 쓰면 옵션 방향 알파가 안정화되는가?",finding:"CAGR 9.78% · Sharpe 0.980 · MDD -13.60%",lesson:"CAGR·MDD는 개선했지만 Sharpe가 낮아 Stage 20을 유지했다."},
+      {id:"stage-30-quality",no:"30B",phase:4,title:"옵션 체인 데이터 품질 검증",folder:"stage30_data_quality_validation",status:"validation",question:"Stage 30 후기 성과는 단지 옵션 체인 품질 개선 때문인가?",finding:"20개 반사실 열화 표본에서도 가설 불지지",lesson:"IV 유효성은 일부 도움됐지만 후기 성과 전부를 품질로 설명할 수 없었다."},
+      {id:"stage-31-longiv",no:"31",phase:4,title:"장기 버킷 IV·상태의존성",folder:"stage31_long_iv_state_dependence",status:"rejected",question:"ODS 부호 변화와 거시·VIX6 상태의존성이 통계적으로 확인되는가?",finding:"구조변화 p=0.405; reliability 후보 CAGR 9.48%",lesson:"상태 interaction과 reliability shrinkage 모두 승격 근거가 부족했다."},
+      {id:"stage-32-fear",no:"32",phase:4,title:"옵션 Fear Premium 검증",folder:"stage32_fear_premium_validation",status:"validation",question:"WingAsym은 VIX6 이후에도 독립적인 반등 알파인가?",finding:"3·6개월 원시 패턴은 강하지만 통제 후 1개월 추가 설명력 소멸",lesson:"옵션 이상현상과 운용 가능한 독립 알파를 구분했다."},
+      {id:"stage-33-wing",no:"33",phase:4,title:"WingAsym 미래위험·맥락",folder:"stage33_wingasym_risk_context_validation",status:"validation",question:"WingAsym은 미래위험이나 VIX6 방어비용을 추가로 설명하는가?",finding:"사전 위험·상호작용 게이트 전부 실패",lesson:"옵션 WingAsym 연구 분기를 닫고 독립 정보원으로 이동했다."},
+      {id:"stage-34-futures",no:"34",phase:4,title:"선물 Basis·OI 확인축",folder:"stage34_futures_basis_oi_confirmation",status:"rejected",question:"Basis·OI·calendar spread가 VIX6와 다른 방향·위험 정보를 주는가?",finding:"BasisAlpha: CAGR 9.58% · Sharpe 0.986 · MDD -11.28%",lesson:"MDD는 좋아졌지만 통제 beta·Sharpe·비용 게이트가 실패했다."},
+
+      {id:"stage-35-fundamental",no:"35",phase:5,title:"Earnings·Valuation·Credit",folder:"stage35_earnings_credit_fundamentals",status:"adopted",main:true,question:"옵션·시장수급과 독립적인 기업 돈벌이·가치·조달환경이 살아남는가?",finding:"CAGR 10.608% · Sharpe 1.057 · MDD -13.743%",lesson:"EPS·EY gap·AA− 신용의 분리된 역할이 메커니즘·성과 게이트를 모두 통과했다."},
+      {id:"stage-36-iv",no:"36",phase:5,title:"GVZ·OVX 자산별 IV 위험",folder:"stage36_asset_implied_volatility_risk",status:"adopted",main:true,question:"금·원유 고유 IV를 방향이 아닌 자기자산 위험에만 연결하면 효율이 좋아지는가?",finding:"CAGR 10.499% · Sharpe 1.105 · MDD -12.407%",lesson:"Stage 35 μ를 동결한 채 변동성 -0.571%p, Sharpe +0.048, MDD +1.336%p를 얻었다."}
+    ];
+
+    const perfPoints = [
+      {label:"01",name:"Stage 01 · 베이스라인",cagr:8.12,sharpe:1.144,mdd:8.93,note:"거시 4국면 기준선"},
+      {label:"03",name:"Stage 03 · Final blend",cagr:14.30,sharpe:1.024,mdd:14.90,note:"MDD 15% 제약 이정표"},
+      {label:"06",name:"Stage 06 · Robust VKOSPI",cagr:15.64,sharpe:1.133,mdd:12.96,note:"강한 성장 기준; 이후 숨은 레버리지 감사"},
+      {label:"09B",name:"Stage 09B · Hard+SLSQP",cagr:9.60,sharpe:1.049,mdd:11.45,note:"SLSQP의 분산 효과 확인"},
+      {label:"10A",name:"Stage 10A · SLSQP 100%",cagr:6.86,sharpe:1.329,mdd:6.88,note:"고 Sharpe·저 MDD 방어 코어"},
+      {label:"12",name:"Stage 12 · 비레버리지 통합",cagr:10.20,sharpe:1.305,mdd:11.00,note:"총 익스포저 1배로 성장·방어 결합"},
+      {label:"13",name:"Stage 13 · 조건부 모멘트",cagr:11.50,sharpe:.901,mdd:21.32,note:"구조적 설명력은 높였지만 집중위험 확대"},
+      {label:"14",name:"Stage 14 · 고정 λ 기준",cagr:11.00,sharpe:.851,mdd:23.19,note:"상한 없는 완전투자 SLSQP 기준"},
+      {label:"19",name:"Stage 19 · 추세 신뢰도",cagr:9.76,sharpe:.839,mdd:15.90,note:"금 낙폭 개선, 채권 집중 발생"},
+      {label:"20",name:"Stage 20 · 일별 기술 위험",cagr:9.40,sharpe:.987,mdd:14.01,note:"집중·MDD를 줄인 공식 기준"},
+      {label:"24",name:"Stage 24 · 주식 K-Ratio",cagr:9.52,sharpe:.997,mdd:13.63,note:"Stage20 대비 유일한 파레토 개선"},
+      {label:"30",name:"Stage 30 · 비정상 ODS",cagr:9.78,sharpe:.980,mdd:13.60,note:"CAGR·MDD 개선, Sharpe 미달"},
+      {label:"35",name:"Stage 35 · FundamentalDualRole",cagr:10.608,sharpe:1.057,mdd:13.743,note:"독립 펀더멘털 승격"},
+      {label:"36",name:"Stage 36 · GVZ+OVX",cagr:10.499,sharpe:1.105,mdd:12.407,note:"자산별 IV로 위험효율 보강"}
+    ];
+
+    function sourceHref(folder) {
+      return `../../strategies/${folder}/README.md`;
+    }
+
+    function renderTimeline() {
+      const timeline = document.getElementById("timeline");
+      timeline.innerHTML = Object.entries(phases).map(([phaseId, phase]) => {
+        const rows = stages.filter(s => String(s.phase) === phaseId).map(s => `
+          <article class="stage-card" id="${s.id}" data-status="${s.status}" data-main="${s.main ? "true" : "false"}" data-phase="${s.phase}" aria-expanded="false">
+            <div class="stage-no">${s.no}</div>
+            <div class="stage-title"><strong>${s.title}</strong><span class="stage-folder">${s.folder}</span><span class="status-chip status-${s.status}">${statusLabel[s.status]}</span></div>
+            <div class="stage-question">${s.question}</div>
+            <div class="stage-result"><strong>결과</strong>${s.finding}</div>
+            <button class="stage-toggle" type="button" aria-label="${s.no} 상세 내용 열기">＋</button>
+            <div class="stage-detail">
+              <div><span class="detail-label">다음 단계에 남긴 것</span><br>${s.lesson}</div>
+              <div><span class="detail-label">근거</span><br><a class="source-link" href="${sourceHref(s.folder)}">strategies/${s.folder}/README.md</a></div>
+            </div>
+          </article>`).join("");
+        return `<section class="phase-block" data-phase-block="${phaseId}"><header class="phase-header"><div class="phase-number">0${phaseId}</div><div><h3>${phase.title}</h3><p>${phase.subtitle}</p></div></header><div class="stage-list">${rows}</div></section>`;
+      }).join("");
+
+      timeline.querySelectorAll(".stage-card").forEach(card => {
+        card.addEventListener("click", event => {
+          if (event.target.closest("a")) return;
+          const open = card.classList.toggle("is-open");
+          card.setAttribute("aria-expanded", String(open));
+          const button = card.querySelector(".stage-toggle");
+          button.setAttribute("aria-label", `${card.querySelector(".stage-no").textContent} 상세 내용 ${open ? "닫기" : "열기"}`);
+        });
+      });
+    }
+
+    let activeFilter = "all";
+    function applyFilters() {
+      const phase = document.getElementById("phase-select").value;
+      let visible = 0;
+      document.querySelectorAll(".stage-card").forEach(card => {
+        const statusMatch = activeFilter === "all" || (activeFilter === "main" ? card.dataset.main === "true" : card.dataset.status === activeFilter);
+        const phaseMatch = phase === "all" || card.dataset.phase === phase;
+        card.hidden = !(statusMatch && phaseMatch);
+        if (!card.hidden) visible += 1;
+      });
+      document.querySelectorAll("[data-phase-block]").forEach(block => {
+        block.hidden = !Array.from(block.querySelectorAll(".stage-card")).some(card => !card.hidden);
+      });
+      document.getElementById("timeline-status").textContent = `${visible}개 실험 표시`;
+    }
+
+    function drawChart() {
+      const svg = document.getElementById("risk-return-chart");
+      const width = 1040, height = 470;
+      const margin = {top:34,right:34,bottom:62,left:74};
+      const xMin = 5, xMax = 25, yMin = 5, yMax = 17;
+      const x = v => margin.left + (v-xMin)/(xMax-xMin)*(width-margin.left-margin.right);
+      const y = v => height-margin.bottom - (v-yMin)/(yMax-yMin)*(height-margin.top-margin.bottom);
+      const xTicks = [5,10,15,20,25], yTicks = [6,8,10,12,14,16];
+      const gridX = xTicks.map(t => `<line x1="${x(t)}" y1="${margin.top}" x2="${x(t)}" y2="${height-margin.bottom}" stroke="#c9c2b6" stroke-width="1" opacity=".65"/><text x="${x(t)}" y="${height-margin.bottom+25}" text-anchor="middle" fill="#607075" font-size="12">${t}%</text>`).join("");
+      const gridY = yTicks.map(t => `<line x1="${margin.left}" y1="${y(t)}" x2="${width-margin.right}" y2="${y(t)}" stroke="#c9c2b6" stroke-width="1" opacity=".65"/><text x="${margin.left-14}" y="${y(t)+4}" text-anchor="end" fill="#607075" font-size="12">${t}%</text>`).join("");
+      const marks = perfPoints.map((p, i) => {
+        const final = p.label === "36";
+        const fill = final ? "#d46d4c" : p.label === "35" ? "#b8842e" : "#1f756e";
+        const anchor = p.mdd > 21 ? "end" : "start";
+        const dx = p.mdd > 21 ? -10 : 10;
+        return `<g class="chart-point" data-index="${i}" role="button" aria-label="${p.name}, CAGR ${p.cagr}%, 최대낙폭 -${p.mdd}%" tabindex="0" style="cursor:pointer"><circle cx="${x(p.mdd)}" cy="${y(p.cagr)}" r="${final?9:6}" fill="${fill}" stroke="#f4f0e8" stroke-width="3"/><text x="${x(p.mdd)+dx}" y="${y(p.cagr)-9}" text-anchor="${anchor}" fill="#17282d" font-size="12" font-weight="700">${p.label}</text></g>`;
+      }).join("");
+      svg.innerHTML = `<title id="chart-title">주요 Stage의 CAGR과 최대낙폭 비교</title><desc id="chart-desc">왼쪽일수록 최대낙폭이 작고 위쪽일수록 CAGR이 높다.</desc>${gridX}${gridY}<line x1="${margin.left}" y1="${height-margin.bottom}" x2="${width-margin.right}" y2="${height-margin.bottom}" stroke="#17282d"/><line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height-margin.bottom}" stroke="#17282d"/><text x="${(margin.left+width-margin.right)/2}" y="${height-14}" text-anchor="middle" fill="#17282d" font-size="13">MDD 절댓값 · 낮을수록 방어적</text><text x="20" y="${(margin.top+height-margin.bottom)/2}" transform="rotate(-90 20 ${(margin.top+height-margin.bottom)/2})" text-anchor="middle" fill="#17282d" font-size="13">CAGR · 높을수록 성장</text><text x="${margin.left+8}" y="${margin.top+16}" fill="#607075" font-size="12">↖ 더 방어적 · 더 높은 성장</text>${marks}`;
+      svg.querySelectorAll(".chart-point").forEach(point => {
+        const select = () => {
+          const p = perfPoints[Number(point.dataset.index)];
+          const detail = document.getElementById("chart-detail");
+          detail.querySelector("strong").textContent = p.name;
+          detail.querySelector(":scope > div:not(.metrics) > span").textContent = p.note;
+          detail.querySelector(".metrics").textContent = `CAGR ${p.cagr.toFixed(p.cagr<10?2:3)}% · Sharpe ${p.sharpe.toFixed(3)} · MDD -${p.mdd.toFixed(2)}%`;
+        };
+        point.addEventListener("click", select);
+        point.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); } });
+      });
+    }
+
+    renderTimeline();
+    drawChart();
+    document.querySelectorAll(".filter-button").forEach(button => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        document.querySelectorAll(".filter-button").forEach(b => b.setAttribute("aria-pressed", String(b === button)));
+        applyFilters();
+      });
+    });
+    document.getElementById("phase-select").addEventListener("change", applyFilters);
+    applyFilters();
+  </script>
+</body>
+</html>

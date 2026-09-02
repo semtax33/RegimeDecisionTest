@@ -1,0 +1,88 @@
+{
+  "source_checks": {
+    "signal_month_precedes_target": true,
+    "no_backfill_before_252": true,
+    "variance_multipliers_between_one_and_two": true,
+    "no_leverage_long_only_sum_to_one": true,
+    "no_directional_gvz_ovx_mu": true,
+    "all_solvers_feasible": true
+  },
+  "solver_audit": {
+    "Stage35_Frozen": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.640926668108563e-10,
+      "minimum_cdar_slack": -8.729952039043809e-10
+    },
+    "Stage36_GVZGoldRisk": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.44119810109001e-10,
+      "minimum_cdar_slack": -9.061801586884854e-10
+    },
+    "Stage36_OVXOilRisk": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -7.84349252214156e-10,
+      "minimum_cdar_slack": -8.798068662496661e-10
+    },
+    "Stage36_GVZ_OVXAssetRisk": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.442993609276584e-10,
+      "minimum_cdar_slack": -9.4076296752732e-10
+    }
+  },
+  "data_audit": {
+    "asset_vol": {
+      "gvz_first_valid": "2008-06-03",
+      "gvz_last_valid": "2026-08-27",
+      "gvz_valid_observations": 4590,
+      "ovx_first_valid": "2007-05-10",
+      "ovx_last_valid": "2026-08-27",
+      "ovx_valid_observations": 4858,
+      "minimum_prior_observations": 252,
+      "directional_mu_effect": false
+    },
+    "fundamental": {
+      "earnings_first_valid": "2000-02-25",
+      "credit_first_valid": "1995-05-30",
+      "winsorization": false,
+      "parameter_grid": false
+    },
+    "market": {
+      "foreign_prices_converted_to_krw": true,
+      "bond_atr_uses_close_to_close_proxy": true,
+      "assets": {
+        "KODEX200": {
+          "rows": 6535,
+          "start": "2000-01-04",
+          "end": "2026-08-25"
+        },
+        "BOND": {
+          "rows": 7469,
+          "start": "2006-03-02",
+          "end": "2026-08-12"
+        },
+        "GLD": {
+          "rows": 5474,
+          "start": "2004-11-18",
+          "end": "2026-08-24"
+        },
+        "USO": {
+          "rows": 5125,
+          "start": "2006-04-10",
+          "end": "2026-08-24"
+        }
+      }
+    }
+  }
+}

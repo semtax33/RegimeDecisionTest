@@ -1,0 +1,86 @@
+{
+  "source_notebook": "C:\\Users\\PC_1M\\Downloads\\economic_regime_asset_allocation_backtest_multi_asset.ipynb",
+  "comparison_definition": "Notebook regime labels and hard allocations evaluated with the repository's fixed market cache and transaction-cost engine.",
+  "saved_notebook_output": {
+    "period": "2006-05 to 2026-07",
+    "months": 243,
+    "CAGR": 0.1863,
+    "Sharpe": 0.8684,
+    "MDD": -0.2525
+  },
+  "periods": {
+    "full_2007_04_2026_07": {
+      "uploaded_hard_regime": {
+        "Months": 232,
+        "CAGR": 0.20456368235895606,
+        "Volatility": 0.2293835604287732,
+        "Sharpe": 0.9285127960217631,
+        "Sortino": 1.766642654539485,
+        "MDD": -0.25247908841617417,
+        "Calmar": 0.8102202984104699,
+        "FinalMultiple": 36.534972998328485
+      },
+      "current_robust_vkospi": {
+        "Months": 232,
+        "CAGR": 0.15636553973863587,
+        "Volatility": 0.13715819260316825,
+        "Sharpe": 1.1325286822772858,
+        "Sortino": 2.282422546924721,
+        "MDD": -0.12958799769553853,
+        "Calmar": 1.2066359733870573,
+        "FinalMultiple": 16.58973285850312
+      }
+    },
+    "locked_2018_01_2026_07": {
+      "uploaded_hard_regime": {
+        "Months": 103,
+        "CAGR": 0.29647533830743567,
+        "Volatility": 0.24761393992471886,
+        "Sharpe": 1.1780397952617592,
+        "Sortino": 2.4261655447428647,
+        "MDD": -0.23748771456351647,
+        "Calmar": 1.2483817904110692,
+        "FinalMultiple": 9.28738034583606
+      },
+      "current_robust_vkospi": {
+        "Months": 103,
+        "CAGR": 0.20907823332988906,
+        "Volatility": 0.13357225120050709,
+        "Sharpe": 1.4969186464577038,
+        "Sortino": 3.581010224776775,
+        "MDD": -0.09760421330851343,
+        "Calmar": 2.1421025408915666,
+        "FinalMultiple": 5.101919757045714
+      }
+    },
+    "sensitivity_2007_04_2025_12": {
+      "uploaded_hard_regime": {
+        "Months": 225,
+        "CAGR": 0.19081588726253695,
+        "Volatility": 0.20306301742236252,
+        "Sharpe": 0.9652405004768643,
+        "Sortino": 1.8132038560839685,
+        "MDD": -0.25247908841617417,
+        "Calmar": 0.7557690756075821,
+        "FinalMultiple": 26.42935885688569
+      },
+      "current_robust_vkospi": {
+        "Months": 225,
+        "CAGR": 0.1440410602883735,
+        "Volatility": 0.1293557196038208,
+        "Sharpe": 1.109444504108661,
+        "Sortino": 2.1731220774432107,
+        "MDD": -0.12958799769553853,
+        "Calmar": 1.1115308736137108,
+        "FinalMultiple": 12.467524247115437
+      }
+    }
+  },
+  "notes": [
+    "The fair comparison starts in 2007-04 because the current strategy requires a 24-month warm-up.",
+    "A direct notebook rerun over 2007-04 to 2026-07 returned CAGR 0.204650, Sharpe 0.928926 and MDD -0.252479, nearly matching the shared-cache calculation.",
+    "The notebook's period=max Yahoo call may provide incomplete KODEX200 history; use the fixed repository cache for reproducibility.",
+    "Both inputs contain several absolute monthly returns above 20% in 2026, so a through-2025 sensitivity is reported.",
+    "The current no-SJM reference is a post-lock ablation and not a clean untouched holdout winner."
+  ]
+}

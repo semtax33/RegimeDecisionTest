@@ -1,0 +1,16 @@
+{
+  "decision": "retain_stage20",
+  "reason": "No option-direction replacement Pareto-improves full-period CAGR, Sharpe and MDD. Stage28 is strong only in the locked 2018+ period.",
+  "full_period_pareto_replacements": [],
+  "stage28_is_regime_unstable": true,
+  "stage28_early_period_cagr": 0.0444933149368667,
+  "stage28_locked_period_cagr": 0.17448590997150237,
+  "additional_feedback_assessment": {
+    "signed_order_flow_available": false,
+    "reason": "The supplied KRX daily file has aggregate volume/value but no bid/ask quote or aggressor-side transaction field.",
+    "abnormal_surface_residual_implemented": false,
+    "reason_not_added_post_hoc": "It would introduce a newly trained residual model after seeing Stage28 performance and belongs in a separately preregistered study.",
+    "vix6_should_remain_risk_engine_in_next_study": true
+  },
+  "bootstrap_is_descriptive_not_post_selection_significance": true
+}

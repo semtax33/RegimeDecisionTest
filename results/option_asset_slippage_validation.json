@@ -1,0 +1,167 @@
+{
+  "objective": "Add a physically priced KOSPI200 put option as a fifth asset sleeve and stress test delta-bucket, one-tick and VKOSPI-dependent slippage.",
+  "evaluation_status": "Post-lock exploratory walk-forward comparison; 2007-2026 is not an untouched holdout after candidate inspection.",
+  "period": {
+    "requested": "2007-2026",
+    "actual_start": "2007-04",
+    "actual_end": "2026-07",
+    "months": 232
+  },
+  "option_contract": {
+    "type": "long KOSPI200 monthly put",
+    "entry_delta_range": [
+      0.05,
+      0.15
+    ],
+    "target_delta": 0.1,
+    "entry_dte_range": [
+      30,
+      60
+    ],
+    "target_dte": 45,
+    "funding": "Option premium weight scales down the existing four-asset strategy sleeve, so sleeve weights sum to one.",
+    "volume_rule": "entry and exit volume must both be positive",
+    "roll_rule": "enter the first liquid quote after a lagged VIX6 tail signal; exit on the first lagged VIX6 recovery signal or the last liquid same-contract quote in the month",
+    "delta_iv_estimation": "same-expiry put-call-parity forward and price-inverted Black put IV",
+    "fractional_contract_assumption": true
+  },
+  "vix6_allocation": {
+    "entry_components": [
+      "left_tail",
+      "asymmetry",
+      "left_impulse_z",
+      "breadth_z"
+    ],
+    "entry_threshold": 0.2,
+    "exit_components": [
+      "left_change_5",
+      "left_impulse_z",
+      "right_tail_minus_left_tail"
+    ],
+    "recovery_threshold": 0.35,
+    "weight_rules": [
+      "vix6_score",
+      "vix6_sqrt",
+      "vix6_squared",
+      "vix6_plus_logistic"
+    ],
+    "timing": "all VIX6 features are shifted one observation before action"
+  },
+  "slippage": {
+    "scenarios": {
+      "Optimistic": {
+        "name": "Optimistic",
+        "atm": 0.01,
+        "shoulder": 0.02,
+        "tail": 0.05,
+        "deep_tail": 0.1
+      },
+      "Base": {
+        "name": "Base",
+        "atm": 0.015,
+        "shoulder": 0.03,
+        "tail": 0.075,
+        "deep_tail": 0.15
+      },
+      "Conservative": {
+        "name": "Conservative",
+        "atm": 0.02,
+        "shoulder": 0.05,
+        "tail": 0.1,
+        "deep_tail": 0.2
+      }
+    },
+    "tick_rule": "0.01 point below 10 premium points; 0.05 at or above 10",
+    "effective_formula": "max(delta bucket rate * stress multiplier, tick / close)",
+    "buy": "close * (1 + effective slippage)",
+    "sell": "close * (1 - effective slippage)",
+    "stress_multiplier": {
+      "normal": 1.0,
+      "VKOSPI_percentile_80": 1.25,
+      "VKOSPI_percentile_90": 1.5,
+      "VKOSPI_percentile_97_or_shock5_2.5": 2.0
+    },
+    "signal_timing": "prior VKOSPI observation, shifted one row before trade date"
+  },
+  "trade_audit": {
+    "liquid_put_universe_rows": 99745,
+    "completed_monthly_trades": 39,
+    "entry_volume_zero_count": 0,
+    "exit_volume_zero_count": 0,
+    "entry_delta_min": 0.08681549268692024,
+    "entry_delta_max": 0.12974485826808418,
+    "entry_dte_min": 30.0,
+    "entry_dte_max": 34.0,
+    "entry_strictly_before_exit": true,
+    "vix6_entry_signal_precedes_trade": true,
+    "vix6_exit_signal_precedes_trade": true,
+    "vix6_recovery_exits": 29,
+    "month_end_roll_exits": 10
+  },
+  "candidate_count": 48,
+  "baseline": {
+    "CAGR": 0.15636553973863587,
+    "Sharpe": 1.1325286822772858,
+    "MDD": -0.12958799769553853
+  },
+  "scenario_summary": {
+    "Optimistic": {
+      "best_candidate": "Optimistic_vix6_squared_w0.005",
+      "CAGR": 0.15503350290094242,
+      "Sharpe": 1.1237498666409262,
+      "MDD": -0.12958799769553853,
+      "all_three_improve": false,
+      "mean_entry_effective_slippage": 0.05673076923076923,
+      "mean_exit_effective_slippage": 0.08905677655677655,
+      "entry_tick_floor_binding_rate": 0.0,
+      "exit_tick_floor_binding_rate": 0.20512820512820512
+    },
+    "Base": {
+      "best_candidate": "Base_vix6_squared_w0.005",
+      "CAGR": 0.1549513196607164,
+      "Sharpe": 1.1232119443317117,
+      "MDD": -0.12958799769553841,
+      "all_three_improve": false,
+      "mean_entry_effective_slippage": 0.08509615384615386,
+      "mean_exit_effective_slippage": 0.11554487179487181,
+      "entry_tick_floor_binding_rate": 0.0,
+      "exit_tick_floor_binding_rate": 0.15384615384615385
+    },
+    "Conservative": {
+      "best_candidate": "Conservative_vix6_squared_w0.005",
+      "CAGR": 0.15487149099281483,
+      "Sharpe": 1.1226916318974045,
+      "MDD": -0.12958799769553841,
+      "all_three_improve": false,
+      "mean_entry_effective_slippage": 0.11346153846153846,
+      "mean_exit_effective_slippage": 0.1474358974358974,
+      "entry_tick_floor_binding_rate": 0.0,
+      "exit_tick_floor_binding_rate": 0.02564102564102564
+    }
+  },
+  "best_base_candidate": {
+    "candidate": "Base_vix6_squared_w0.005",
+    "CAGR": 0.1549513196607164,
+    "Sharpe": 1.1232119443317117,
+    "MDD": -0.12958799769553841,
+    "CAGR_delta": -0.0014142200779194702,
+    "Sharpe_delta": -0.009316737945574083,
+    "MDD_delta": 1.1102230246251565e-16,
+    "all_three_improve": false
+  },
+  "selection": {
+    "selected_strategy": "Existing_Final_RobustVKOSPI",
+    "decision": "Keep the existing strategy: no option allocation improved full-period CAGR, Sharpe and MDD under both Base and Conservative slippage.",
+    "robust_candidate_count": 0,
+    "rule": "An option allocation must improve full-period CAGR, Sharpe and MDD under both Base and Conservative slippage."
+  },
+  "artifacts": {
+    "liquid_put_universe": "results\\option_asset_liquid_put_universe.csv",
+    "monthly_trades": "results\\option_asset_monthly_trades.csv",
+    "option_returns": "results\\option_asset_monthly_returns_by_slippage.csv",
+    "comparison": "results\\option_asset_slippage_comparison_2007_2026.csv",
+    "best_candidate": "results\\option_asset_best_candidate_monthly.csv",
+    "selected_strategy": "results\\option_asset_selected_strategy_monthly.csv"
+  },
+  "official_reference": "https://global.krx.co.kr/contents/GLB/02/0201/0201040202/GLB0201040202.jsp"
+}

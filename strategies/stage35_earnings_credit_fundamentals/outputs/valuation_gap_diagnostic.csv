@@ -1,0 +1,3 @@
+HorizonMonths,Observations,ValuationGapStandardizedBeta,ValuationGapHACPValue,SpearmanIC,SpearmanICPValue,Role
+6,227,0.034339982716746334,0.08308523906649508,0.08339779509981145,0.21065749798138528,eligible_slow_anchor_after_gate
+12,221,0.1146001216154056,0.06768576631210962,0.16134279075455546,0.016364603342348173,eligible_slow_anchor_after_gate

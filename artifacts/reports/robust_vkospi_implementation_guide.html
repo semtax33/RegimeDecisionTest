@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Robust VKOSPI 구현·알고리즘·옵션 매매 가이드</title>
+<style>
+:root{--bg:#07111f;--panel:#0d1b2b;--panel2:#11243a;--ink:#eaf2fb;--muted:#a9bdd1;--line:#28425d;--cyan:#5de4d3;--blue:#73a7ff;--amber:#ffcc70;--red:#ff8193;--green:#87e59a;--shadow:0 18px 44px rgba(0,0,0,.22)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% 0,#14335c 0,transparent 32rem),var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.72}a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}code{font-family:"Cascadia Code",Consolas,monospace;font-size:.92em;color:#b9f6ee}button{font:inherit}.shell{max-width:1480px;margin:auto;padding:0 24px}.hero{padding:76px 0 44px;border-bottom:1px solid var(--line)}.eyebrow{letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);font-size:.78rem;font-weight:800}.hero h1{font-size:clamp(2.35rem,5vw,5.2rem);line-height:1.03;max-width:1150px;margin:.45rem 0 1.25rem;letter-spacing:-.045em}.hero p{max-width:970px;color:var(--muted);font-size:1.08rem}.meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.tag,.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--muted);font-size:.78rem}.tag.good{border-color:#2f7e66;color:var(--green)}.tag.warn{border-color:#80612d;color:var(--amber)}.tag.stop{border-color:#853b49;color:#ffb1bd}.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:42px;align-items:start}.toc{position:sticky;top:0;padding:28px 0;max-height:100vh;overflow:auto}.toc b{display:block;margin-bottom:10px}.toc a{display:block;color:var(--muted);padding:5px 0;font-size:.88rem}.toc a.active{color:var(--cyan)}main{min-width:0;padding:42px 0 100px}.section{scroll-margin-top:24px;margin:0 0 58px}.section>h2{font-size:clamp(1.7rem,3vw,2.6rem);letter-spacing:-.035em;margin:0 0 10px}.lead{color:var(--muted);max-width:980px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:22px}.card{grid-column:span 4;background:linear-gradient(150deg,rgba(17,36,58,.94),rgba(9,23,38,.98));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}.card.wide{grid-column:span 8}.card.full{grid-column:1/-1}.card.half{grid-column:span 6}.card h3{margin:0 0 9px;font-size:1.08rem}.card p{margin:0;color:var(--muted)}.metric strong{display:block;font-size:2rem;color:var(--cyan);line-height:1.15;margin:.3rem 0}.metric span{color:var(--muted);font-size:.86rem}.callout{border-left:4px solid var(--amber);background:#211d15;padding:16px 18px;border-radius:0 12px 12px 0;margin:20px 0;color:#f4dfb4}.callout.good{border-color:var(--green);background:#10241b}.callout.red{border-color:var(--red);background:#29151b}.flow{display:flex;gap:10px;align-items:stretch;overflow:auto;padding:8px 2px 16px}.flow .node{min-width:190px;flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}.flow .arrow{align-self:center;color:var(--cyan);font-size:1.4rem}.node small{display:block;color:var(--muted)}.node b{display:block;margin:3px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin:18px 0;background:rgba(10,25,41,.8)}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:11px 13px;text-align:left;border-bottom:1px solid rgba(40,66,93,.7);vertical-align:top}th{position:sticky;top:0;background:#10243a;color:#c7d7e7;font-size:.78rem;letter-spacing:.035em}tr:last-child td{border-bottom:0}tr.winner{background:rgba(93,228,211,.075)}tr.delta{color:var(--amber)}.line{color:#7490aa;font-family:Consolas,monospace;font-size:.78rem}.formula{background:#06101c;border:1px solid var(--line);border-radius:14px;padding:16px 18px;overflow:auto;color:#c8f8f1;font-family:"Cascadia Code",Consolas,monospace;white-space:pre;line-height:1.55}.decision{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center}.decision .branch{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px}.decision .yes{border-color:#337d66}.decision .no{border-color:#814252}.decision .gate{font-size:2rem;color:var(--amber)}details{background:rgba(10,25,41,.72);border:1px solid var(--line);border-radius:14px;margin:12px 0}summary{cursor:pointer;padding:15px 17px;font-weight:750;color:#dce9f5}details>div{padding:0 17px 17px;color:var(--muted)}ul,ol{padding-left:1.3rem}li{margin:.35rem 0}.kicker{color:var(--cyan);font-weight:800}.subtle{color:var(--muted);font-size:.9rem}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.statusbar{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:15px 0}.print{background:transparent;border:1px solid var(--line);border-radius:10px;padding:7px 11px;color:var(--ink);cursor:pointer}.print:hover{border-color:var(--cyan)}footer{border-top:1px solid var(--line);padding:35px 0 60px;color:var(--muted)}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.toc{position:static;max-height:none;columns:2;border-bottom:1px solid var(--line)}.card,.card.half,.card.wide{grid-column:1/-1}.two{grid-template-columns:1fr}.decision{grid-template-columns:1fr}.decision .gate{transform:rotate(90deg);text-align:center}}
+@media(max-width:640px){.shell{padding:0 15px}.hero{padding-top:50px}.toc{columns:1}.flow{flex-direction:column}.flow .arrow{transform:rotate(90deg)}.hero h1{font-size:2.35rem}}
+@media print{body{background:white;color:#111}.toc,.print{display:none}.layout{display:block}.shell{max-width:none}.card,.table-wrap,details{box-shadow:none;background:white;color:#111;border-color:#bbb}.card p,.lead,.subtle,details>div{color:#333}a,code{color:#064f47}.section{break-inside:avoid}.hero{padding:25px 0}.hero h1{font-size:34px}.formula{white-space:pre-wrap;color:#111;background:#f5f5f5}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="shell">
+  <div class="statusbar"><span class="eyebrow">Implementation & decision audit · 2026</span><button class="print" onclick="print()">인쇄 / PDF</button></div>
+  <h1>Robust VKOSPI<br>구현·알고리즘·옵션 매매 가이드</h1>
+  <p>이 보고서는 “Robust VKOSPI”라는 이름이 실제로 가리키는 파일과 실행 경로를 먼저 분리한다. 이어서 월간 무SJM·균형 로지스틱, 일간 VKOSPI 위험 이전, 성과가 생긴 지점, VIX6 decomposition을 이용한 옵션 매수·청산·비중 결정까지 코드와 결과 파일을 기준으로 연결한다.</p>
+  <div class="meta"><span class="tag good">현재 선택: Existing Final Robust VKOSPI</span><span class="tag stop">옵션 자산: 최종 비중 0%</span><span class="tag warn">2007-04–2026-07 · 232개월</span><span class="tag">생성 2026-08-28 15:38 KST</span></div>
+</div></header>
+
+<div class="shell layout">
+<nav class="toc" aria-label="목차"><b>목차</b>
+  <a href="#verdict">1. 결론</a><a href="#naming">2. 이름과 버전</a><a href="#architecture">3. 전체 구조</a><a href="#files">4. 구현 파일</a><a href="#monthly">5. 월간 알고리즘</a><a href="#inputs">6. 입력변수 전부</a><a href="#overlay">7. Robust VKOSPI</a><a href="#search">8. 반복 후보 탐색</a><a href="#execution">9. 체결·비용·조정</a><a href="#effects">10. 효과의 원인</a><a href="#option">11. 옵션 매수·매도</a><a href="#results">12. 성과</a><a href="#validation">13. 검증과 한계</a><a href="#run">14. 실행 방법</a>
+</nav>
+<main>
+
+<section class="section" id="verdict"><h2>1. 결론부터</h2><p class="lead">현재 작업공간에서 최종 비교 기준으로 쓰는 경로는 <b>무SJM 거시 국면 + 균형 L2 로지스틱 + Robust VKOSPI 일간 오버레이</b>다. 옵션 풋 매수·청산 로직은 구현과 검증까지 끝났지만, 비용을 넣은 48개 후보 중 CAGR·Sharpe·MDD를 동시에 개선한 후보가 없어 최종 전략에서는 옵션 비중을 0%로 유지한다.</p>
+<div class="grid">
+ <article class="card metric"><span>전체 CAGR</span><strong>15.64%</strong><span>2007-04–2026-07</span></article>
+ <article class="card metric"><span>전체 Sharpe</span><strong>1.133</strong><span>월수익, 무위험 0 가정 요약치</span></article>
+ <article class="card metric"><span>전체 MDD</span><strong>-12.96%</strong><span>덜 음수일수록 양호</span></article>
+ <article class="card metric"><span>2018 이후 CAGR</span><strong>20.91%</strong><span>표기상 locked 구간</span></article>
+ <article class="card metric"><span>2018 이후 Sharpe</span><strong>1.497</strong><span>103개월</span></article>
+ <article class="card metric"><span>2018 이후 MDD</span><strong>-9.76%</strong><span>2018-01–2026-07</span></article>
+</div>
+<div class="callout red"><b>중요한 연구상 주의.</b> Robust VKOSPI 오버레이 승자는 2017년 말 이전 자료로 고른 뒤 2018년 이후를 잠갔다. 하지만 현재 기준인 <b>무SJM 변형</b>과 뒤이은 VIX6·옵션 실험은 사용자의 추가 요청에 따른 사후 비교다. 따라서 현재 기준의 2018년 이후 숫자는 편의상 “locked”라고 표기하지만, 전체 연구가 끝난 뒤에도 완전히 손대지 않은 최종 홀드아웃이라고 해석하면 안 된다.</div>
+</section>
+
+<section class="section" id="naming"><h2>2. “Robust VKOSPI”는 세 층으로 나눠 봐야 한다</h2>
+<div class="grid">
+ <article class="card"><h3>① 오버레이 모듈</h3><p>VKOSPI 수준·충격·가속으로 0–1 스트레스를 만들고 주식·원유 비중 일부를 안전자산으로 옮기는 일간 규칙 자체다. 핵심은 <a href="../../strategies/stage06_vkospi/vkospi_robust_dynamic_experiment.py"><code>build_robust_daily_features()</code></a> <span class="line">L72</span>와 <a href="../../strategies/stage06_vkospi/vkospi_robust_dynamic_experiment.py"><code>stress_from_features()</code></a> <span class="line">L117</span>다.</p></article>
+ <article class="card"><h3>② 구 배포 결합경로</h3><p>SJM 가중치 10%의 거시 모델, 균형 로지스틱, Robust VKOSPI를 결합한 과거 기준이다. 결과는 <code>vkospi_robust_dynamic_reconciled_monthly.csv</code>에 남아 있다.</p></article>
+ <article class="card"><h3>③ 현재 비교 기준</h3><p>SJM을 0%로 제거하고 같은 균형 로지스틱과 같은 오버레이를 다시 계산한 경로다. <a href="../../strategies/stage06_vkospi/balanced_logistic_no_sjm_strategy.py"><code>fixed_robust_overlay()</code></a> <span class="line">L337</span>가 조립하고 <code>balanced_logistic_no_sjm_final_reconciled.csv</code>가 현재 기준 결과다.</p></article>
+</div>
+<p class="callout">이 구분이 필요한 이유는 단순하다. “오버레이가 얼마나 개선했는가”와 “무SJM까지 포함한 최신 전체 전략 성과”는 서로 다른 비교다. 앞의 개선폭은 오버레이만 바꾼 공정한 절삭실험이고, 뒤의 성과는 월간 모델 변경까지 합친 최종 경로다.</p>
+</section>
+
+<section class="section" id="architecture"><h2>3. 전체 알고리즘 구조</h2><p class="lead">월간 엔진이 기본 비중을 정하고, 일간 엔진이 급격한 변동성 스트레스 때만 그 비중을 방어적으로 덮어쓴다. 옵션 확장은 이 네 자산 경로의 일부를 풋 프리미엄으로 재배분하는 별도 5번째 슬리브다.</p>
+<div class="flow" aria-label="전략 데이터 흐름">
+ <div class="node"><small>월간 입력</small><b>거시 12개 + 시장/OAP 16개</b><small>전월까지 관측</small></div><div class="arrow">→</div>
+ <div class="node"><small>월간 모델</small><b>무SJM 국면 + 균형 로지스틱</b><small>2개월 꼬리손실 예측</small></div><div class="arrow">→</div>
+ <div class="node"><small>기준 비중</small><b>KODEX200·채권·금·원유</b><small>15% 변동성 목표</small></div><div class="arrow">→</div>
+ <div class="node"><small>일간 입력</small><b>Robust VKOSPI</b><small>수준·충격·가속</small></div><div class="arrow">→</div>
+ <div class="node"><small>오버레이</small><b>위험 이전 + 20% 밴드</b><small>주식·원유 → 금</small></div>
+</div>
+<div class="flow" aria-label="옵션 확장 흐름">
+ <div class="node"><small>옵션 원자료</small><b>KOSPI200 콜·풋 표면</b><small>30일 만기 보간</small></div><div class="arrow">→</div>
+ <div class="node"><small>VIX6</small><b>shift·skew·convexity</b><small>6 decomposition</small></div><div class="arrow">→</div>
+ <div class="node"><small>매매 규칙</small><b>10델타 풋 진입·회복 청산</b><small>신호 1관측치 지연</small></div><div class="arrow">→</div>
+ <div class="node"><small>승격 게이트</small><b>CAGR·Sharpe·MDD 동시 개선?</b><small>Base와 Conservative 비용</small></div><div class="arrow">→</div>
+ <div class="node"><small>현재 판정</small><b>아니오 → 옵션 0%</b><small>기존 Robust 유지</small></div>
+</div>
+</section>
+
+<section class="section" id="files"><h2>4. 어떤 파일이 실제 구현인가</h2><p class="lead">“보고서 생성기”와 “전략 엔진”을 섞어 보면 실행 경로를 오해하기 쉽다. 아래 표의 앞 세 파일이 Robust VKOSPI 코어이고, <code>balanced_logistic_no_sjm_strategy.py</code>가 현재 전체 경로의 진입점이다.</p>
+<div class="table-wrap"><table><thead><tr><th>분류</th><th>파일·시작점</th><th>상태</th><th>역할</th></tr></thead><tbody><tr><td><span class="pill">핵심 실행</span></td><td><a href="../../strategies/stage06_vkospi/balanced_logistic_no_sjm_strategy.py"><code>strategies/stage06_vkospi/balanced_logistic_no_sjm_strategy.py</code></a> <span class="line">L473</span></td><td><b>현재 기준 경로</b></td><td>무SJM 거시 신호 → 16변수 균형 로지스틱 → 월간 기준 비중 → 고정 Robust VKOSPI 오버레이를 한 번에 재구성한다.</td></tr><tr><td><span class="pill">핵심 신호</span></td><td><a href="../../strategies/stage06_vkospi/vkospi_robust_dynamic_experiment.py"><code>strategies/stage06_vkospi/vkospi_robust_dynamic_experiment.py</code></a> <span class="line">L72</span></td><td><b>오버레이 정의·선정</b></td><td>VKOSPI robust 특징 15개를 만들고 5개 스트레스 조합, 810개 정책 후보를 2017년 말 이전 자료로 비교한다.</td></tr><tr><td><span class="pill">핵심 엔진</span></td><td><a href="../../strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py"><code>strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py</code></a> <span class="line">L260</span></td><td><b>일별 체결·비용·조정</b></td><td>전일 신호 정렬, 주식·원유 위험 이전, 리밸런싱 밴드, 거래·환전·조달비용, 월간 상대수익 조정을 담당한다.</td></tr><tr><td><span class="pill">월간 모델</span></td><td><a href="../../strategies/stage06_vkospi/vkospi_model_robustness.py"><code>strategies/stage06_vkospi/vkospi_model_robustness.py</code></a> <span class="line">L417</span></td><td><b>로지스틱·비중 엔진</b></td><td>중앙값 대치, 표준화, expanding walk-forward 학습, 꼬리위험 비중 이동, 변동성 목표와 로지스틱/SJM 강건성 감사를 제공한다.</td></tr><tr><td><span class="pill">설명·진단</span></td><td><a href="../../strategies/stage06_vkospi/vkospi_robust_dynamic_attribution.py"><code>strategies/stage06_vkospi/vkospi_robust_dynamic_attribution.py</code></a> <span class="line">L59</span></td><td><b>효과 분해</b></td><td>새 신호, 최대 이전 35%, 리밸런싱 밴드 20%를 단계별로 분리하고 성분 절삭실험과 월별 기여도를 만든다.</td></tr><tr><td><span class="pill">옵션 확장</span></td><td><a href="../../strategies/stage08_options/vix6_case1_strategy.py"><code>strategies/stage08_options/vix6_case1_strategy.py</code></a> <span class="line">L425</span></td><td><b>VIX6 decomposition</b></td><td>KOSPI200 옵션 표면을 30일 만기로 보간하고 sticky-strike, parallel shift, skew, convexity를 분해한다.</td></tr><tr><td><span class="pill">옵션 매매</span></td><td><a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>strategies/stage08_options/option_asset_slippage_experiment.py</code></a> <span class="line">L258</span></td><td><b>풋 매수·청산·비중</b></td><td>VIX6 기반 진입·회복 점수, 10델타 풋 선택, 실제 보유기간, 슬리피지와 5번째 자산 비중을 평가한다.</td></tr><tr><td><span class="pill">확장 비교</span></td><td><a href="../../strategies/stage08_options/vix6_case1_model_comparison.py"><code>strategies/stage08_options/vix6_case1_model_comparison.py</code></a> <span class="line">L715</span></td><td><b>VIX6 대안 3종</b></td><td>기존 Robust VKOSPI와 VIX6 입력, 단독 오버레이, 혼합 오버레이를 같은 기간·비용 기준으로 비교한다.</td></tr><tr><td><span class="pill">테스트</span></td><td><a href="../../tests/test_vkospi_robust_dynamic_experiment.py"><code>tests/test_vkospi_robust_dynamic_experiment.py</code></a> <span class="line">L12</span></td><td><b>오버레이 회귀검증</b></td><td>신호 선행성, 810개 후보·승자 재현, 상대수익 조정, 잠금성과, 비용 2배와 attribution 일치를 검사한다.</td></tr><tr><td><span class="pill">테스트</span></td><td><a href="../../tests/test_balanced_logistic_no_sjm_strategy.py"><code>tests/test_balanced_logistic_no_sjm_strategy.py</code></a> <span class="line">L23</span></td><td><b>현재 기준 경로 검증</b></td><td>무SJM·균형 L2 설정, 2개월 embargo, 일별 선행성, 232개월 정렬, 잠금 결과와 사전구간 게이트를 검사한다.</td></tr><tr><td><span class="pill">테스트</span></td><td><a href="../../tests/test_option_asset_slippage_experiment.py"><code>tests/test_option_asset_slippage_experiment.py</code></a> <span class="line">L19</span></td><td><b>옵션 매매 검증</b></td><td>틱 하한, 거래량, 델타·DTE, 진입/청산 순서, 48개 후보, 자금조달 비중합과 채택 규칙을 검사한다.</td></tr></tbody></table></div>
+<details><summary>결과 파일 지도</summary><div><div class="table-wrap"><table><thead><tr><th>파일</th><th>내용</th></tr></thead><tbody><tr><td><a href="../../raw_data/VKOSPIData.csv"><code>raw_data/VKOSPIData.csv</code></a></td><td>2003–2026 VKOSPI 일별 OHLC 원자료</td></tr><tr><td><a href="../../raw_data/KOSPI200OptionPrice.csv"><code>raw_data/KOSPI200OptionPrice.csv</code></a></td><td>VIX6 표면과 풋 실물수익을 만드는 통합 KOSPI200 옵션 원자료</td></tr><tr><td><a href="../../results/openassetpricing_composites.csv"><code>results/openassetpricing_composites.csv</code></a></td><td>Open Asset Pricing 신호를 네 개 스트레스 합성변수로 묶은 월간 입력</td></tr><tr><td><a href="../../results/vkospi_selected_backtest.csv"><code>results/vkospi_selected_backtest.csv</code></a></td><td>일간 오버레이가 받아오는 검증된 월간 기준 비중·수익</td></tr><tr><td><a href="../../results/balanced_logistic_no_sjm_final_reconciled.csv"><code>results/balanced_logistic_no_sjm_final_reconciled.csv</code></a></td><td>현재 기준 월별 수익·NAV·낙폭</td></tr><tr><td><a href="../../results/balanced_logistic_no_sjm_final_daily.csv"><code>results/balanced_logistic_no_sjm_final_daily.csv</code></a></td><td>현재 기준 일별 비중·스트레스·비용·신호일</td></tr><tr><td><a href="../../results/balanced_logistic_no_sjm_validation.json"><code>results/balanced_logistic_no_sjm_validation.json</code></a></td><td>무SJM·로지스틱·잠금성과·부트스트랩 설정</td></tr><tr><td><a href="../../results/vkospi_robust_dynamic_calibration.csv"><code>results/vkospi_robust_dynamic_calibration.csv</code></a></td><td>Robust VKOSPI 810개 후보의 사전구간 비교</td></tr><tr><td><a href="../../results/vkospi_robust_dynamic_validation.json"><code>results/vkospi_robust_dynamic_validation.json</code></a></td><td>오버레이 승자와 2018년 이후 잠금 결과</td></tr><tr><td><a href="../../results/vkospi_robust_dynamic_stepwise_attribution.csv"><code>results/vkospi_robust_dynamic_stepwise_attribution.csv</code></a></td><td>효과가 생긴 단계를 분해한 결과</td></tr><tr><td><a href="../../results/vkospi_robust_dynamic_component_ablation.csv"><code>results/vkospi_robust_dynamic_component_ablation.csv</code></a></td><td>수준·충격·가속 성분 절삭실험</td></tr><tr><td><a href="../../results/vkospi_robust_dynamic_cost_sensitivity.csv"><code>results/vkospi_robust_dynamic_cost_sensitivity.csv</code></a></td><td>기본비용·2배 비용 비교</td></tr><tr><td><a href="../../results/vkospi_model_robustness.json"><code>results/vkospi_model_robustness.json</code></a></td><td>로지스틱 28개·SJM 37개 유효 후보·CSCV/PBO 감사</td></tr><tr><td><a href="../../results/option_asset_monthly_trades.csv"><code>results/option_asset_monthly_trades.csv</code></a></td><td>VIX6 신호로 완결된 옵션 진입·청산 39건</td></tr><tr><td><a href="../../results/option_asset_slippage_comparison_2007_2026.csv"><code>results/option_asset_slippage_comparison_2007_2026.csv</code></a></td><td>슬리피지 3종×신호 4종×최대비중 4종=48개 후보</td></tr><tr><td><a href="../../results/option_asset_slippage_validation.json"><code>results/option_asset_slippage_validation.json</code></a></td><td>옵션 후보 최종 채택/기각 판정</td></tr><tr><td><a href="../../results/vix6_case1_final_selection.json"><code>results/vix6_case1_final_selection.json</code></a></td><td>VIX6 입력·단독·혼합 대안 최종 판정</td></tr><tr><td><a href="../notebooks/vkospi_robust_dynamic_strategy_colab.ipynb"><code>vkospi_robust_dynamic_strategy_colab.ipynb</code></a></td><td>Google Colab에서 전략을 재현하는 기존 노트북</td></tr><tr><td><a href="vkospi_robust_dynamic_technical_report.html"><code>vkospi_robust_dynamic_technical_report.html</code></a></td><td>모형·통계 진단을 더 넓게 다룬 기존 기술보고서</td></tr></tbody></table></div></div></details>
+<p class="subtle"><code>build_vkospi_robust_dynamic_technical_report.py</code>, <code>build_vkospi_robust_dynamic_deliverables.py</code>, 이 문서를 만드는 <code>build_robust_vkospi_implementation_guide.py</code>는 설명 자료 생성기다. 백테스트 비중이나 수익을 결정하는 실행 경로에는 들어가지 않는다.</p>
+<div class="callout good"><b>가장 짧은 추적 순서:</b> <code>balanced_logistic_no_sjm_strategy.py:main()</code> → <code>fixed_robust_overlay()</code> → <code>build_robust_daily_features()</code> → <code>stress_from_features()</code> → <code>simulate()</code> → <code>reconcile_to_monthly_reference()</code>.</div>
+</section>
+
+<section class="section" id="monthly"><h2>5. 월간 기본전략: 무SJM + 균형 로지스틱</h2>
+<div class="grid">
+ <article class="card half"><h3>5-1. 국면 확률</h3><p>성장축은 GDP·수출·BSI, 물가축은 CPI·PPI·수입물가의 수준과 3개월 변화를 사용한다. 현재 상태 가중 85%, 3개월 변화 가중 20%, sigmoid scale 0.55는 그대로 두되 SJM 기여를 0으로 만든다. 신호월은 항상 투자월보다 앞선다.</p></article>
+ <article class="card half"><h3>5-2. 4자산 기준 비중</h3><p>하드 국면 비중 40%와 방어 최적화 경로 60%를 섞는다. 자산 순서는 KODEX200, BOND, GLD, USO다. 이 단계가 “어떤 자산을 기본적으로 얼마나 들고 갈지”를 정한다.</p></article>
+ <article class="card half"><h3>5-3. 꼬리위험 라벨</h3><p>중립 기준 수익의 앞으로 2개월 누적 경로 중 최저값이 −5% 아래면 <code>tail_event=1</code>이다. 즉 다음 달 하나의 방향보다 두 달 안에 나타날 수 있는 경로 손실을 분류한다.</p></article>
+ <article class="card half"><h3>5-4. expanding 학습</h3><p><a href="../../strategies/stage06_vkospi/vkospi_model_robustness.py"><code>fit_logistic_candidate()</code></a> <span class="line">L417</span>은 중앙값 대치 → 표준화 → class-balanced L2 로지스틱(<code>C=0.1</code>, <code>liblinear</code>)을 매월 다시 적합한다. 최소 36개월, 양성 4건, 음성 12건을 요구하고 현재 월 앞의 2개월을 embargo한다.</p></article>
+</div>
+<details open><summary>4개 국면 분류와 하드 비중</summary><div>
+<p><code>p_growth_high</code>와 <code>p_inflation_high</code>의 곱으로 네 사분면 확률을 만든 뒤 가장 큰 확률을 국면으로 택한다. 자산 순서는 KODEX200 / BOND / GLD / USO다.</p>
+<div class="table-wrap"><table><thead><tr><th>국면</th><th>확률식</th><th>하드 비중</th><th>경제적 해석</th></tr></thead><tbody>
+<tr><td>Goldilocks</td><td><code>g × (1-i)</code></td><td>100% / 0% / 0% / 0%</td><td>고성장·저물가 → 주식</td></tr>
+<tr><td>Overheating</td><td><code>g × i</code></td><td>0% / 0% / 0% / 100%</td><td>고성장·고물가 → 원유</td></tr>
+<tr><td>Slowdown</td><td><code>(1-g) × (1-i)</code></td><td>60% / 40% / 0% / 0%</td><td>저성장·저물가 → 주식+채권</td></tr>
+<tr><td>Stagflation</td><td><code>(1-g) × i</code></td><td>0% / 0% / 100% / 0%</td><td>저성장·고물가 → 금</td></tr>
+</tbody></table></div>
+<p>방어 경로는 이 하드 비중과 별개로 soft regime anchor, 역변동성 기울기, 기대수익, 연율 변동성, CDaR, turnover, anchor 추적오차를 함께 넣은 SLSQP 최적화다. 자산별 범위와 변동성·CDaR 제약을 적용하고, 실현 낙폭이 −5%를 넘으면 방어 앵커 쪽으로 추가 혼합한다. 최종 월간 기준은 이 방어 경로 60%와 하드 비중 40%의 혼합이다.</p>
+</div></details>
+<div class="formula">train_end(t) = position(t) - 2
+train = observations[0 : train_end(t)]
+model_t = MedianImputer → StandardScaler → LogisticRegression(L2, C=0.1, class_weight="balanced")
+p_tail(t) = model_t.predict_proba(X_t)
+
+risk_percentile(t) = percentile of p_tail(t) versus prior 60 valid probabilities
+severity(t) = clip((risk_percentile(t) - 0.80) / 0.20, 0, 1)
+p_up(t) = 0.50 - 0.15 × severity(t)
+risk_score(t) = -severity(t)</div>
+<p>로지스틱이 학습을 “안 하는” 것이 아니다. 매월 과거 자료만으로 다시 학습한다. 반면 <b>일간 Robust VKOSPI와 옵션 VIX6 진입·청산은 학습모델이 아니라 사전 정의된 연속 규칙</b>이다. 두 종류를 분리해 봐야 한다.</p>
+<div class="formula">base = 0.40 × hard_regime_weights + 0.60 × defensive_weights
+
+if risk_score &lt; 0:
+    transfer up to 20% from KODEX200 and USO → BOND and GLD
+
+forecast_vol = exponentially weighted volatility of prior 24 months (minimum 12)
+leverage = clip(0.15 / forecast_vol, 0.50, 1.50)
+final_monthly_weights = leverage × tilted_base</div>
+</section>
+
+<section class="section" id="inputs"><h2>6. 사용한 입력변수 전체 목록</h2><p class="lead">아래 목록은 “현재 전체 경로에 실제로 쓰는 월간 입력”, “Robust VKOSPI가 생성하는 일간 입력”, “옵션 매매에 추가로 쓰는 VIX6 입력”을 구분한다. CAGR·Sharpe·MDD는 입력변수가 아니라 후보를 평가하는 목적함수다.</p>
+<div class="two">
+<details open><summary>거시 국면 입력 12개</summary><div><div class="table-wrap"><table><thead><tr><th>변수</th><th>의미</th></tr></thead><tbody><tr><td><code>GDP_level</code></td><td>GDP 성장 수준의 표준화 상태</td></tr><tr><td><code>GDP_level_d3</code></td><td>GDP 성장 수준의 3개월 변화</td></tr><tr><td><code>Export_level</code></td><td>수출 성장 수준</td></tr><tr><td><code>Export_level_d3</code></td><td>수출 성장의 3개월 변화</td></tr><tr><td><code>BSI_level</code></td><td>기업경기실사지수 수준</td></tr><tr><td><code>BSI_level_d3</code></td><td>기업심리의 3개월 변화</td></tr><tr><td><code>CPI_level</code></td><td>소비자물가 수준</td></tr><tr><td><code>CPI_level_d3</code></td><td>소비자물가의 3개월 변화</td></tr><tr><td><code>PPI_level</code></td><td>생산자물가 수준</td></tr><tr><td><code>PPI_level_d3</code></td><td>생산자물가의 3개월 변화</td></tr><tr><td><code>ImportPrice_level</code></td><td>수입물가 수준</td></tr><tr><td><code>ImportPrice_level_d3</code></td><td>수입물가의 3개월 변화</td></tr></tbody></table></div></div></details>
+<details open><summary>균형 로지스틱 입력 16개</summary><div><div class="table-wrap"><table><thead><tr><th>변수</th><th>의미</th></tr></thead><tbody><tr><td><code>base_USO</code></td><td>중립 기준 포트폴리오의 원유 비중</td></tr><tr><td><code>base_GLD</code></td><td>중립 기준 포트폴리오의 금 비중</td></tr><tr><td><code>base_KODEX200</code></td><td>중립 기준 포트폴리오의 주식 비중</td></tr><tr><td><code>p_inflation_high</code></td><td>다음 달 고물가 국면 확률</td></tr><tr><td><code>proxy_mom1</code></td><td>국내 위험자산 1개월 모멘텀 대용치</td></tr><tr><td><code>proxy_mom6</code></td><td>국내 위험자산 6개월 모멘텀 대용치</td></tr><tr><td><code>proxy_vol6</code></td><td>6개월 변동성 대용치</td></tr><tr><td><code>daily_mom21</code></td><td>일별 자료로 계산한 21거래일 모멘텀</td></tr><tr><td><code>daily_mom252</code></td><td>일별 자료로 계산한 252거래일 모멘텀</td></tr><tr><td><code>daily_vol21</code></td><td>21거래일 실현변동성</td></tr><tr><td><code>daily_downvol21</code></td><td>21거래일 하방변동성</td></tr><tr><td><code>daily_mean_corr63</code></td><td>자산 간 63거래일 평균 상관</td></tr><tr><td><code>oap_momentum_trend_stress</code></td><td>Open Asset Pricing 모멘텀·추세 합성 스트레스</td></tr><tr><td><code>oap_reversal_crowding_stress</code></td><td>단기반전·혼잡 합성 스트레스</td></tr><tr><td><code>oap_low_risk_tail_stress</code></td><td>저위험·꼬리위험 합성 스트레스</td></tr><tr><td><code>oap_liquidity_activity_stress</code></td><td>유동성·거래활동 합성 스트레스</td></tr></tbody></table></div></div></details>
+</div>
+<details open><summary>Robust VKOSPI 생성변수 15개</summary><div><p>최종 승자식이 직접 쓰는 것은 <code>percentile_252</code>(초기에는 126일로 보충), <code>shock_5</code>, <code>acceleration_z5</code> 세 축이다. 나머지는 후보 모드와 진단·대체식에 쓰인다.</p><div class="table-wrap"><table><thead><tr><th>변수</th><th>의미</th></tr></thead><tbody><tr><td><code>close</code></td><td>VKOSPI 종가</td></tr><tr><td><code>percentile_126</code></td><td>현재 값의 인과적 126거래일 분위수</td></tr><tr><td><code>percentile_252</code></td><td>현재 값의 인과적 252거래일 분위수</td></tr><tr><td><code>robust_z_63</code></td><td>로그 VKOSPI의 63일 median/MAD z점수</td></tr><tr><td><code>robust_z_252</code></td><td>로그 VKOSPI의 252일 median/MAD z점수</td></tr><tr><td><code>shock_5</code></td><td>5일 로그변화를 직전 63일 변동성으로 나눈 충격</td></tr><tr><td><code>shock_10</code></td><td>10일 정규화 충격</td></tr><tr><td><code>shock_21</code></td><td>21일 정규화 충격</td></tr><tr><td><code>acceleration_5</code></td><td>최근 5일 변화 − 그 전 5일 변화</td></tr><tr><td><code>acceleration_z5</code></td><td>5일 가속도를 63일 변동성으로 정규화</td></tr><tr><td><code>distance_high21</code></td><td>현재 값 / 21일 고가 − 1</td></tr><tr><td><code>close_location21</code></td><td>21일 고저 범위 안에서 현재 종가 위치</td></tr><tr><td><code>positive_fraction5</code></td><td>최근 5일 VKOSPI 상승일 비율</td></tr><tr><td><code>positive_fraction21</code></td><td>최근 21일 VKOSPI 상승일 비율</td></tr><tr><td><code>fast_slow</code></td><td>5일 변화 − 5/21×21일 변화</td></tr></tbody></table></div></div></details>
+<details open><summary>VIX6 decomposition 및 옵션 매매 입력</summary><div>
+<ul><li><b>기초 6성분:</b> <code>sticky_strike</code>, <code>parallel_shift</code>, <code>put_skew</code>, <code>call_skew</code>, <code>downside_convexity</code>, <code>upside_convexity</code>.</li><li><b>수준 합성:</b> <code>left_tail</code> = put-skew와 downside-convexity의 robust z 평균, <code>right_tail</code> = call 쪽 평균, <code>asymmetry</code> = left − right.</li><li><b>경로 합성:</b> <code>breadth_z</code>, <code>reaction_z</code>, <code>left_impulse_z</code>, <code>left_change_5</code>, 옵션 내재 forward의 5·21일 수익.</li><li><b>실제 옵션 진입:</b> <code>left_tail</code>, <code>asymmetry</code>, <code>left_impulse_z</code>, <code>breadth_z</code>.</li><li><b>실제 옵션 청산:</b> <code>left_change_5</code>, <code>left_impulse_z</code>, <code>right_tail - left_tail</code>.</li><li><b>체결비용만 보정:</b> 전일 <code>VKOSPI percentile</code>과 <code>shock_5</code>가 위기 슬리피지 배수를 1.0–2.0배로 높인다.</li></ul>
+</div></details>
+</section>
+
+<section class="section" id="overlay"><h2>7. Robust VKOSPI 오버레이는 구체적으로 무엇인가</h2><p class="lead">오버레이는 VKOSPI 자체를 매수하는 전략이 아니다. 월간 모델이 만든 4자산 비중을 유지하되, 한국판 VIX인 VKOSPI가 “높고, 빠르게 오르고, 상승 속도까지 빨라질 때” 주식과 원유 일부를 금으로 옮기는 일간 위험예산 규칙이다.</p>
+<div class="grid"><article class="card"><h3>선정 모드</h3><p><code>acceleration</code><br>수준 40% + 5일 충격 35% + 5일 가속 25%</p></article><article class="card"><h3>문턱</h3><p>수준 분위수 0.90<br>충격·가속 z 문턱 1.00</p></article><article class="card"><h3>정책</h3><p>최대 이전 35%<br>채권 몫 0%<br>리밸런싱 밴드 20%</p></article></div>
+<div class="formula">P = percentile_252, falling back to percentile_126
+L = clip((P - 0.90) / 0.10, 0, 1)
+S = clip((shock_5 - 1.00) / 2.50, 0, 1)
+A = clip((acceleration_z5 - 1.00) / 2.50, 0, 1)
+
+stress = clip(0.40 × L + 0.35 × S + 0.25 × A, 0, 1)
+transfer_fraction = 0.35 × stress</div>
+<div class="formula">removed_equity = w_KODEX200 × transfer_fraction
+removed_oil    = w_USO      × transfer_fraction
+w_KODEX200 -= removed_equity
+w_USO      -= removed_oil
+
+removed = removed_equity + removed_oil
+w_BOND += removed × bond_share           # winner: 0%
+w_GLD  += removed × (1 - bond_share)     # winner: 100%</div>
+<p>따라서 스트레스가 1이어도 전체 포트폴리오의 35%를 무조건 옮기는 것은 아니다. <b>그 시점 KODEX200과 USO 비중의 각각 35%</b>를 줄인다. 승자의 <code>bond_share=0</code>이므로 줄인 금액은 모두 GLD로 간다.</p>
+</section>
+
+<section class="section" id="search"><h2>8. “반복적인 후보·파라미터 탐색”의 실제 의미</h2><p class="lead">매일 미래를 보며 파라미터를 바꾸는 것이 아니다. 사전에 정한 유한한 격자를 2007–2017과 그 안의 2013–2017 두 창에서 반복 실행하고, 두 창 모두에서 기존 동적 VKOSPI보다 CAGR·Sharpe·MDD가 좋아진 후보만 남긴 뒤 한 개를 고정했다.</p>
+<div class="formula">5 stress modes
+× 3 level thresholds     {0.70, 0.80, 0.90}
+× 3 shock thresholds     {0.0, 0.5, 1.0}
+× 3 max transfers        {0.15, 0.25, 0.35}
+× 2 bond shares          {0.0, 0.5}
+× 3 rebalance bands      {0.10, 0.15, 0.20}
+= 810 candidates</div>
+<ol><li>각 후보를 같은 일별 가격·같은 비용·같은 월간 기준 비중 위에서 실행한다.</li><li>2007–2017과 2013–2017에서 CAGR, Sharpe, MDD, Calmar의 백분위 순위를 구한다.</li><li>두 창 모두에서 CAGR&gt;0, Sharpe&gt;0, MDD≥0의 상대개선과 평균 스트레스&gt;0.002를 요구한다.</li><li>엄격 통과 후보는 810개 중 <b>2개</b>였다.</li><li>통과군에서 다목적 평균순위, Sharpe, CAGR 순으로 <code>acceleration / .90 / 1.0 / .35 / .0 / .20</code>을 선택했다.</li><li>2018년 이후 103개월은 이 선택에 쓰지 않고 성과 확인에만 사용했다.</li></ol>
+<div class="callout"><b>이 탐색이 보장하지 않는 것:</b> 후보 수가 많으면 우연히 사전구간에 맞는 조합이 생길 수 있다. 그래서 2018년 이후 잠금, 6개월 블록 부트스트랩, 비용 2배, 성분 절삭실험을 추가했지만 과적합이 없다는 증명은 아니다.</div>
+</section>
+
+<section class="section" id="execution"><h2>9. 일별 체결, 비용, 리밸런싱, 월간 조정</h2>
+<div class="grid"><article class="card half"><h3>신호 시점</h3><p><a href="../../strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py"><code>simulate()</code></a> <span class="line">L260</span>은 수익을 계산할 날짜보다 앞선 마지막 VKOSPI 관측치만 사용한다. 테스트도 <code>signal_date &lt; return_date</code>를 강제한다.</p></article><article class="card half"><h3>20% 밴드</h3><p>월초에는 항상 리밸런싱한다. 월중에는 목표 비중과 현재 비중 사이의 반회전율이 20% 이상일 때만 거래한다. 신호가 조금 움직일 때마다 사고파는 것을 막는다.</p></article><article class="card half"><h3>비용</h3><p>총 비중변화에 15bp, GLD·USO 합산 비중변화에 추가 5bp를 부과한다. 레버리지의 현금/차입 부분은 연 4%를 일단위로 환산한다.</p></article><article class="card half"><h3>월간 상대수익 조정</h3><p><a href="../../strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py"><code>reconcile_to_monthly_reference()</code></a> <span class="line">L386</span>은 일별 오버레이 수익을 그대로 월간 알파로 붙이지 않는다. 같은 일별 엔진의 오버레이/중립 상대배수만 검증된 월간 기준수익에 곱한다.</p></article></div>
+<div class="formula">relative_factor_m = (1 + daily_overlay_return_m) / (1 + daily_neutral_return_m)
+final_return_m = (1 + validated_monthly_reference_return_m) × relative_factor_m - 1</div>
+<p>이 조정은 월간 엔진과 일간 엔진의 조달비용·비용 복리 차이가 마치 오버레이의 성과인 것처럼 섞이는 문제를 줄인다.</p>
+</section>
+
+<section class="section" id="effects"><h2>10. 어떤 아이디어가 실제 효과를 냈나</h2><p class="lead">결과를 보면 “VKOSPI 특징을 더 복잡하게 만들었다”만으로 성과가 좋아진 것이 아니다. Robust 신호만 넣으면 오히려 잠금 Sharpe가 낮아졌고, <b>월중 20% 리밸런싱 밴드</b>까지 적용했을 때 최종 개선이 나타났다.</p>
+<div class="table-wrap"><table><thead><tr><th>단계</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>월평균 turnover</th></tr></thead><tbody><tr><td><b>① 기존 동적 VKOSPI</b></td><td>18.30%</td><td>1.329</td><td>-11.29%</td><td>0.163</td></tr><tr><td><b>② Robust 신호만 교체</b></td><td>18.08%</td><td>1.299</td><td>-11.13%</td><td>0.156</td></tr><tr><td><b>③ 최대 이전 35% 적용</b></td><td>18.06%</td><td>1.303</td><td>-11.13%</td><td>0.171</td></tr><tr class="winner"><td><b>④ 리밸런싱 밴드 20%까지 적용</b></td><td>18.44%</td><td>1.363</td><td>-11.13%</td><td>0.163</td></tr></tbody></table></div>
+<p><span class="kicker">핵심 해석:</span> 신호는 방어 필요도를 연속값으로 만들었고, 35% 최대 이전은 극단구간의 방어 폭을 열어 두었다. 하지만 작은 신호 변화에 반응하지 않는 20% 밴드가 불필요한 월중 뒤집기와 비용을 줄이며 위험조정 성과를 살렸다.</p>
+<div class="table-wrap"><table><thead><tr><th>성분</th><th>2007–2017: CAGR / Sharpe / MDD</th><th>2018–2026: CAGR / Sharpe / MDD</th></tr></thead><tbody><tr><td>수준만</td><td>12.98% / 0.945 / -12.98%</td><td>18.11% / 1.324 / -11.39%</td></tr><tr><td>충격만</td><td>12.80% / 0.943 / -12.98%</td><td>17.94% / 1.277 / -11.20%</td></tr><tr><td>가속만</td><td>12.09% / 0.906 / -12.96%</td><td>17.16% / 1.209 / -12.02%</td></tr><tr><td>수준+충격</td><td>12.85% / 0.942 / -12.98%</td><td>18.62% / 1.379 / -11.18%</td></tr><tr class="winner"><td>선정식 · 수준+충격+가속</td><td>12.92% / 0.949 / -12.98%</td><td>18.44% / 1.363 / -11.13%</td></tr></tbody></table></div>
+<p class="subtle">2018년 이후만 보면 수준+충격 조합의 숫자가 선정식보다 더 좋아 보인다. 그러나 그 조합은 잠금구간 결과를 본 뒤 바꾸지 않았다. 선정식은 사전구간 규칙으로 고정됐고, 잠금구간은 선택을 뒤집는 데 쓰지 않았다.</p>
+</section>
+
+<section class="section" id="option"><h2>11. 옵션 자산 매수·매도 결정</h2><p class="lead">옵션 확장은 <b>풋을 매수한 뒤 청산하는 long-put 슬리브</b>다. 여기서 “매도”는 신규 풋 매도(short put)가 아니라 보유한 풋을 파는 청산이다. 의사결정은 <a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>build_vix6_trade_signals()</code></a> <span class="line">L258</span>, 종목 선택은 <a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>select_monthly_put_trades()</code></a> <span class="line">L297</span>, 최종 비중은 <a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>run_option_allocation()</code></a> <span class="line">L522</span>에 구현돼 있다.</p>
+<h3>11-1. 진입 점수와 매수 조건</h3>
+<div class="formula">ramp(x; θ, w) = clip((x - θ) / w, 0, 1)
+
+left  = ramp(left_tail,      0.25, 1.75)
+asym  = ramp(asymmetry,      0.25, 1.75)
+imp   = ramp(left_impulse_z, 0.25, 1.75)
+bread = ramp(breadth_z,      0.00, 2.00)
+
+entry_score = max(left, asym, imp) × (0.50 + 0.50 × bread)
+BUY long KOSPI200 put if entry_score ≥ 0.20</div>
+<ul><li>모든 VIX6 특징은 <code>shift(1)</code> 후 사용한다. 신호일은 체결일보다 엄격히 앞선다.</li><li>그 달 조건을 처음 만족한 유동성 있는 풋 중 절대델타 5–15%, DTE 30–60일을 남긴다.</li><li>목표 10델타, 목표 DTE 45일에 가장 가깝고, 동률이면 거래량이 큰 종목을 한 개 고른다.</li><li>실제 완결 거래는 <b>39건</b>, 진입 델타는 0.087–0.130, DTE는 30–34일였다.</li></ul>
+<h3>11-2. 회복 점수와 매도/청산 조건</h3>
+<div class="formula">recovery_score =
+    0.50 × clip((-left_change_5) / 1.50, 0, 1)
+  + 0.30 × clip((-left_impulse_z) / 1.50, 0, 1)
+  + 0.20 × clip((right_tail - left_tail) / 1.50, 0, 1)
+
+SELL/CLOSE held put at the first liquid quote if recovery_score ≥ 0.35
+otherwise CLOSE at the last liquid same-contract quote of the month</div>
+<p>회복 신호 청산은 <b>29건</b>, 월말 롤 청산은 <b>10건</b>이었다. 진입과 청산 모두 거래량이 0보다 큰 관측치만 허용한다.</p>
+<h3>11-3. 옵션 비중</h3>
+<div class="formula">g(score) ∈ {score, sqrt(score), score², max(score, logistic_severity)}
+w_option = w_max × g(entry_score),  w_max ∈ {0.5%, 1%, 2%, 3%}
+w_existing_four_asset_sleeve = 1 - w_option
+
+mixed_growth = (1 - w_option) × four_asset_growth
+             + w_option × option_growth
+             - 2 × 15bp × w_option</div>
+<p>옵션 프리미엄을 공짜 레버리지로 더하지 않는다. 옵션 비중만큼 기존 네 자산 슬리브를 줄여 합이 100%가 되게 한다. 후보의 물리적 매수가는 종가×(1+슬리피지), 매도가는 종가×(1−슬리피지)다. VKOSPI가 80·90·97 분위수 또는 5일 충격 2.5 이상이면 슬리피지 배수를 1.25·1.5·2배로 올린다.</p>
+<div class="decision"><div class="branch yes"><b>승격 조건</b><p>Base와 Conservative 슬리피지 모두에서 전체기간 CAGR↑, Sharpe↑, MDD 개선.</p></div><div class="gate">→</div><div class="branch no"><b>현재 결과</b><p>강건 후보 0개. 최종 옵션 비중 0%, 기존 Robust VKOSPI 유지.</p></div></div>
+</section>
+
+<section class="section" id="results"><h2>12. 성과 결과를 어떻게 읽을 것인가</h2>
+<h3>12-1. 현재 전체 경로</h3><div class="table-wrap"><table><thead><tr><th>경로</th><th>개월</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>Calmar</th></tr></thead><tbody><tr class="winner"><td><b>현재 기준 · 전체 2007-04–2026-07</b></td><td>232</td><td>15.64%</td><td>1.133</td><td>-12.96%</td><td>1.207</td></tr><tr class="winner"><td><b>현재 기준 · 잠금표기 2018-01–2026-07</b></td><td>103</td><td>20.91%</td><td>1.497</td><td>-9.76%</td><td>2.142</td></tr><tr><td>구 배포 SJM10 · 전체</td><td>232</td><td>15.34%</td><td>1.128</td><td>-12.98%</td><td>1.182</td></tr><tr><td>구 배포 SJM10 · 2018 이후</td><td>103</td><td>18.44%</td><td>1.363</td><td>-11.13%</td><td>1.656</td></tr></tbody></table></div>
+<p class="subtle">무SJM 변형은 2007–2017 전체 사전구간에서 구 SJM10보다 낮았다(CAGR 11.59% vs 12.92%, Sharpe 0.857 vs 0.949). 그러므로 잠금 이후 숫자가 좋아졌다는 이유만으로 “사전 승격 게이트를 통과한 새 배포판”이라고 표현하지 않는다. 현재 작업공간의 비교 기준이라는 뜻이다.</p>
+<h3>12-2. 오버레이만 바꾼 순수 비교 · 2018–2026</h3><div class="table-wrap"><table><thead><tr><th>전략</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>Calmar</th></tr></thead><tbody><tr><td>기존 동적 VKOSPI</td><td>18.30%</td><td>1.329</td><td>-11.29%</td><td>1.621</td></tr><tr class="winner"><td><b>Robust VKOSPI</b></td><td>18.44%</td><td>1.363</td><td>-11.13%</td><td>1.656</td></tr><tr class="delta"><td>차이</td><td>+0.14%p</td><td>0.0341</td><td>+0.16%p</td><td>0.0354</td></tr></tbody></table></div>
+<p>Robust 오버레이의 잠금 개선폭은 CAGR 약 +0.14%p, Sharpe +0.0341, MDD +0.16%p다. 방향은 세 지표 모두 좋지만 크기는 작다. 6개월 블록 부트스트랩에서 CAGR 개선 확률 57.5%, Sharpe 86.8%, MDD 64.4%, 세 지표 동시개선 확률은 <b>40.4%</b>였다.</p>
+<h3>12-3. 비용 2배</h3><div class="table-wrap"><table><thead><tr><th>비용</th><th>전략</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>월평균 turnover</th></tr></thead><tbody><tr><td>기본비용</td><td>기존</td><td>17.74%</td><td>1.294</td><td>-11.59%</td><td>0.163</td></tr><tr class="winner"><td>기본비용</td><td>Robust</td><td>17.89%</td><td>1.328</td><td>-11.44%</td><td>0.163</td></tr><tr><td>비용 2배</td><td>기존</td><td>16.99%</td><td>1.244</td><td>-11.98%</td><td>0.163</td></tr><tr class="winner"><td>비용 2배</td><td>Robust</td><td>17.13%</td><td>1.276</td><td>-11.83%</td><td>0.163</td></tr></tbody></table></div>
+<h3>12-4. 옵션 자산 후보</h3><div class="table-wrap"><table><thead><tr><th>전략</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>판정</th></tr></thead><tbody><tr class="winner"><td><b>옵션 없음 · 현재 Robust 기준</b></td><td>15.64%</td><td>1.133</td><td>-12.96%</td><td>채택</td></tr><tr><td>Base · <code>Base_vix6_squared_w0.005</code></td><td>15.50%</td><td>1.123</td><td>-12.96%</td><td>기각</td></tr><tr class="delta"><td>옵션 후보 − 기준</td><td>-0.14%p</td><td>-0.0093</td><td>+0.00%p</td><td>3개 동시개선 실패</td></tr></tbody></table></div>
+<p>Base 비용의 최선도 옵션 없는 기준보다 CAGR과 Sharpe가 낮았다. MDD는 사실상 같았다. “옵션이 위기 때 오를 수 있다”는 아이디어와 “장기간 프리미엄·슬리피지까지 포함해 포트폴리오 성과를 높인다”는 결과는 다르다.</p>
+<h3>12-5. VIX6 입력·단독·혼합 오버레이 · 2018–2026</h3><div class="table-wrap"><table><thead><tr><th>대안</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>기준 대비 CAGR / Sharpe / MDD</th><th>3개 동시</th></tr></thead><tbody><tr><td><code>VIX6_Hybrid_Overlay</code></td><td>20.93%</td><td>1.497</td><td>-9.76%</td><td>+0.02%p / -0.0002 / +0.00%p</td><td>실패</td></tr><tr><td><code>VIX6_Logistic_Input</code></td><td>19.99%</td><td>1.462</td><td>-10.15%</td><td>-0.91%p / -0.0349 / -0.39%p</td><td>실패</td></tr><tr><td><code>VIX6_Standalone_Overlay</code></td><td>21.48%</td><td>1.395</td><td>-9.88%</td><td>+0.58%p / -0.1019 / -0.12%p</td><td>실패</td></tr></tbody></table></div>
+<p>VIX6 단독은 CAGR을 높였지만 Sharpe와 MDD가 악화했고, 혼합은 CAGR이 소폭 높지만 Sharpe가 아주 조금 낮았다. 정해 둔 3개 동시개선 규칙에 따라 기존 Robust VKOSPI가 유지됐다.</p>
+</section>
+
+<section class="section" id="validation"><h2>13. 검증, 강건성, 남은 한계</h2>
+<div class="grid">
+ <article class="card"><h3>인과적 정렬</h3><p>월간 신호월&lt;투자월, 로지스틱 2개월 embargo, VKOSPI·VIX6 signal_date&lt;체결일을 테스트가 강제한다.</p></article>
+ <article class="card"><h3>재현성</h3><p>로지스틱 확률 최대 오차 7.8e−15, 포트폴리오 수익 최대 오차 1.1e−16으로 저장 결과를 재현했다.</p></article>
+ <article class="card"><h3>강건성</h3><p>Robust 후보 810개, 로지스틱 후보 28개, 비용 2배, 6개월 블록 부트스트랩, 성분 절삭실험을 기록했다.</p></article>
+</div>
+<div class="callout red"><b>가장 큰 경고:</b> 로지스틱 후보의 사전구간 포트폴리오 Sharpe CSCV/PBO는 95.7%로 높다. 선택된 균형 L2 후보가 2018년 이후 포트폴리오 순위 1위를 유지했어도, 여러 후보 가운데 성과가 좋은 것을 고르는 과정의 과적합 위험은 크다는 뜻이다.</div>
+<ul><li><b>데이터 범위:</b> 요청은 2007–2026이지만 실제 공통 수익 경로는 2007-04–2026-07이다.</li><li><b>수정·생존편향:</b> 거시/OAP/ETF 데이터의 과거 가용성과 수정 이력은 실시간 데이터베이스 수준으로 완전히 재현하지 못할 수 있다.</li><li><b>옵션 체결:</b> bid/ask 원자료가 없어 종가와 델타 버킷·틱 하한으로 슬리피지를 모형화했다. fractional contract도 허용했다.</li><li><b>옵션 후보 선택:</b> 2007–2026 결과를 보며 추가한 사후 탐색이다. 그래서 옵션을 채택하지 않은 판정은 보수적이지만, 이 구간을 새 전략의 깨끗한 홀드아웃으로 부를 수 없다.</li><li><b>성과지표:</b> Sharpe는 월수익 기반 연율화이며 별도 무위험 초과수익을 빼지 않은 프로젝트 내 공통 정의다.</li></ul>
+</section>
+
+<section class="section" id="run"><h2>14. 재실행 순서</h2><p class="lead">캐시와 결과 파일이 이미 있는 현재 작업공간에서 아래 순서로 재현할 수 있다. 옵션 원시 표면 재생성은 시간이 오래 걸릴 수 있으므로 기본 실행은 캐시를 사용한다.</p>
+<div class="formula">$py = "D:\Programming\python_example\Arcana\.venv-llama\Scripts\python.exe"
+
+# 1) Robust VKOSPI 오버레이 후보·잠금 검증
+&amp; $py vkospi_robust_dynamic_experiment.py
+&amp; $py vkospi_robust_dynamic_attribution.py
+
+# 2) 현재 무SJM + 균형 로지스틱 + Robust VKOSPI 전체 경로
+&amp; $py balanced_logistic_no_sjm_strategy.py
+
+# 3) VIX6 기반 옵션 매수·청산·비중·슬리피지 비교
+&amp; $py option_asset_slippage_experiment.py
+
+# 4) 핵심 회귀 테스트
+&amp; $py -m pytest -q test_vkospi_robust_dynamic_experiment.py `
+    test_balanced_logistic_no_sjm_strategy.py `
+    test_option_asset_slippage_experiment.py
+
+# 5) 이 설명서 재생성
+&amp; $py build_robust_vkospi_implementation_guide.py</div>
+<p>전략을 코드에서 따라갈 때는 <a href="../../strategies/stage06_vkospi/balanced_logistic_no_sjm_strategy.py"><code>fixed_robust_overlay()</code></a> <span class="line">L337</span>, <a href="../../strategies/stage06_vkospi/vkospi_robust_dynamic_experiment.py"><code>stress_from_features()</code></a> <span class="line">L117</span>, <a href="../../strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py"><code>simulate()</code></a> <span class="line">L260</span>, <a href="../../strategies/stage06_vkospi/vkospi_dynamic_risk_experiment.py"><code>reconcile_to_monthly_reference()</code></a> <span class="line">L386</span>, <a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>build_vix6_trade_signals()</code></a> <span class="line">L258</span>, <a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>select_monthly_put_trades()</code></a> <span class="line">L297</span>, <a href="../../strategies/stage08_options/option_asset_slippage_experiment.py"><code>run_option_allocation()</code></a> <span class="line">L522</span> 순으로 보면 된다.</p>
+</section>
+
+</main></div>
+<footer><div class="shell"><b>Robust VKOSPI implementation guide</b><br><span>코드·CSV·JSON 산출물을 자동으로 읽어 만든 단일 HTML. 투자 권유가 아니라 연구 구현·백테스트 감사 문서다.</span></div></footer>
+<script>
+const links=[...document.querySelectorAll('.toc a')];
+const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}})},{rootMargin:'-15% 0px -75% 0px'});
+sections.forEach(s=>observer.observe(s));
+</script>
+</body></html>

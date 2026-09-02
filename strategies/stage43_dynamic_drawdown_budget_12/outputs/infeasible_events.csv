@@ -1,0 +1,2 @@
+month,current_drawdown,remaining_loss_budget,reason,message
+2008-11,-0.13890782242781496,0.02195795400339695,DrawdownFloorAlreadyBreached,Current drawdown -13.890782% is already below -12%.

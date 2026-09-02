@@ -1,0 +1,121 @@
+{
+  "method": {
+    "paper": "Pagliaro (2026), Regime-Aware LightGBM",
+    "adaptation": "10-day KODEX200 direction probability used as a monthly allocation tilt in FinalBlend",
+    "korean_hmm_inputs": [
+      "KOSPI200 20-day return",
+      "KOSPI200 20-day realized volatility",
+      "USDKRW 20-day return",
+      "KOSPI200 positive-day fraction over 20 days"
+    ],
+    "global_feature_timing": "All US-market features lagged by one Korean trading session",
+    "hmm_covariance": "diagonal (Korean computational adaptation; source paper used full covariance)",
+    "hmm_refit_interval_trading_days": 63,
+    "hmm_rolling_history_trading_days": 756,
+    "hmm_em_iteration_cap": 5,
+    "horizon_trading_days": 10,
+    "factor_oos_start": "2005-01",
+    "portfolio_common_start": "2007-04",
+    "calibration_end": "2017-12",
+    "locked_test_start": "2018-01",
+    "calibration_common_start": "2007-04"
+  },
+  "winner_feature_variant": "kr_only",
+  "winner": {
+    "max_shift": 0.0,
+    "probability_scale": 0.15,
+    "hard_fraction": 0.4,
+    "leverage": 1.2,
+    "financing_rate": 0.04
+  },
+  "prediction_metrics_by_variant_full": {
+    "kr_only": {
+      "observations": 259,
+      "auc": 0.524561403508772,
+      "balanced_accuracy": 0.5153357531760435,
+      "brier_score": 0.2492749555523895,
+      "mean_probability": 0.5747294288863263,
+      "positive_rate": 0.5598455598455598
+    },
+    "kr_plus_global": {
+      "observations": 259,
+      "auc": 0.49455535390199634,
+      "balanced_accuracy": 0.4824258923169994,
+      "brier_score": 0.252825302796874,
+      "mean_probability": 0.5755381893271989,
+      "positive_rate": 0.5598455598455598
+    },
+    "us_paper_original": {
+      "observations": 259,
+      "auc": 0.4765880217785844,
+      "balanced_accuracy": 0.5078039927404718,
+      "brier_score": 0.2543163835411065,
+      "mean_probability": 0.5739363013549418,
+      "positive_rate": 0.5598455598455598
+    }
+  },
+  "prediction_metrics_by_variant_locked": {
+    "kr_only": {
+      "observations": 103,
+      "auc": 0.43784421715184896,
+      "balanced_accuracy": 0.5121951219512195,
+      "brier_score": 0.241090693511233,
+      "mean_probability": 0.5732261341104297,
+      "positive_rate": 0.6019417475728155
+    },
+    "kr_plus_global": {
+      "observations": 103,
+      "auc": 0.43548387096774194,
+      "balanced_accuracy": 0.459874114870181,
+      "brier_score": 0.2474209229286555,
+      "mean_probability": 0.5641440992246965,
+      "positive_rate": 0.6019417475728155
+    },
+    "us_paper_original": {
+      "observations": 103,
+      "auc": 0.3933910306845004,
+      "balanced_accuracy": 0.4761998426435877,
+      "brier_score": 0.2556971389105885,
+      "mean_probability": 0.5539412366322163,
+      "positive_rate": 0.6019417475728155
+    }
+  },
+  "prediction_metrics_full": {
+    "observations": 259,
+    "auc": 0.524561403508772,
+    "balanced_accuracy": 0.5153357531760435,
+    "brier_score": 0.2492749555523895,
+    "mean_probability": 0.5747294288863263,
+    "positive_rate": 0.5598455598455598
+  },
+  "prediction_metrics_locked": {
+    "observations": 103,
+    "auc": 0.43784421715184896,
+    "balanced_accuracy": 0.5121951219512195,
+    "brier_score": 0.241090693511233,
+    "mean_probability": 0.5732261341104297,
+    "positive_rate": 0.6019417475728155
+  },
+  "locked_deltas": {
+    "CAGR": 0.0,
+    "Sharpe": 0.0,
+    "MDD": 0.0,
+    "Calmar": 0.0
+  },
+  "bootstrap": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.0,
+    "sharpe_delta_p05": 0.0,
+    "sharpe_delta_median": 0.0,
+    "sharpe_delta_p95": 0.0
+  },
+  "gates": {
+    "nonzero_factor_selected_in_calibration": false,
+    "locked_sharpe_delta_at_least_0_02": false,
+    "locked_calmar_delta_at_least_0_05": false,
+    "locked_mdd_within_15": true,
+    "locked_cagr_retention_at_least_95pct": true,
+    "performance_improved": false
+  }
+}

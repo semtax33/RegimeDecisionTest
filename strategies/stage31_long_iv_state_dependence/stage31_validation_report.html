@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage 31 장기 버킷 IV·상태의존성 검증</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #dce3ea;
+      --paper: #ffffff;
+      --wash: #f4f7fa;
+      --navy: #142d4c;
+      --blue: #2563a6;
+      --green: #18794e;
+      --red: #b42318;
+      --amber: #a15c00;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--wash);
+      color: var(--ink);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      line-height: 1.72;
+    }
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 28px auto 64px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 48px rgba(20, 45, 76, 0.08);
+    }
+    header {
+      padding: 48px 56px 42px;
+      color: white;
+      background: linear-gradient(135deg, #10233c, #214b73);
+    }
+    header .eyebrow { color: #bcd5ec; font-size: 13px; letter-spacing: .08em; }
+    h1 { margin: 8px 0 12px; font-size: clamp(28px, 4vw, 44px); line-height: 1.25; }
+    header p { max-width: 840px; margin: 0; color: #e6eef6; }
+    section { padding: 34px 56px; border-bottom: 1px solid var(--line); }
+    h2 { margin: 0 0 18px; color: var(--navy); font-size: 25px; }
+    h3 { margin: 26px 0 10px; color: var(--blue); font-size: 18px; }
+    p { margin: 10px 0; }
+    .verdict {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+    .callout, .card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 20px 22px;
+      background: #fbfcfe;
+    }
+    .callout { border-left: 5px solid var(--red); }
+    .callout strong { color: var(--red); }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .kpi { padding: 17px; border-radius: 9px; background: #edf4fa; }
+    .kpi span { display: block; color: var(--muted); font-size: 12px; }
+    .kpi b { display: block; margin-top: 4px; font-size: 23px; color: var(--navy); }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 8px; font-size: 14px; }
+    th { background: var(--navy); color: white; text-align: left; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .good { color: var(--green); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .neutral { color: var(--amber); font-weight: 700; }
+    code, pre { font-family: Consolas, "D2Coding", monospace; }
+    pre {
+      padding: 16px 18px;
+      overflow-x: auto;
+      border-radius: 8px;
+      color: #edf5fc;
+      background: #14263b;
+    }
+    .formula { font-size: 15px; }
+    .chart { width: 100%; margin-top: 18px; border: 1px solid var(--line); border-radius: 8px; }
+    .note { color: var(--muted); font-size: 13px; }
+    ul { padding-left: 22px; }
+    li { margin: 6px 0; }
+    .decision { border-left: 5px solid var(--green); background: #f2faf6; }
+    footer { padding: 24px 56px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 760px) {
+      header, section, footer { padding-left: 24px; padding-right: 24px; }
+      .verdict { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">REGIME DECISION TEST · STAGE 31 VALIDATION</div>
+    <h1>1997~2026 버킷 IV로 다시 본<br>Stage 30 ODS의 상태의존성</h1>
+    <p>원본 XLSX를 훼손하지 않고 장기 옵션 비대칭, 구조변화, 거시 Fragility, VIX6 Stress, reliability shrinkage를 한 번에 검증한 결과다. 신호와 판정 기준은 결과 확인 전에 고정했다.</p>
+  </header>
+
+  <section>
+    <div class="verdict">
+      <div class="callout">
+        <h2>결론</h2>
+        <p><strong>피드백의 state-dependent alpha 가설은 현재 표본에서 지지되지 않았다.</strong> ODS의 초기·후기 IC 부호는 달라졌지만 구조변화 p값은 0.405였고, Macro Fragility와 VIX6 Stress interaction도 각각 p=0.779, p=0.725로 불명확했다.</p>
+        <p>Reliability Stage 31은 Sharpe를 0.0025 높이는 대신 CAGR과 MDD를 모두 훼손했다. 따라서 Fragility interaction도, Stage 31 reliability도 승격하지 않는다.</p>
+      </div>
+      <div class="card">
+        <div class="kpis">
+          <div class="kpi"><span>Stage 31 CAGR</span><b>9.476%</b></div>
+          <div class="kpi"><span>Stage 31 Sharpe</span><b>0.982</b></div>
+          <div class="kpi"><span>Stage 31 MDD</span><b>-14.03%</b></div>
+        </div>
+        <p class="note">2007-04~2026-07, 무레버리지·롱온리·기존 SLSQP/VIX6 엔진 유지</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. XLSX에서 무엇을 읽었나</h2>
+    <p><b>260829_옵션내재변동성.xlsx</b>는 최근월물과 차근월물 두 시트로 구성되어 있다. 각 시트에는 CALL/PUT ATM, ITM1~4, OTM1~4 일별 IV가 들어 있으며 실제 관측은 1997-07-07부터 시작한다.</p>
+    <pre class="formula">WingAsym_near = IV(PUT OTM2, 최근월) - IV(CALL OTM2, 최근월)
+BucketDirection_near = -WingAsym_near  # Stage 30과 동일하게 양수=bullish</pre>
+    <p>주 검정은 최근월 OTM2 하나로 고정했다. 차근월 OTM2와 최근·차근월 평균은 강건성 검정일 뿐 후보 선택에 쓰지 않았다. 다음 달 KOSPI200 수익률은 K200 최근월 선물 종가로 만들었고, 2000년 이후에는 현물 종가로도 교차확인했다.</p>
+  </section>
+
+  <section>
+    <h2>2. 장기 버킷 IV 결과</h2>
+    <table>
+      <thead><tr><th>구간</th><th class="num">BucketDirection IC</th><th class="num">표준화 beta</th><th class="num">HAC p값</th></tr></thead>
+      <tbody>
+        <tr><td>1997~2026 전체</td><td class="num bad">-0.138</td><td class="num">-1.94%</td><td class="num">0.098</td></tr>
+        <tr><td>1997~2006</td><td class="num">-0.177</td><td class="num">-3.42%</td><td class="num">0.116</td></tr>
+        <tr><td>2007~2017</td><td class="num">-0.103</td><td class="num">-0.05%</td><td class="num">0.951</td></tr>
+        <tr><td>2018~2026</td><td class="num">-0.089</td><td class="num">-1.72%</td><td class="num">0.086</td></tr>
+      </tbody>
+    </table>
+    <p>원래 WingAsym의 부호로 읽으면 전체 IC는 +0.138이다. 풋 OTM2 IV가 상대적으로 높을수록 다음 달 수익률이 높았다는 뜻이다. 이는 단순 방향예측보다 <b>공포 이후 위험프리미엄 또는 반등</b>에 가깝다.</p>
+    <p>현물수익률로 바꿔도 최근월 IC -0.113, 차근월 -0.118, 두 월물 평균 -0.123으로 부호가 유지됐다. 선물 롤만으로 생긴 결과가 아니다.</p>
+  </section>
+
+  <section>
+    <h2>3. Stage 30 ODS는 정말 구조적으로 바뀌었나</h2>
+    <table>
+      <thead><tr><th>구간</th><th class="num">ODS score IC</th><th class="num">표준화 beta</th><th class="num">HAC p값</th></tr></thead>
+      <tbody>
+        <tr><td>2006~2026 전체</td><td class="num">0.026</td><td class="num">0.40%</td><td class="num">0.437</td></tr>
+        <tr><td>2007~2017</td><td class="num bad">-0.065</td><td class="num">-0.03%</td><td class="num">0.948</td></tr>
+        <tr><td>2018~2026</td><td class="num good">0.111</td><td class="num">0.83%</td><td class="num">0.379</td></tr>
+      </tbody>
+    </table>
+    <p>표본상으로는 분명 후기 개선이 보인다. 하지만 2018년 더미와 ODS×후기더미를 넣은 HAC 구조변화 검정의 p값은 <b>0.405</b>다. 장기 버킷 IV의 같은 검정도 p=0.355다. “후기에 좋아 보인다”와 “2018년에 구조가 바뀌었다”는 같은 말이 아니다.</p>
+    <img class="chart" src="outputs/rolling_beta_paths.png" alt="ODS와 장기 버킷 IV의 expanding beta 경로">
+    <p class="note">각 시점의 beta는 그 월보다 먼저 실현된 자료만 사용한 expanding 추정이다. 붉은 점선은 2018-01이다.</p>
+  </section>
+
+  <section>
+    <h2>4. Macro Fragility와 VIX6 상태</h2>
+    <table>
+      <thead><tr><th>Soft state</th><th class="num">Stage 30 ODS 가중 IC</th></tr></thead>
+      <tbody>
+        <tr><td>Goldilocks</td><td class="num">0.015</td></tr>
+        <tr><td>Overheating</td><td class="num">0.015</td></tr>
+        <tr><td>Slowdown</td><td class="num">0.011</td></tr>
+        <tr><td>Stagflation</td><td class="num">0.088</td></tr>
+        <tr><td>VIX6 저스트레스</td><td class="num">0.025</td></tr>
+        <tr><td>VIX6 고스트레스</td><td class="num">0.024</td></tr>
+      </tbody>
+    </table>
+    <pre class="formula">Fragility = p(Slowdown) + p(Stagflation)
+Return = a + beta·ODS + delta·Fragility + gamma·ODS·Fragility + error</pre>
+    <ul>
+      <li>Macro Fragility interaction: gamma 0.0803, p=0.779</li>
+      <li>VIX6 Stress interaction: gamma -0.1300, p=0.725</li>
+    </ul>
+    <p>두 interaction 모두 추정오차가 훨씬 크다. Slowdown·Stagflation에서 ODS가 음수로 바뀔 것이라는 예시도 재현되지 않았다. 이 상태에서 interaction 전략을 만들면 진단 결과가 아니라 자유도 추가가 된다.</p>
+  </section>
+
+  <section>
+    <h2>5. Reliability shrinkage는 왜 실패했나</h2>
+    <pre class="formula">z = beta_hat / SE(beta_hat)
+Reliability = z² / (1 + z²)
+mu_adjustment = max(beta_hat, 0) · Reliability · ODS_score</pre>
+    <p>식 자체는 합리적이고 임계값도 없다. 문제는 ODS slope의 증거가 너무 약했다는 데 있다. 전체기간 평균 reliability는 0.110, 중앙값은 0.0159였다. 기대수익 조정의 평균 절댓값이 0.000657에서 0.000174로 약 74% 줄었다.</p>
+    <p>결국 불확실한 알파만 덜어낸 것이 아니라 Stage 30의 수익 기여도 함께 줄였다.</p>
+  </section>
+
+  <section>
+    <h2>6. 최종 성과</h2>
+    <table>
+      <thead><tr><th>전략</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th class="num">Calmar</th></tr></thead>
+      <tbody>
+        <tr><td>Stage 20 VIX6</td><td class="num">9.397%</td><td class="num good">0.987</td><td class="num">-14.015%</td><td class="num">0.671</td></tr>
+        <tr><td>Stage 30 ODS</td><td class="num good">9.782%</td><td class="num">0.980</td><td class="num good">-13.599%</td><td class="num good">0.719</td></tr>
+        <tr><td>Stage 31 Reliability</td><td class="num">9.476%</td><td class="num">0.982</td><td class="num bad">-14.027%</td><td class="num">0.676</td></tr>
+      </tbody>
+    </table>
+    <p>Stage 31은 Stage 30 대비 CAGR -0.306%p, Sharpe +0.0025, MDD -0.428%p다. 2,000회 블록 부트스트랩에서 CAGR 개선 확률은 13.7%, Sharpe 개선 확률은 58.9%였다.</p>
+  </section>
+
+  <section>
+    <div class="card decision">
+      <h2>운용·개발 판단</h2>
+      <ol>
+        <li>장기 버킷 IV를 Stage 30 방향 입력으로 추가하지 않는다.</li>
+        <li>Macro Fragility 또는 VIX6 interaction을 추가하지 않는다.</li>
+        <li>Stage 31 reliability 후보를 승격하지 않는다.</li>
+        <li>공식 기준은 Stage 20으로 유지한다.</li>
+        <li>Stage 30은 CAGR과 MDD의 교환관계를 명시한 연구 변형으로 남긴다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2>7. 무결성과 재현성</h2>
+    <p>두 원본 XLSX의 분석 전후 SHA-256, 파일 크기, 수정시각이 동일하다. 모든 파생 CSV·PNG·JSON은 `strategies/stage31_long_iv_state_dependence/outputs`에만 저장했다.</p>
+    <ul>
+      <li>옵션 IV SHA-256: 967f0a612eb8ccde36e47a5ad870e1a27c58bd43685dc9234ac4f7b46e403d6c</li>
+      <li>K200 선물 SHA-256: 4d37798c636a4716b7a7d03b71549d7195067e35718635da0db2420f019d0818</li>
+    </ul>
+    <p class="note">본 검증은 과거 자료에 대한 연구 결과다. 구조변화·상태의존성의 부재를 영구적으로 증명하는 것이 아니라, 현재 표본에서 해당 가설을 채택할 증거가 부족하다는 판정이다.</p>
+  </section>
+
+  <footer>Generated from the frozen Stage 31 validation outputs · 2026-08-29</footer>
+</main>
+</body>
+</html>

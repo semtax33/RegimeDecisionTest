@@ -1,0 +1,159 @@
+{
+  "objective": "Apply feedback-ranked CJM+LightGBM, TVTP-HMM, and CJM upgrades",
+  "baseline": "Existing VKOSPI dynamic strategy (monthly reconciled authority)",
+  "risk_off_definition": "KODEX200 monthly open-to-open return below zero",
+  "timing": "features through signal month t; target return starts in month t+1",
+  "horizons_months": [
+    1,
+    3,
+    6
+  ],
+  "calibration_end": "2017-12",
+  "locked_start": "2018-01",
+  "models": {
+    "SJM": "existing sparse-jump probability with causal empirical transition propagation",
+    "CJM": "official jumpmodels.JumpModel(cont=True), online probabilities, transition propagation",
+    "TVTP-HMM": "statsmodels two-state Gaussian MarkovRegression with exog_tvtp",
+    "CJM+LightGBM": "horizon-specific LightGBM plus recent holdout Platt calibration"
+  },
+  "feature_engineering": "Level + 1M/3M momentum + rolling z-score + acceleration for macro, credit, financial conditions, VIX/VKOSPI and market variables",
+  "baseline_locked_metrics": {
+    "Months": 103.0,
+    "CAGR": 0.18298446144639158,
+    "Volatility": 0.13389120459522738,
+    "Sharpe": 1.3289531274434303,
+    "Sortino": 2.705242424492421,
+    "MDD": -0.11289722654519829,
+    "Calmar": 1.6208056393053547,
+    "FinalMultiple": 4.230614253711762,
+    "PositiveMonths": 0.6310679611650486
+  },
+  "validation": {
+    "CJM": {
+      "selected_config": {
+        "threshold": 0.5,
+        "max_shift": 0.1,
+        "bond_share": 1.0,
+        "horizon_weights": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "locked_metrics": {
+        "Months": 103.0,
+        "CAGR": 0.18099064806167475,
+        "Volatility": 0.13284934305363927,
+        "Sharpe": 1.3254795042238599,
+        "Sortino": 2.69697754822058,
+        "MDD": -0.11289722654519829,
+        "Calmar": 1.6031452109163666,
+        "FinalMultiple": 4.169802026358442,
+        "PositiveMonths": 0.6310679611650486
+      },
+      "locked_deltas": {
+        "CAGR": -0.001993813384716825,
+        "Sharpe": -0.003473623219570454,
+        "MDD": 0.0,
+        "Calmar": -0.01766042838898807
+      },
+      "passes_all_three": false,
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_cagr_improves": 0.0226,
+        "probability_sharpe_improves": 0.267,
+        "probability_mdd_improves": 0.499,
+        "probability_all_three_improve": 0.0134
+      }
+    },
+    "TVTP-HMM": {
+      "selected_config": {
+        "threshold": 0.5,
+        "max_shift": 0.4,
+        "bond_share": 1.0,
+        "horizon_weights": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "locked_metrics": {
+        "Months": 103.0,
+        "CAGR": 0.1405013327905844,
+        "Volatility": 0.1086186607290812,
+        "Sharpe": 1.2703052906583194,
+        "Sortino": 2.4430422220179744,
+        "MDD": -0.11377065783069129,
+        "Calmar": 1.2349522756532936,
+        "FinalMultiple": 3.0908096442037603,
+        "PositiveMonths": 0.6213592233009708
+      },
+      "locked_deltas": {
+        "CAGR": -0.04248312865580717,
+        "Sharpe": -0.058647836785110874,
+        "MDD": -0.0008734312854929982,
+        "Calmar": -0.38585336365206113
+      },
+      "passes_all_three": false,
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_cagr_improves": 0.0018,
+        "probability_sharpe_improves": 0.2334,
+        "probability_mdd_improves": 0.7376,
+        "probability_all_three_improve": 0.0016
+      }
+    },
+    "CJM+LightGBM": {
+      "selected_config": {
+        "threshold": 0.5,
+        "max_shift": 0.4,
+        "bond_share": 1.0,
+        "horizon_weights": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "locked_metrics": {
+        "Months": 103.0,
+        "CAGR": 0.1822288646779211,
+        "Volatility": 0.13356748992933476,
+        "Sharpe": 1.3270020963793743,
+        "Sortino": 2.7031432590162923,
+        "MDD": -0.11210087794674373,
+        "Calmar": 1.625579281943656,
+        "FinalMultiple": 4.207476623387751,
+        "PositiveMonths": 0.6310679611650486
+      },
+      "locked_deltas": {
+        "CAGR": -0.000755596768470479,
+        "Sharpe": -0.0019510310640560302,
+        "MDD": 0.000796348598454566,
+        "Calmar": 0.004773642638301379
+      },
+      "passes_all_three": false,
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_cagr_improves": 0.0118,
+        "probability_sharpe_improves": 0.1414,
+        "probability_mdd_improves": 0.7964,
+        "probability_all_three_improve": 0.0106
+      }
+    }
+  },
+  "probability_metric_rows": 24,
+  "cjm_fit_success_rate": 1.0,
+  "tvtp_primary_fit_rate": 1.0,
+  "lgbm_causality_audit_fields": [
+    "signal_month",
+    "horizon",
+    "max_label_month",
+    "fit_end_month",
+    "train_rows",
+    "feature_count",
+    "calibration_method"
+  ]
+}

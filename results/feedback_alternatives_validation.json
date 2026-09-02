@@ -1,0 +1,287 @@
+{
+  "factor_oos_start": "2005-01",
+  "portfolio_start": "2007-04",
+  "calibration_end": "2017-12",
+  "locked_start": "2018-01",
+  "prediction_metrics_2005_2026": {
+    "JumpModel": {
+      "observations": 259,
+      "auc": 0.552843315184513,
+      "balanced_accuracy": 0.526799758015729,
+      "brier_score": 0.4135954304664206,
+      "mean_probability": 0.5129243895166925,
+      "positive_rate": 0.5598455598455598
+    },
+    "GeneralHMM": {
+      "observations": 256,
+      "auc": 0.5259607648988179,
+      "balanced_accuracy": 0.5000309425088186,
+      "brier_score": 0.3827367391221414,
+      "mean_probability": 0.556437331689074,
+      "positive_rate": 0.55859375
+    },
+    "DurationAwareHSMM": {
+      "observations": 256,
+      "auc": 0.5254656847577202,
+      "balanced_accuracy": 0.49653443901231514,
+      "brier_score": 0.36356507989422754,
+      "mean_probability": 0.5661499201697944,
+      "positive_rate": 0.55859375
+    },
+    "EngineeredTechnical": {
+      "observations": 259,
+      "auc": 0.530550514216576,
+      "balanced_accuracy": 0.5277676950998185,
+      "brier_score": 0.2592542609514298,
+      "mean_probability": 0.5180967674458175,
+      "positive_rate": 0.5598455598455598
+    },
+    "TechnicalMLEnsemble": {
+      "observations": 259,
+      "auc": 0.480188679245283,
+      "balanced_accuracy": 0.45528301886792455,
+      "brier_score": 0.2648690410084829,
+      "mean_probability": 0.5327944341469749,
+      "positive_rate": 0.6138996138996139
+    }
+  },
+  "prediction_metrics_locked": {
+    "JumpModel": {
+      "observations": 103,
+      "auc": 0.5582218725413061,
+      "balanced_accuracy": 0.5350118017309206,
+      "brier_score": 0.4371844818397037,
+      "mean_probability": 0.36577133381649796,
+      "positive_rate": 0.6019417475728155
+    },
+    "GeneralHMM": {
+      "observations": 102,
+      "auc": 0.501008064516129,
+      "balanced_accuracy": 0.4161290322580645,
+      "brier_score": 0.4261674397247641,
+      "mean_probability": 0.559459185552393,
+      "positive_rate": 0.6078431372549019
+    },
+    "DurationAwareHSMM": {
+      "observations": 102,
+      "auc": 0.49153225806451617,
+      "balanced_accuracy": 0.4286290322580645,
+      "brier_score": 0.39751184420612184,
+      "mean_probability": 0.5761710350149511,
+      "positive_rate": 0.6078431372549019
+    },
+    "EngineeredTechnical": {
+      "observations": 103,
+      "auc": 0.569236821400472,
+      "balanced_accuracy": 0.5625491738788355,
+      "brier_score": 0.24828119499138093,
+      "mean_probability": 0.5078707635913959,
+      "positive_rate": 0.6019417475728155
+    },
+    "TechnicalMLEnsemble": {
+      "observations": 103,
+      "auc": 0.4219948849104859,
+      "balanced_accuracy": 0.43861892583120204,
+      "brier_score": 0.27590082575927877,
+      "mean_probability": 0.50870469157132,
+      "positive_rate": 0.6699029126213593
+    }
+  },
+  "validation": {
+    "JumpModel": {
+      "config": {
+        "max_shift": 0.2,
+        "probability_scale": 0.15,
+        "hard_fraction": 0.4,
+        "leverage": 1.2,
+        "financing_rate": 0.04
+      },
+      "locked_deltas": {
+        "CAGR": -0.01845080053519821,
+        "Sharpe": -0.12025417075248246,
+        "MDD": 0.012742586887168117,
+        "Calmar": -0.028290910914625433
+      },
+      "gates": {
+        "nonzero_selected": true,
+        "locked_sharpe_delta_at_least_0_02": false,
+        "locked_calmar_delta_at_least_0_05": false,
+        "locked_mdd_within_15": true,
+        "locked_cagr_retention_at_least_95pct": false,
+        "performance_improved": false
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.196,
+        "sharpe_delta_p05": -0.36195297529877984,
+        "sharpe_delta_median": -0.12089927919960208,
+        "sharpe_delta_p95": 0.11835395032215247
+      }
+    },
+    "GeneralHMM": {
+      "config": {
+        "max_shift": 0.075,
+        "probability_scale": 0.15,
+        "hard_fraction": 0.4,
+        "leverage": 1.2,
+        "financing_rate": 0.04
+      },
+      "locked_deltas": {
+        "CAGR": 0.004785442645272697,
+        "Sharpe": 0.013560348288228052,
+        "MDD": 0.024299000663406845,
+        "Calmar": 0.2615607468128578
+      },
+      "gates": {
+        "nonzero_selected": true,
+        "locked_sharpe_delta_at_least_0_02": false,
+        "locked_calmar_delta_at_least_0_05": true,
+        "locked_mdd_within_15": true,
+        "locked_cagr_retention_at_least_95pct": true,
+        "performance_improved": true
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.424,
+        "sharpe_delta_p05": -0.09704922306336201,
+        "sharpe_delta_median": -0.009499064609720609,
+        "sharpe_delta_p95": 0.07033504848140307
+      }
+    },
+    "DurationAwareHSMM": {
+      "config": {
+        "max_shift": 0.0,
+        "probability_scale": 0.15,
+        "hard_fraction": 0.4,
+        "leverage": 1.2,
+        "financing_rate": 0.04
+      },
+      "locked_deltas": {
+        "CAGR": 0.0,
+        "Sharpe": 0.0,
+        "MDD": 0.0,
+        "Calmar": 0.0
+      },
+      "gates": {
+        "nonzero_selected": false,
+        "locked_sharpe_delta_at_least_0_02": false,
+        "locked_calmar_delta_at_least_0_05": false,
+        "locked_mdd_within_15": true,
+        "locked_cagr_retention_at_least_95pct": true,
+        "performance_improved": false
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.0,
+        "sharpe_delta_p05": 0.0,
+        "sharpe_delta_median": 0.0,
+        "sharpe_delta_p95": 0.0
+      }
+    },
+    "EngineeredTechnical": {
+      "config": {
+        "max_shift": 0.0,
+        "probability_scale": 0.15,
+        "hard_fraction": 0.4,
+        "leverage": 1.2,
+        "financing_rate": 0.04
+      },
+      "locked_deltas": {
+        "CAGR": 0.0,
+        "Sharpe": 0.0,
+        "MDD": 0.0,
+        "Calmar": 0.0
+      },
+      "gates": {
+        "nonzero_selected": false,
+        "locked_sharpe_delta_at_least_0_02": false,
+        "locked_calmar_delta_at_least_0_05": false,
+        "locked_mdd_within_15": true,
+        "locked_cagr_retention_at_least_95pct": true,
+        "performance_improved": false
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.0,
+        "sharpe_delta_p05": 0.0,
+        "sharpe_delta_median": 0.0,
+        "sharpe_delta_p95": 0.0
+      }
+    },
+    "TechnicalMLEnsemble": {
+      "config": {
+        "max_shift": 0.0,
+        "probability_scale": 0.15,
+        "hard_fraction": 0.4,
+        "leverage": 1.2,
+        "financing_rate": 0.04
+      },
+      "locked_deltas": {
+        "CAGR": 0.0,
+        "Sharpe": 0.0,
+        "MDD": 0.0,
+        "Calmar": 0.0
+      },
+      "gates": {
+        "nonzero_selected": false,
+        "locked_sharpe_delta_at_least_0_02": false,
+        "locked_calmar_delta_at_least_0_05": false,
+        "locked_mdd_within_15": true,
+        "locked_cagr_retention_at_least_95pct": true,
+        "performance_improved": false
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.0,
+        "sharpe_delta_p05": 0.0,
+        "sharpe_delta_median": 0.0,
+        "sharpe_delta_p95": 0.0
+      }
+    },
+    "VolTarget15": {
+      "config": {
+        "max_shift": NaN,
+        "probability_scale": 0.15,
+        "hard_fraction": 0.4,
+        "leverage": 1.2,
+        "financing_rate": 0.04
+      },
+      "locked_deltas": {
+        "CAGR": 0.006057414861549093,
+        "Sharpe": 0.016695952775877432,
+        "MDD": 0.021629213866881547,
+        "Calmar": 0.24205631099558977
+      },
+      "gates": {
+        "nonzero_selected": true,
+        "locked_sharpe_delta_at_least_0_02": false,
+        "locked_calmar_delta_at_least_0_05": true,
+        "locked_mdd_within_15": true,
+        "locked_cagr_retention_at_least_95pct": true,
+        "performance_improved": true
+      },
+      "bootstrap": {
+        "block_length": 6,
+        "simulations": 5000,
+        "probability_sharpe_improves": 0.265,
+        "sharpe_delta_p05": -0.2170319333799342,
+        "sharpe_delta_median": -0.06752419096961815,
+        "sharpe_delta_p95": 0.12361582844796826
+      }
+    }
+  },
+  "successful_strategies": [
+    "GeneralHMM",
+    "VolTarget15"
+  ],
+  "notes": {
+    "DurationAwareHSMM": "Explicit-duration approximation over causal 3-state HMM posteriors; not a fitted parametric HSMM package.",
+    "TechnicalMLEnsemble": "Equal-weight ExtraTrees, HistGradientBoosting, and LogisticRegression; LSTM excluded.",
+    "VolTarget15": "15% annualized target with ex-ante 24-month EWMA portfolio volatility and leverage clipped to [0.5, 1.5]."
+  }
+}

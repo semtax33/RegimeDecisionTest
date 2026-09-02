@@ -1,0 +1,116 @@
+{
+  "method": {
+    "interpretation": "VKOSPI is the Korean equity implied-volatility index (domestic VIX)",
+    "timing": "previous VKOSPI close only; position earns next open-to-open return",
+    "overlay": "transfer a stress-scaled fraction of KODEX200 and USO to BOND and GLD",
+    "reconciliation": "validated monthly reference multiplied by dynamic/base daily relative return; isolates overlay alpha from frequency conversion",
+    "selection": "all CAGR, Sharpe, and MDD objectives must improve in both 2007-2017 and 2013-2017"
+  },
+  "winner": {
+    "mode": "mean",
+    "level_threshold": 0.8,
+    "momentum_window": 5,
+    "spike_threshold": 0.15,
+    "max_risk_transfer": 0.25,
+    "bond_share": 0.0,
+    "rebalance_band": 0.15,
+    "financing_rate": 0.04
+  },
+  "eligible_candidates": 96,
+  "total_candidates": 836,
+  "locked": {
+    "actual_daily": {
+      "reference": {
+        "Months": 103.0,
+        "CAGR": 0.17305246928293028,
+        "Volatility": 0.145041495838767,
+        "Sharpe": 1.1782848243369541,
+        "Sortino": 2.304534906555283,
+        "MDD": -0.12828931506483787,
+        "Calmar": 1.348923479679262,
+        "FinalMultiple": 3.9352712842710256,
+        "PositiveMonths": 0.6116504854368932
+      },
+      "candidate": {
+        "Months": 103.0,
+        "CAGR": 0.1774467653081795,
+        "Volatility": 0.13376505499524116,
+        "Sharpe": 1.2944448501077281,
+        "Sortino": 2.680844500580589,
+        "MDD": -0.11593679863800643,
+        "Calmar": 1.530547396450266,
+        "FinalMultiple": 4.0636159973261226,
+        "PositiveMonths": 0.5922330097087378
+      },
+      "deltas": {
+        "CAGR": 0.004394296025249211,
+        "Sharpe": 0.116160025770774,
+        "MDD": 0.01235251642683144,
+        "Calmar": 0.1816239167710041
+      },
+      "passes_all_three": true
+    },
+    "monthly_reference_reconciled": {
+      "reference": {
+        "Months": 103.0,
+        "CAGR": 0.17856949843487446,
+        "Volatility": 0.14500117495944875,
+        "Sharpe": 1.2114625945539084,
+        "Sortino": 2.3306117187431514,
+        "MDD": -0.12557237529490872,
+        "Calmar": 1.4220444426212466,
+        "FinalMultiple": 4.09699508969706,
+        "PositiveMonths": 0.6310679611650486
+      },
+      "candidate": {
+        "Months": 103.0,
+        "CAGR": 0.18298446144639136,
+        "Volatility": 0.1338912045952275,
+        "Sharpe": 1.3289531274434303,
+        "Sortino": 2.705242424492421,
+        "MDD": -0.11289722654519863,
+        "Calmar": 1.6208056393053478,
+        "FinalMultiple": 4.230614253711755,
+        "PositiveMonths": 0.6310679611650486
+      },
+      "deltas": {
+        "CAGR": 0.0044149630115168925,
+        "Sharpe": 0.11749053288952194,
+        "MDD": 0.012675148749710097,
+        "Calmar": 0.1987611966841012
+      },
+      "passes_all_three": true
+    },
+    "promoted": true,
+    "actual_daily_bootstrap": {
+      "probability_cagr_improves": 0.6316,
+      "probability_sharpe_improves": 0.9752,
+      "probability_mdd_improves": 0.951,
+      "probability_all_three_improve": 0.616,
+      "cagr_delta_p05": -0.01121092161681878,
+      "cagr_delta_median": 0.0032006676245346366,
+      "cagr_delta_p95": 0.019999136315012433,
+      "sharpe_delta_p05": 0.010766598062201229,
+      "sharpe_delta_median": 0.11995762817082611,
+      "sharpe_delta_p95": 0.26863908607207393,
+      "mdd_delta_p05": 0.00021753060159182547,
+      "mdd_delta_median": 0.017892547059290664,
+      "mdd_delta_p95": 0.058596143311746354
+    },
+    "reconciled_multiobjective_bootstrap": {
+      "probability_cagr_improves": 0.6316,
+      "probability_sharpe_improves": 0.9712,
+      "probability_mdd_improves": 0.912,
+      "probability_all_three_improve": 0.606,
+      "cagr_delta_p05": -0.011293376777041874,
+      "cagr_delta_median": 0.0032118134971460544,
+      "cagr_delta_p95": 0.020025826249812688,
+      "sharpe_delta_p05": 0.00812986422247537,
+      "sharpe_delta_median": 0.12002124691411298,
+      "sharpe_delta_p95": 0.2784546039265365,
+      "mdd_delta_p05": -0.0019238974525259632,
+      "mdd_delta_median": 0.01779103544677174,
+      "mdd_delta_p95": 0.05880457603770151
+    }
+  }
+}

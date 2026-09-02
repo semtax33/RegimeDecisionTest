@@ -1,0 +1,177 @@
+{
+  "candidate_count": 37,
+  "grid": {
+    "jump_penalty": [
+      0.0,
+      1.5,
+      3.0,
+      6.0
+    ],
+    "keep_features": [
+      2,
+      4,
+      6
+    ],
+    "sjm_weight": [
+      0.05,
+      0.1,
+      0.2,
+      0.3
+    ],
+    "no_sjm_candidate": true
+  },
+  "deployed_candidate": "sjm_j3_k4_w0.1",
+  "deployed_calibration_prediction_rank": 21,
+  "deployed_locked_prediction_rank": 21,
+  "deployed_calibration_soft_rank": 30,
+  "deployed_locked_soft_rank": 9,
+  "calibration_prediction_winner": "sjm_j0_k4_w0.1",
+  "calibration_prediction_winner_locked_rank": 15,
+  "calibration_soft_winner": "sjm_j0_k4_w0.2",
+  "calibration_soft_winner_locked_rank": 27,
+  "prediction_rank_correlation_calibration_vs_locked": 0.8368632024389643,
+  "soft_rank_correlation_calibration_vs_locked": -0.13247153700189754,
+  "strict_both_prelock_windows_count": 5,
+  "strict_both_prelock_windows_candidates": [
+    "sjm_j0_k4_w0.05",
+    "sjm_j0_k4_w0.1",
+    "sjm_j0_k6_w0.05",
+    "sjm_j0_k6_w0.1",
+    "sjm_j3_k4_w0.1"
+  ],
+  "prelock_macro_brier_pbo": {
+    "kind": "mean",
+    "partitions": 8,
+    "splits": 70,
+    "pbo": 0.9285714285714286,
+    "median_oos_percentile": 0.17567567567567569,
+    "median_logit": -1.5459245067117744,
+    "most_selected_candidate": "no_sjm",
+    "most_selected_share": 0.35714285714285715
+  },
+  "prelock_soft_sharpe_pbo": {
+    "kind": "sharpe",
+    "partitions": 8,
+    "splits": 70,
+    "pbo": 0.7571428571428571,
+    "median_oos_percentile": 0.06756756756756757,
+    "median_logit": -2.624668592163159,
+    "most_selected_candidate": "no_sjm",
+    "most_selected_share": 0.34285714285714286
+  },
+  "proposed_one_axis_candidate_count": 9,
+  "attempted_candidate_count": 49,
+  "valid_candidate_count": 37,
+  "invalid_candidate_count": 12,
+  "invalid_candidates": [
+    {
+      "candidate": "sjm_j6_k2_w0.05",
+      "jump_penalty": 6.0,
+      "keep_features": 2,
+      "sjm_weight": 0.05,
+      "first_bad_month": "2007-09",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-09."
+    },
+    {
+      "candidate": "sjm_j6_k2_w0.1",
+      "jump_penalty": 6.0,
+      "keep_features": 2,
+      "sjm_weight": 0.1,
+      "first_bad_month": "2007-09",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-09."
+    },
+    {
+      "candidate": "sjm_j6_k2_w0.2",
+      "jump_penalty": 6.0,
+      "keep_features": 2,
+      "sjm_weight": 0.2,
+      "first_bad_month": "2007-09",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-09."
+    },
+    {
+      "candidate": "sjm_j6_k2_w0.3",
+      "jump_penalty": 6.0,
+      "keep_features": 2,
+      "sjm_weight": 0.3,
+      "first_bad_month": "2007-09",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-09."
+    },
+    {
+      "candidate": "sjm_j6_k4_w0.05",
+      "jump_penalty": 6.0,
+      "keep_features": 4,
+      "sjm_weight": 0.05,
+      "first_bad_month": "2007-06",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-06."
+    },
+    {
+      "candidate": "sjm_j6_k4_w0.1",
+      "jump_penalty": 6.0,
+      "keep_features": 4,
+      "sjm_weight": 0.1,
+      "first_bad_month": "2007-06",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-06."
+    },
+    {
+      "candidate": "sjm_j6_k4_w0.2",
+      "jump_penalty": 6.0,
+      "keep_features": 4,
+      "sjm_weight": 0.2,
+      "first_bad_month": "2007-06",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-06."
+    },
+    {
+      "candidate": "sjm_j6_k4_w0.3",
+      "jump_penalty": 6.0,
+      "keep_features": 4,
+      "sjm_weight": 0.3,
+      "first_bad_month": "2007-06",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-06."
+    },
+    {
+      "candidate": "sjm_j6_k6_w0.05",
+      "jump_penalty": 6.0,
+      "keep_features": 6,
+      "sjm_weight": 0.05,
+      "first_bad_month": "2007-05",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-05."
+    },
+    {
+      "candidate": "sjm_j6_k6_w0.1",
+      "jump_penalty": 6.0,
+      "keep_features": 6,
+      "sjm_weight": 0.1,
+      "first_bad_month": "2007-05",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-05."
+    },
+    {
+      "candidate": "sjm_j6_k6_w0.2",
+      "jump_penalty": 6.0,
+      "keep_features": 6,
+      "sjm_weight": 0.2,
+      "first_bad_month": "2007-05",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-05."
+    },
+    {
+      "candidate": "sjm_j6_k6_w0.3",
+      "jump_penalty": 6.0,
+      "keep_features": 6,
+      "sjm_weight": 0.3,
+      "first_bad_month": "2007-05",
+      "reason": "SparseJump2 produced a non-finite state probability; recursive macro smoothing became non-finite from 2007-05."
+    }
+  ],
+  "deployed_reproduction": {
+    "observations": 232,
+    "max_absolute_growth_probability_difference": 1.1102230246251565e-16,
+    "max_absolute_inflation_probability_difference": 2.220446049250313e-16
+  },
+  "no_sjm_vs_deployed": {
+    "cal_mean_brier_delta": -0.0016972126482205918,
+    "locked_mean_brier_delta": -0.005118831681027378,
+    "locked_soft_sharpe_delta": 0.0025266947773834314,
+    "locked_proposed_sharpe_delta": 0.0028937706597573776,
+    "bootstrap_probability_no_sjm_brier_better": 0.986,
+    "bootstrap_probability_no_sjm_soft_sharpe_better": 0.5485
+  }
+}

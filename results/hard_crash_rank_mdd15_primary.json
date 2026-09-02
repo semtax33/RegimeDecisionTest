@@ -1,0 +1,10 @@
+{
+  "model_name": "gbdt_s_l5_d1",
+  "rank_threshold": 0.95,
+  "protection_fraction": 1.0,
+  "vix_threshold": 35.0,
+  "vix_fraction": 1.0,
+  "vol_cap": 0.3,
+  "dd_start": -0.05,
+  "dd_fraction": 0.75
+}

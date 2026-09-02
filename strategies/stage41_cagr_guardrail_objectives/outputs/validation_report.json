@@ -1,0 +1,292 @@
+{
+  "stage": 41,
+  "base": "Stage36_GVZ_OVXAssetRisk",
+  "objective": "maximize causal historical CAGR",
+  "candidate_definitions": {
+    "A": "maximize CAGR subject to historical MDD >= -14% and Sharpe >= 1",
+    "B": "maximize CAGR subject to historical CDaR(90%) >= -16% and Sharpe >= 1; realized MDD >= -14% is a validation gate"
+  },
+  "preserved": {
+    "monthly_asset_returns": "Stage36 input loader",
+    "monthly_execution_and_costs": "Stage36 definitions",
+    "long_only_unlevered_sum_one": true,
+    "single_asset_majority_cap": false
+  },
+  "deliberately_not_used": {
+    "future_realized_returns_in_optimization": true,
+    "calmar_or_sortino_ratio_objective": true,
+    "objective_weighting": true,
+    "guardrail_relaxation_when_infeasible": true,
+    "stage36_13pct_volatility_constraint": true
+  },
+  "important_scope_note": "The supplied feedback defines CAGR, MDD and Sharpe from strictly prior historical asset returns. Therefore Stage36 macro/technical/GVZ/OVX forecasts do not enter the new objective; Stage36 is preserved as the data, execution, cost and frozen comparison framework.",
+  "thresholds": {
+    "mdd": -0.14,
+    "sharpe": 1.0,
+    "cdar": -0.16,
+    "cdar_confidence": 0.9
+  },
+  "anti_overfit": {
+    "candidate_count": 2,
+    "threshold_grid_search": false,
+    "lookback_grid_search": false,
+    "infeasible_guardrail_relaxation": false,
+    "realized_validation_metrics_used_in_optimizer": false
+  },
+  "stage36_frozen_files_unchanged": true,
+  "return_audit": "              KODEX200    BOND            GLD            USO\nmonth                                                       \n2000-01    9692.569130     NaN            NaN            NaN\n2000-02    8977.250375     NaN            NaN            NaN\n2000-03    8149.417941     NaN            NaN            NaN\n2000-04    8112.161756     NaN            NaN            NaN\n2000-05    6865.569800     NaN            NaN            NaN\n...                ...     ...            ...            ...\n2026-04   79418.443045  198.97  653948.530884  187705.779231\n2026-05  102320.600161  197.78  621162.563613  211564.654902\n2026-06  134724.294640  195.38  617593.406318  204402.832167\n2026-07  139384.758222  194.27  574859.499430  161907.178694\n2026-08  101980.000000  194.62  531352.560692  173432.558483\n\n[320 rows x 4 columns]",
+  "checks": {
+    "Stage41_CAGR_HardMDD14_Sharpe1": {
+      "months": 232,
+      "all_solver_success": true,
+      "infeasible_months": 0,
+      "max_sum_error": 2.220446049250313e-16,
+      "minimum_weight": 0.0,
+      "maximum_weight": 1.0,
+      "minimum_historical_sharpe_slack": -9.895179120533726e-10,
+      "minimum_selected_guardrail_slack": -9.297089764714883e-10,
+      "all_history_ends_before_target": true
+    },
+    "Stage41_CAGR_CDaR16_Sharpe1": {
+      "months": 232,
+      "all_solver_success": true,
+      "infeasible_months": 0,
+      "max_sum_error": 2.220446049250313e-16,
+      "minimum_weight": 0.0,
+      "maximum_weight": 1.0,
+      "minimum_historical_sharpe_slack": -9.895179120533726e-10,
+      "minimum_selected_guardrail_slack": -1.2019357731318792e-11,
+      "all_history_ends_before_target": true
+    }
+  },
+  "validation_gates": {
+    "Stage36_Frozen": {
+      "period_metrics": {
+        "full_2007_2026": {
+          "CAGR": 0.10499388753644401,
+          "Sharpe": 1.1049112900976705,
+          "MDD": -0.12407087222855073
+        },
+        "common_2010_2026": {
+          "CAGR": 0.09231779291550102,
+          "Sharpe": 1.059236031302839,
+          "MDD": -0.12407087222855073
+        },
+        "locked_2018_2026": {
+          "CAGR": 0.12625620430876783,
+          "Sharpe": 1.223505157307841,
+          "MDD": -0.11931111403506678
+        }
+      },
+      "full_mdd_at_least_minus_14pct": true,
+      "full_sharpe_at_least_one": true,
+      "full_validation_pass": true,
+      "all_monthly_optimization_constraints_pass": null
+    },
+    "Stage41_CAGR_HardMDD14_Sharpe1": {
+      "period_metrics": {
+        "full_2007_2026": {
+          "CAGR": 0.09829235418537485,
+          "Sharpe": 0.7065962471503325,
+          "MDD": -0.25019198467068027
+        },
+        "common_2010_2026": {
+          "CAGR": 0.07684379164810351,
+          "Sharpe": 0.7318605508279683,
+          "MDD": -0.2354791028791653
+        },
+        "locked_2018_2026": {
+          "CAGR": 0.11857151513503372,
+          "Sharpe": 1.0501576331113316,
+          "MDD": -0.1377865315633252
+        }
+      },
+      "full_mdd_at_least_minus_14pct": false,
+      "full_sharpe_at_least_one": false,
+      "full_validation_pass": false,
+      "all_monthly_optimization_constraints_pass": true
+    },
+    "Stage41_CAGR_CDaR16_Sharpe1": {
+      "period_metrics": {
+        "full_2007_2026": {
+          "CAGR": 0.09644352269793655,
+          "Sharpe": 0.6572631326875651,
+          "MDD": -0.2535834358171307
+        },
+        "common_2010_2026": {
+          "CAGR": 0.07744454060262917,
+          "Sharpe": 0.6650047772598412,
+          "MDD": -0.2535834358171303
+        },
+        "locked_2018_2026": {
+          "CAGR": 0.11921552016416359,
+          "Sharpe": 0.9413256062489272,
+          "MDD": -0.17275773822858387
+        }
+      },
+      "full_mdd_at_least_minus_14pct": false,
+      "full_sharpe_at_least_one": false,
+      "full_validation_pass": false,
+      "all_monthly_optimization_constraints_pass": true
+    }
+  },
+  "eligible_strategies": [
+    "Stage36_Frozen"
+  ],
+  "selected_highest_cagr_strategy": "Stage36_Frozen",
+  "performance": [
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1049938875,
+      "Volatility": 0.0947174638,
+      "Sharpe": 1.1049112901,
+      "Sortino": 2.2018564577,
+      "MDD": -0.1240708722,
+      "Calmar": 0.8462412301,
+      "FinalMultiple": 6.8911377181,
+      "PositiveMonths": 0.6293103448,
+      "AvgTurnover": 0.0369775517,
+      "TotalCost": 0.0265354519
+    },
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0923177929,
+      "Volatility": 0.087193443,
+      "Sharpe": 1.0592360313,
+      "Sortino": 2.0494518521,
+      "MDD": -0.1240708722,
+      "Calmar": 0.7440730548,
+      "FinalMultiple": 4.3246840303,
+      "PositiveMonths": 0.6331658291,
+      "AvgTurnover": 0.0279465684,
+      "TotalCost": 0.0180913888
+    },
+    {
+      "Strategy": "Stage36_Frozen",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1262562043,
+      "Volatility": 0.1017821984,
+      "Sharpe": 1.2235051573,
+      "Sortino": 2.5377845953,
+      "MDD": -0.119311114,
+      "Calmar": 1.0582099189,
+      "FinalMultiple": 2.7747206697,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0261551454,
+      "TotalCost": 0.0086887009
+    },
+    {
+      "Strategy": "Stage41_CAGR_HardMDD14_Sharpe1",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0982923542,
+      "Volatility": 0.1484303326,
+      "Sharpe": 0.7065962472,
+      "Sortino": 1.2558752435,
+      "MDD": -0.2501919847,
+      "Calmar": 0.3928677184,
+      "FinalMultiple": 6.1265206004,
+      "PositiveMonths": 0.5948275862,
+      "AvgTurnover": 0.0313251105,
+      "TotalCost": 0.0223235373
+    },
+    {
+      "Strategy": "Stage41_CAGR_HardMDD14_Sharpe1",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0768437916,
+      "Volatility": 0.1095314159,
+      "Sharpe": 0.7318605508,
+      "Sortino": 1.2985797228,
+      "MDD": -0.2354791029,
+      "Calmar": 0.3263295584,
+      "FinalMultiple": 3.4134935253,
+      "PositiveMonths": 0.5929648241,
+      "AvgTurnover": 0.0172011975,
+      "TotalCost": 0.0111546128
+    },
+    {
+      "Strategy": "Stage41_CAGR_HardMDD14_Sharpe1",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1185715151,
+      "Volatility": 0.1131291309,
+      "Sharpe": 1.0501576331,
+      "Sortino": 2.0773103331,
+      "MDD": -0.1377865316,
+      "Calmar": 0.8605450314,
+      "FinalMultiple": 2.6163584046,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0157121402,
+      "TotalCost": 0.0052430379
+    },
+    {
+      "Strategy": "Stage41_CAGR_CDaR16_Sharpe1",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0964435227,
+      "Volatility": 0.159566467,
+      "Sharpe": 0.6572631327,
+      "Sortino": 1.1523036633,
+      "MDD": -0.2535834358,
+      "Calmar": 0.3803226437,
+      "FinalMultiple": 5.9301791665,
+      "PositiveMonths": 0.5818965517,
+      "AvgTurnover": 0.0326095355,
+      "TotalCost": 0.0233685188
+    },
+    {
+      "Strategy": "Stage41_CAGR_CDaR16_Sharpe1",
+      "Period": "common_2010_2026",
+      "Start": "2010-01",
+      "End": "2026-07",
+      "Months": 199.0,
+      "CAGR": 0.0774445406,
+      "Volatility": 0.1238562075,
+      "Sharpe": 0.6650047773,
+      "Sortino": 1.1629749064,
+      "MDD": -0.2535834358,
+      "Calmar": 0.3054006282,
+      "FinalMultiple": 3.4452111051,
+      "PositiveMonths": 0.5879396985,
+      "AvgTurnover": 0.0170839633,
+      "TotalCost": 0.0111859425
+    },
+    {
+      "Strategy": "Stage41_CAGR_CDaR16_Sharpe1",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1192155202,
+      "Volatility": 0.1288413583,
+      "Sharpe": 0.9413256062,
+      "Sortino": 1.7323546915,
+      "MDD": -0.1727577382,
+      "Calmar": 0.6900734021,
+      "FinalMultiple": 2.6293160757,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0159842006,
+      "TotalCost": 0.0053441205
+    }
+  ]
+}

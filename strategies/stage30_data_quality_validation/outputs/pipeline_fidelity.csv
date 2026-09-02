@@ -1,0 +1,5 @@
+Feature,Observations,MaxAbsoluteDifference
+pure_direction_raw,3937,7.16093850883226e-15
+data_quality_confidence,4995,3.3306690738754696e-16
+option_direction_score,3937,3.164135620181696e-15
+z_option_erp_proxy,4743,2.9753977059954195e-14

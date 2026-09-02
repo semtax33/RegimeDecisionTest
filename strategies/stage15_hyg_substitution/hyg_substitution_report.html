@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stage15 HYG 교체 실험</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#17212b;--muted:#5e6a75;--line:#dfe5ea;--blue:#195fa8;--green:#157347;--red:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;line-height:1.65}.wrap{max-width:1080px;margin:0 auto;padding:40px 22px 70px}header{padding:34px;border-radius:18px;background:linear-gradient(135deg,#102f4f,#1f6ea9);color:#fff}h1{margin:0 0 10px;font-size:32px}header p{margin:0;opacity:.9}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;margin-top:20px;box-shadow:0 8px 24px rgba(30,50,70,.05)}h2{margin:0 0 14px;font-size:23px}.verdict{display:grid;grid-template-columns:1fr 1fr;gap:16px}.good,.risk{border-radius:12px;padding:18px}.good{background:#eaf6ef;border-left:5px solid var(--green)}.risk{background:#fff1f0;border-left:5px solid var(--red)}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}th{background:#f7f9fb}.up{color:var(--green);font-weight:700}.down{color:var(--red);font-weight:700}pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#14202b;color:#e8f0f7;padding:18px;border-radius:12px;overflow:auto}.note{color:var(--muted);font-size:14px}.pill{display:inline-block;border-radius:99px;padding:4px 10px;background:#e8f0fa;color:var(--blue);font-weight:700;font-size:13px}ul{padding-left:22px}@media(max-width:760px){.verdict{grid-template-columns:1fr}.card{overflow-x:auto}h1{font-size:27px}}
+</style>
+</head>
+<body><main class="wrap">
+<header><span class="pill">Stage15 · 새 폴더 실험</span><h1>Stage14의 채권을 HYG로 바꾸면?</h1><p>2008-04~2026-07, 원화 환산·배당·거래비용 반영</p></header>
+
+<section class="card"><h2>한 줄 결론</h2><div class="verdict"><div class="good"><strong>비중은 유지하고 HYG만 매수</strong><br>CAGR 10.15% → 11.02%, Sharpe 0.816 → 0.838. 수익률은 개선됐다.</div><div class="risk"><strong>HYG로 완전 재최적화</strong><br>Sharpe와 MDD는 좋아졌지만 CAGR은 9.64%로 낮아졌다. 전면 대체는 수익률 개선안이 아니다.</div></div></section>
+
+<section class="card"><h2>공통 전체 구간</h2><table><thead><tr><th>전략</th><th>CAGR</th><th>변동성</th><th>Sharpe</th><th>MDD</th><th>최종 배수</th></tr></thead><tbody>
+<tr><td>Stage14 BOND</td><td>10.15%</td><td>12.89%</td><td>0.816</td><td>-22.97%</td><td>5.88</td></tr>
+<tr><td>HYG 실행자산 교체</td><td class="up">11.02%</td><td>13.63%</td><td class="up">0.838</td><td class="down">-23.15%</td><td class="up">6.80</td></tr>
+<tr><td>HYG 동적 λ 재최적화</td><td class="down">9.64%</td><td class="up">11.37%</td><td class="up">0.870</td><td class="up">-21.50%</td><td>5.41</td></tr>
+</tbody></table><p class="note">실행자산 교체는 CAGR +0.87%p, Sharpe +0.021, MDD -0.18%p. 재최적화는 CAGR -0.51%p, Sharpe +0.054, MDD +1.47%p다.</p></section>
+
+<section class="card"><h2>2018-01~2026-07 고정 구간</h2><table><thead><tr><th>전략</th><th>CAGR</th><th>변동성</th><th>Sharpe</th><th>MDD</th></tr></thead><tbody>
+<tr><td>Stage14 BOND</td><td>15.78%</td><td>13.87%</td><td>1.130</td><td>-15.90%</td></tr>
+<tr><td>HYG 실행자산 교체</td><td class="up">17.30%</td><td>14.52%</td><td class="up">1.176</td><td class="down">-16.51%</td></tr>
+<tr><td>HYG 동적 λ 재최적화</td><td class="down">13.88%</td><td class="up">11.07%</td><td class="up">1.235</td><td class="up">-14.84%</td></tr>
+</tbody></table></section>
+
+<section class="card"><h2>왜 결과가 갈렸나</h2><p>HYG는 국채형 방어자산이 아니라 신용위험을 가진 위험자산이다. 실행자산만 바꾸면 기존 채권 비중에서 HYG의 높은 수익을 얻는다. 반면 HYG 위험을 조건부 모멘트에 직접 넣으면 SLSQP가 주식 비중을 32.46%에서 21.99%로 낮추고 HYG를 36.32%까지 높인다. 이 재배치가 변동성과 MDD는 줄였지만 상승장 참여율과 CAGR도 낮췄다.</p><table><thead><tr><th>전략</th><th>KODEX200</th><th>BOND/HYG</th><th>GLD</th><th>USO</th></tr></thead><tbody><tr><td>Stage14</td><td>32.46%</td><td>19.56%</td><td>47.66%</td><td>0.32%</td></tr><tr><td>Stage15 재최적화</td><td>21.99%</td><td>36.32%</td><td>40.67%</td><td>1.02%</td></tr></tbody></table></section>
+
+<section class="card"><h2>동일하게 유지한 구조</h2><pre>maximize mu - 0.5 × variance
+            - (1 + stress) × downside semivariance
+            - transaction cost
+
+0 ≤ weight ≤ 1, sum(weight) = 1
+현금 없음 · 레버리지 없음 · 단일자산 과반 제한 없음</pre><ul><li>거시 확률과 VKOSPI·VIX6 스트레스는 Stage14와 동일</li><li>HYG는 배당·분할 조정가격을 원화로 환산</li><li>220개월 SLSQP 성공, fallback 0회</li><li>파라미터 반복 탐색 없음</li></ul></section>
+
+<section class="card"><h2>주의할 점</h2><p>HYG는 2007년 4월 설정됐으므로 최소 12개월의 인과적 학습을 확보한 2008-04부터 비교했다. 2008-12에는 네 자산의 최소 가능 예상 변동성이 13.0827%여서 13% 상한이 불가능했다. 이 한 달에만 상한을 13.0828%로 자동 완화했으며 나머지 219개월은 원래 상한을 유지했다.</p><p class="note">HYG 공식 정보: iShares iBoxx $ High Yield Corporate Bond ETF, 설정일 2007-04-04, 월배당.</p></section>
+</main></body></html>

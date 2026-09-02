@@ -1,0 +1,10 @@
+{
+  "max_exposure": 1.25,
+  "target_vol": 0.35,
+  "vix_threshold": 35.0,
+  "vix_multiplier": 0.5,
+  "dd_floor": -0.08,
+  "dd_strength": 1.0,
+  "rebalance_band": 0.1,
+  "financing_rate": 0.04
+}

@@ -1,0 +1,74 @@
+{
+  "CompositeDomestic": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.8176,
+    "sharpe_delta_p05": -0.02743120553378502,
+    "sharpe_delta_median": 0.033086187928651145,
+    "sharpe_delta_p95": 0.08728871344612098
+  },
+  "CompositePlusVol15": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.3564,
+    "sharpe_delta_p05": -0.16939716801118807,
+    "sharpe_delta_median": -0.029971642676719035,
+    "sharpe_delta_p95": 0.11032621519799785
+  },
+  "IndexVolumeRaw": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.6912,
+    "sharpe_delta_p05": -0.06774311152500455,
+    "sharpe_delta_median": 0.0328619671936915,
+    "sharpe_delta_p95": 0.13490866207349725
+  },
+  "IndexVolumeComposite": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.6734,
+    "sharpe_delta_p05": -0.07588300399228401,
+    "sharpe_delta_median": 0.031192732637787657,
+    "sharpe_delta_p95": 0.1394295667571297
+  },
+  "CompositePlusIndexVolume": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.7454,
+    "sharpe_delta_p05": -0.06500817885105,
+    "sharpe_delta_median": 0.04349738950184345,
+    "sharpe_delta_p95": 0.15014125992884914
+  },
+  "CompositeIndexVolumePlusVol15": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.48,
+    "sharpe_delta_p05": -0.15831687437788147,
+    "sharpe_delta_median": -0.004110844593542495,
+    "sharpe_delta_p95": 0.1285282271360507
+  },
+  "IndexVolumeRaw_vs_VolumeDomestic": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.2846,
+    "sharpe_delta_p05": -0.05691024137965218,
+    "sharpe_delta_median": -0.012151882091323007,
+    "sharpe_delta_p95": 0.016167129335486544
+  },
+  "CompositePlusIndexVolume_vs_CompositeDomestic": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.6092,
+    "sharpe_delta_p05": -0.04610345627596635,
+    "sharpe_delta_median": 0.009880394781480228,
+    "sharpe_delta_p95": 0.07465138489477888
+  },
+  "CompositeIndexVolumePlusVol15_vs_CompositePlusVol15": {
+    "block_length": 6,
+    "simulations": 5000,
+    "probability_sharpe_improves": 0.6492,
+    "sharpe_delta_p05": -0.034698946107370975,
+    "sharpe_delta_median": 0.019459014306466016,
+    "sharpe_delta_p95": 0.0934165345301696
+  }
+}

@@ -1,0 +1,45 @@
+D:\Programming\python_example\Arcana\.venv-llama\Lib\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+D:\Programming\python_example\Arcana\.venv-llama\Lib\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+{
+  "combination_count": 128,
+  "zero_endpoint_months": 244,
+  "zero_endpoint_max_return_difference": 9.8879238130678e-17,
+  "current_medium_months": 232,
+  "current_medium_max_return_difference": 9.874371285911732e-17,
+  "current_endpoint_months": 232,
+  "current_endpoint_max_return_difference": 9.8879238130678e-17
+}
+ Step         ChangedComponent Combination  Full_CAGR  Full_Sharpe  Full_MDD  Locked_CAGR  Locked_Sharpe  Locked_MDD  Delta_Full_CAGR  Delta_Full_Sharpe  Delta_Full_MDD  Delta_Locked_CAGR  Delta_Locked_Sharpe  Delta_Locked_MDD
+    0          Zero-Tune start     0000000   0.071369     0.844699 -0.140129     0.070386       1.133647   -0.140129              NaN                NaN             NaN                NaN                  NaN               NaN
+    1             macro_engine     1000000   0.086467     0.752113 -0.173368     0.096306       1.062822   -0.142819         0.015098          -0.092586       -0.033239           0.025920            -0.070825         -0.002689
+    2          base_allocation     1100000   0.085653     0.970954 -0.129555     0.093758       1.310483   -0.129555        -0.000814           0.218841        0.043812          -0.002548             0.247661          0.013263
+    3            tail_logistic     1110000   0.086460     0.978153 -0.127644     0.090911       1.300323   -0.127644         0.000807           0.007199        0.001911          -0.002847            -0.010159          0.001911
+    4      vol_target_leverage     1111000   0.098555     0.902302 -0.169393     0.114281       1.209322   -0.120902         0.012095          -0.075851       -0.041749           0.023370            -0.091001          0.006742
+    5            vkospi_signal     1111100   0.130936     1.017489 -0.164879     0.176299       1.438826   -0.092810         0.032382           0.115187        0.004514           0.062018             0.229504          0.028092
+    6           overlay_policy     1111110   0.153970     1.120550 -0.129781     0.204159       1.466329   -0.097186         0.023033           0.103061        0.035098           0.027859             0.027503         -0.004376
+    7 frequency_reconciliation     1111111   0.156366     1.132529 -0.129588     0.209078       1.496919   -0.097604         0.002396           0.011979        0.000193           0.004920             0.030589         -0.000418
+     Metric                Component  ShapleyContribution  EndpointDelta  ContributionShare
+  Full_CAGR             macro_engine             0.016837       0.084997           0.198092
+  Full_CAGR          base_allocation             0.022228       0.084997           0.261514
+  Full_CAGR            tail_logistic            -0.000961       0.084997          -0.011308
+  Full_CAGR      vol_target_leverage             0.007755       0.084997           0.091240
+  Full_CAGR            vkospi_signal             0.014979       0.084997           0.176227
+  Full_CAGR           overlay_policy             0.023431       0.084997           0.275667
+  Full_CAGR frequency_reconciliation             0.000728       0.084997           0.008566
+Full_Sharpe             macro_engine            -0.007795       0.287829          -0.027082
+Full_Sharpe          base_allocation             0.211117       0.287829           0.733479
+Full_Sharpe            tail_logistic            -0.003148       0.287829          -0.010936
+Full_Sharpe      vol_target_leverage            -0.053409       0.287829          -0.185557
+Full_Sharpe            vkospi_signal             0.035479       0.287829           0.123264
+Full_Sharpe           overlay_policy             0.091917       0.287829           0.319346
+Full_Sharpe frequency_reconciliation             0.013668       0.287829           0.047486
+   Full_MDD             macro_engine            -0.022719       0.010541          -2.155243
+   Full_MDD          base_allocation             0.045026       0.010541           4.271378
+   Full_MDD            tail_logistic             0.003910       0.010541           0.370920
+   Full_MDD      vol_target_leverage            -0.018154       0.010541          -1.722182
+   Full_MDD            vkospi_signal            -0.007174       0.010541          -0.680545
+   Full_MDD           overlay_policy             0.009754       0.010541           0.925358
+   Full_MDD frequency_reconciliation            -0.000102       0.010541          -0.009687
+saved D:\Programming\python_example\RegimeDecisionTest\strategies\stage08_vkospi_factorial\outputs

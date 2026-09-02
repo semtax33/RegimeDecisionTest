@@ -1,0 +1,11 @@
+{
+  "sleeve": 0.1,
+  "vol_cap": 0.1,
+  "trend_window": 12,
+  "top_k": 2,
+  "brake_fraction": 0.25,
+  "early_guard_start": -0.015,
+  "early_guard_strength": 0.35,
+  "dd_gate": -0.025,
+  "bond_floor": 0.18
+}

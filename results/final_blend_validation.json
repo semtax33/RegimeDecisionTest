@@ -1,0 +1,73 @@
+{
+  "config": {
+    "hard_fraction": 0.4,
+    "leverage": 1.2,
+    "financing_rate": 0.04
+  },
+  "full": {
+    "Months": 232.0,
+    "CAGR": 0.14299110165789664,
+    "Volatility": 0.14078463062395463,
+    "Sharpe": 1.0240004238574387,
+    "Sortino": 1.8485605013005593,
+    "MDD": -0.1490055972547002,
+    "Calmar": 0.9596357740406034,
+    "FinalMultiple": 13.248348824559365,
+    "PositiveMonths": 0.6077586206896551
+  },
+  "locked_test": {
+    "Months": 103.0,
+    "CAGR": 0.17067632952001244,
+    "Volatility": 0.1451976742823581,
+    "Sharpe": 1.1639611286518534,
+    "Sortino": 2.057461707455003,
+    "MDD": -0.14900559725469997,
+    "Calmar": 1.1454356927832046,
+    "FinalMultiple": 3.867374116121918,
+    "PositiveMonths": 0.6310679611650486
+  },
+  "regime_metrics": {
+    "growth_balanced_accuracy": 0.8632497930307819,
+    "inflation_balanced_accuracy": 0.8887599597741163,
+    "quadrant_accuracy": 0.771551724137931,
+    "n_months": 232,
+    "growth_confusion": [
+      [
+        110,
+        19
+      ],
+      [
+        13,
+        90
+      ]
+    ],
+    "inflation_confusion": [
+      [
+        129,
+        10
+      ],
+      [
+        14,
+        79
+      ]
+    ]
+  },
+  "bootstrap_probabilities": {
+    "block6_mdd_better_than_hard": 1.0,
+    "block6_sharpe_better_than_hard": 0.9853333333333333,
+    "block6_mdd_within_15": 0.31,
+    "block6_cagr_at_least_14": 0.5583333333333333,
+    "block6_median_cagr_retention": 0.7811386124335903,
+    "block12_mdd_better_than_hard": 0.9996666666666667,
+    "block12_sharpe_better_than_hard": 0.9716666666666667,
+    "block12_mdd_within_15": 0.5393333333333333,
+    "block12_cagr_at_least_14": 0.43666666666666665,
+    "block12_median_cagr_retention": 0.7719455017048684
+  },
+  "gates": {
+    "full_mdd_within_15": true,
+    "full_sharpe_at_least_1": true,
+    "locked_mdd_within_15": true,
+    "locked_sharpe_at_least_1": true
+  }
+}

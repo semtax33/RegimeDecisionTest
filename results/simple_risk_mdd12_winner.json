@@ -1,0 +1,10 @@
+{
+  "model_name": "none",
+  "rank_threshold": 2.0,
+  "protection_fraction": 0.0,
+  "vix_threshold": 40.0,
+  "vix_fraction": 1.0,
+  "vol_cap": 0.3,
+  "dd_start": -0.03,
+  "dd_fraction": 1.0
+}

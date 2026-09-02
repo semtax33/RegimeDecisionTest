@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage 32 Fear Premium 검증</title>
+  <style>
+    :root { --ink:#172033; --muted:#5f6b7a; --line:#dce3ea; --paper:#fff; --wash:#f3f6f9; --navy:#142d4c; --blue:#2563a6; --green:#18794e; --red:#b42318; --amber:#9a5b00; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--wash); font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif; line-height:1.72; }
+    main { width:min(1140px,calc(100% - 32px)); margin:28px auto 64px; overflow:hidden; background:var(--paper); border:1px solid var(--line); box-shadow:0 18px 48px rgba(20,45,76,.08); }
+    header { padding:50px 58px 44px; color:white; background:linear-gradient(135deg,#10233c,#214b73); }
+    header .eyebrow { color:#bdd6ec; font-size:13px; letter-spacing:.08em; }
+    h1 { margin:8px 0 14px; font-size:clamp(29px,4vw,44px); line-height:1.24; }
+    header p { max-width:900px; margin:0; color:#e6eef6; }
+    section { padding:34px 58px; border-bottom:1px solid var(--line); }
+    h2 { margin:0 0 18px; color:var(--navy); font-size:25px; }
+    h3 { margin:26px 0 10px; color:var(--blue); font-size:18px; }
+    p { margin:10px 0; }
+    .verdict { display:grid; grid-template-columns:1.25fr .75fr; gap:20px; }
+    .callout,.card { padding:20px 22px; background:#fbfcfe; border:1px solid var(--line); border-radius:10px; }
+    .callout { border-left:5px solid var(--red); }
+    .callout strong { color:var(--red); }
+    .evidence { border-left-color:var(--green); background:#f2faf6; }
+    .evidence strong { color:var(--green); }
+    .kpis { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .kpi { padding:17px; border-radius:9px; background:#edf4fa; }
+    .kpi span { display:block; color:var(--muted); font-size:12px; }
+    .kpi b { display:block; margin-top:3px; color:var(--navy); font-size:23px; }
+    .flow { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:18px 0; }
+    .flow div { position:relative; padding:15px; border-radius:9px; background:#eef4f9; }
+    .flow div:not(:last-child)::after { content:"→"; position:absolute; right:-9px; top:30%; color:var(--blue); font-size:19px; z-index:2; }
+    table { width:100%; border-collapse:collapse; margin:16px 0 8px; font-size:14px; }
+    th { color:white; background:var(--navy); text-align:left; }
+    th,td { padding:10px 12px; border-bottom:1px solid var(--line); }
+    td.num,th.num { text-align:right; font-variant-numeric:tabular-nums; }
+    tr:nth-child(even) td { background:#f8fafc; }
+    .good { color:var(--green); font-weight:700; }
+    .bad { color:var(--red); font-weight:700; }
+    .neutral { color:var(--amber); font-weight:700; }
+    code,pre { font-family:Consolas,"D2Coding",monospace; }
+    pre { padding:16px 18px; overflow-x:auto; color:#edf5fc; background:#14263b; border-radius:8px; }
+    .chart { width:100%; margin-top:18px; border:1px solid var(--line); border-radius:8px; }
+    .note { color:var(--muted); font-size:13px; }
+    ul { padding-left:22px; }
+    li { margin:6px 0; }
+    footer { padding:24px 58px; color:var(--muted); font-size:12px; }
+    @media (max-width:800px) { header,section,footer { padding-left:24px; padding-right:24px; } .verdict { grid-template-columns:1fr; } .flow { grid-template-columns:1fr; } .flow div:not(:last-child)::after { content:"↓"; right:50%; top:auto; bottom:-17px; } table { display:block; overflow-x:auto; white-space:nowrap; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">REGIME DECISION TEST · MECHANISM VALIDATION</div>
+    <h1>Stage 32<br>옵션 Fear Premium 검증</h1>
+    <p>WingAsym을 새 방향 신호로 채택하기 전에 10분위, 1·3·6개월, 기존 위험변수 통제, 최근월-차근월 기울기와 위기 제외를 고정 설계로 검증했다. Stage 20·30·31은 동결했다.</p>
+  </header>
+
+  <section>
+    <div class="verdict">
+      <div class="callout">
+        <h2>판정</h2>
+        <p><strong>원시 Fear Premium 패턴은 존재하지만 Stage 20 오버레이로 승격하지 않는다.</strong> WingAsym의 3·6개월 관계와 위기 제외 강건성은 분명했다. 그러나 1개월 분위 단조성이 고정 기준에 못 미쳤고, VIX6·최근 하락·실현변동성·거시 취약도를 넣으면 추가 설명력이 사라졌다.</p>
+        <p><code>fear_premium_fails_overlay_gate_keep_stage20_frozen</code></p>
+      </div>
+      <div class="card">
+        <div class="kpis">
+          <div class="kpi"><span>1개월 IC</span><b>0.138</b></div>
+          <div class="kpi"><span>6개월 IC</span><b>0.259</b></div>
+          <div class="kpi"><span>통제 후 1개월 p</span><b>0.581</b></div>
+          <div class="kpi"><span>Stage 20 변경</span><b>없음</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>신호와 경제적 가설</h2>
+    <pre>WingAsym(t-1) = IV(PUT OTM2, 최근월, t-1) - IV(CALL OTM2, 최근월, t-1)
+FearTermSlope(t-1) = WingAsym(최근월, t-1) - WingAsym(차근월, t-1)</pre>
+    <p>WingAsym이 크다는 것은 같은 외가격 구간에서 풋 보험료가 콜 보험료보다 비싸다는 뜻이다. 이후 수익률이 높다면 시장 하락을 직접 예측하는 신호라기보다 공포가 비싸게 거래된 뒤 위험프리미엄이 정상화되는 현상일 수 있다. FearTermSlope는 그 공포가 먼 만기보다 당장 가까운 만기에 몰렸는지를 확인한다.</p>
+    <p>월 <code>t</code>의 수익률에는 <code>t-1</code> 마지막 완전 관측치만 연결했다. OTM1~4, 윈도우, 임계값을 돌려 최고 결과를 고르지 않았다.</p>
+  </section>
+
+  <section>
+    <h2>고정 검증 순서와 승격 게이트</h2>
+    <div class="flow">
+      <div><b>10분위</b><br><span class="note">계단식인가</span></div>
+      <div><b>1·3·6개월</b><br><span class="note">지속 기간</span></div>
+      <div><b>기존 위험통제</b><br><span class="note">독립 정보인가</span></div>
+      <div><b>Term slope</b><br><span class="note">단기 보험 과잉인가</span></div>
+      <div><b>위기 제외</b><br><span class="note">몇 번의 사건인가</span></div>
+    </div>
+    <table>
+      <thead><tr><th>게이트</th><th>결과 전에 고정한 조건</th><th>실제</th><th>통과</th></tr></thead>
+      <tbody>
+        <tr><td>1개월 분위수</td><td>분위 평균 rho&gt;0, p&lt;10%, Q10-Q1&gt;0</td><td>rho 0.539, p 0.108</td><td class="bad">실패</td></tr>
+        <tr><td>기간 일관성</td><td>1·3·6개월 IC&gt;0, 둘 이상 HAC p&lt;10%</td><td>세 IC 양수, 세 beta p&lt;10%</td><td class="good">통과</td></tr>
+        <tr><td>통제 후 생존</td><td>1개월 Wing beta&gt;0, p&lt;10%</td><td>+0.523%, p 0.581</td><td class="bad">실패</td></tr>
+        <tr><td>위기 제외</td><td>세 위기 제외 후 1개월 IC·Q10-Q1&gt;0</td><td>0.141, +5.441%p</td><td class="good">통과</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>10분위: 계단보다 Q10 꼬리 점프</h2>
+    <table>
+      <thead><tr><th>기간</th><th class="num">분위 평균 rho</th><th class="num">p값</th><th class="num">Q10-Q1</th><th class="num">HAC p값</th><th class="num">Q10 평균</th></tr></thead>
+      <tbody>
+        <tr><td>1개월</td><td class="num">0.539</td><td class="num bad">0.108</td><td class="num good">+6.755%p</td><td class="num">0.046</td><td class="num">7.423%</td></tr>
+        <tr><td>3개월</td><td class="num">0.624</td><td class="num">0.054</td><td class="num good">+17.454%p</td><td class="num">0.0006</td><td class="num">16.992%</td></tr>
+        <tr><td>6개월</td><td class="num">0.624</td><td class="num">0.054</td><td class="num good">+26.385%p</td><td class="num">0.000007</td><td class="num">25.399%</td></tr>
+      </tbody>
+    </table>
+    <img class="chart" src="outputs/decile_forward_return_curves.png" alt="WingAsym과 FearTermSlope의 10분위 선행수익률">
+    <p>1개월 Q1~Q10은 0.67, -1.29, -0.06, -0.11, 1.26, 1.27, 2.06, -0.35, 0.69, 7.42%다. 중간 분위는 정돈되지 않았고 Q10에서만 크게 튄다. 연속적 방향 알파보다 극단 공포 뒤의 꼬리 반등이라는 설명이 더 잘 맞는다.</p>
+  </section>
+
+  <section>
+    <h2>1·3·6개월: 원시 관계는 장기까지 이어졌다</h2>
+    <table>
+      <thead><tr><th>기간</th><th class="num">관측치</th><th class="num">Spearman IC</th><th class="num">표준화 beta</th><th class="num">HAC p값</th></tr></thead>
+      <tbody>
+        <tr><td>1개월</td><td class="num">348</td><td class="num">0.138</td><td class="num">+1.938%</td><td class="num">0.098</td></tr>
+        <tr><td>3개월</td><td class="num">346</td><td class="num">0.225</td><td class="num">+4.239%</td><td class="num good">0.0019</td></tr>
+        <tr><td>6개월</td><td class="num">343</td><td class="num">0.259</td><td class="num">+4.304%</td><td class="num good">0.0238</td></tr>
+      </tbody>
+    </table>
+    <p>1개월만 강한 기술적 반등이 아니다. 3·6개월까지 관계가 이어져 위험프리미엄 정상화의 성격이 있다. 다만 전체 표본은 1997-08부터 시작하고 모든 통제변수는 2006-04 이후에만 존재한다.</p>
+  </section>
+
+  <section>
+    <h2>시기를 나누면 초기 효과가 더 크다</h2>
+    <table>
+      <thead><tr><th>표본</th><th class="num">1개월 beta / p</th><th class="num">3개월 beta / p</th><th class="num">6개월 beta / p</th></tr></thead>
+      <tbody>
+        <tr><td>1997-08~2006-03</td><td class="num">+3.579% / 0.116</td><td class="num">+7.398% / 0.003</td><td class="num">+6.965% / 0.042</td></tr>
+        <tr><td>2006-04~2026-07</td><td class="num">+0.532% / 0.451</td><td class="num">+1.818% / 0.116</td><td class="num">+2.849% / 0.041</td></tr>
+      </tbody>
+    </table>
+    <p>통제변수를 넣기 전부터 후기 표본의 1·3개월 크기는 작다. 장기 전체 결과에는 시대 차이가 포함돼 있다. 이 구분 없이 전체 표본의 강한 beta와 후기 통제 회귀를 직접 비교하면 통제효과를 과장할 수 있다.</p>
+  </section>
+
+  <section>
+    <h2>VIX6와 기존 위험변수를 넣자 독립성이 사라졌다</h2>
+    <pre>Future Return = WingAsym + VIX6 Stress + Recent 1m Return
+                + Prior 21d Realized Volatility + Macro Fragility + error</pre>
+    <table>
+      <thead><tr><th>기간</th><th class="num">통제 beta</th><th class="num">HAC p값</th><th class="num">부분상관</th><th class="num">추가 R²</th></tr></thead>
+      <tbody>
+        <tr><td>1개월</td><td class="num">+0.523%</td><td class="num bad">0.581</td><td class="num">0.061</td><td class="num">0.0035</td></tr>
+        <tr><td>3개월</td><td class="num">-0.333%</td><td class="num bad">0.856</td><td class="num">-0.022</td><td class="num">0.0005 미만</td></tr>
+        <tr><td>6개월</td><td class="num">+1.013%</td><td class="num bad">0.683</td><td class="num">0.038</td><td class="num">0.0014</td></tr>
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th>6개월 순차 통제</th><th class="num">WingAsym beta</th><th class="num">HAC p값</th></tr></thead>
+      <tbody>
+        <tr><td>공통표본 WingAsym만</td><td class="num">+2.849%</td><td class="num">0.041</td></tr>
+        <tr><td>+ VIX6</td><td class="num bad">+0.498%</td><td class="num bad">0.807</td></tr>
+        <tr><td>+ 최근수익률</td><td class="num">+1.986%</td><td class="num">0.268</td></tr>
+        <tr><td>+ 실현변동성</td><td class="num">+0.479%</td><td class="num">0.853</td></tr>
+        <tr><td>+ 거시 취약도</td><td class="num">+1.013%</td><td class="num">0.683</td></tr>
+      </tbody>
+    </table>
+    <p>VIX6 하나가 6개월 효과의 대부분을 흡수했다. WingAsym은 VIX6 stress와 +0.274, 최근 1개월 수익률과 -0.280, 실현변동성과 +0.376의 상관을 보인다. 옵션시장이 공포의 가격을 더해 주는지보다 기존 공포 상태를 비선형으로 재표현하는 쪽에 가깝다.</p>
+  </section>
+
+  <section>
+    <h2>FearTermSlope는 제안한 반등 메커니즘을 지지하지 않았다</h2>
+    <table>
+      <thead><tr><th>기간</th><th class="num">무통제 IC</th><th class="num">무통제 beta / p</th><th class="num">통제 beta / p</th><th class="num">Q10-Q1 / p</th></tr></thead>
+      <tbody>
+        <tr><td>1개월</td><td class="num">0.018</td><td class="num">+0.776% / 0.327</td><td class="num bad">-1.454% / 0.066</td><td class="num">+2.013%p / 0.575</td></tr>
+        <tr><td>3개월</td><td class="num">0.084</td><td class="num">+1.844% / 0.176</td><td class="num bad">-3.221% / 0.047</td><td class="num">+3.895%p / 0.492</td></tr>
+        <tr><td>6개월</td><td class="num">0.106</td><td class="num">+2.569% / 0.101</td><td class="num">+1.594% / 0.410</td><td class="num">+7.777%p / 0.334</td></tr>
+      </tbody>
+    </table>
+    <p>최근월 공포가 차근월보다 비싸면 이후 반등이 커질 것이라는 양의 가설은 통과하지 못했다. 통제 후 1·3개월은 오히려 유의한 음수다. 이 부호를 보고 새 하락 알파로 바꾸지 않았다. 가설이 틀린 뒤 방향을 뒤집는 순간 사후 최적화가 된다.</p>
+  </section>
+
+  <section>
+    <h2>1998·2008·2020이 전부는 아니다</h2>
+    <table>
+      <thead><tr><th>표본</th><th class="num">1개월 IC / Q10-Q1</th><th class="num">3개월 IC / Q10-Q1</th><th class="num">6개월 IC / Q10-Q1</th></tr></thead>
+      <tbody>
+        <tr><td>전체</td><td class="num">0.138 / +6.755%p</td><td class="num">0.225 / +17.454%p</td><td class="num">0.259 / +26.385%p</td></tr>
+        <tr><td>1998 제외</td><td class="num">0.133 / +4.043%p</td><td class="num">0.243 / +14.719%p</td><td class="num">0.256 / +22.888%p</td></tr>
+        <tr><td>2008 제외</td><td class="num">0.159 / +8.530%p</td><td class="num">0.257 / +20.177%p</td><td class="num">0.300 / +30.156%p</td></tr>
+        <tr><td>2020 제외</td><td class="num">0.126 / +6.698%p</td><td class="num">0.217 / +17.395%p</td><td class="num">0.255 / +26.205%p</td></tr>
+        <tr><td>세 위기 모두 제외</td><td class="num good">0.141 / +5.441%p</td><td class="num good">0.272 / +17.171%p</td><td class="num good">0.299 / +26.305%p</td></tr>
+      </tbody>
+    </table>
+    <img class="chart" src="outputs/control_and_crisis_robustness.png" alt="통제 회귀와 위기 제외 강건성">
+    <p>원시 패턴은 위기 세 번에만 기대지 않는다. 다만 위기를 빼도 남는다는 사실은 통제 후 독립 알파가 된다는 뜻과 다르다. 두 검정은 서로 다른 질문에 답한다.</p>
+  </section>
+
+  <section>
+    <h2>인과적 Q10 타이밍은 드물고 복리는 약했다</h2>
+    <table>
+      <thead><tr><th>1998-06~2026-07 진단 경로</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th class="num">투자 개월</th></tr></thead>
+      <tbody>
+        <tr><td>K200 보유</td><td class="num">12.576%</td><td class="num">0.554</td><td class="num">-56.58%</td><td class="num">337</td></tr>
+        <tr><td>WingAsym expanding Q10만 보유</td><td class="num">1.559%</td><td class="num">0.221</td><td class="num">-24.55%</td><td class="num">11</td></tr>
+        <tr><td>WingAsym expanding Q1만 보유</td><td class="num">-0.712%</td><td class="num">-0.131</td><td class="num">-23.62%</td><td class="num">6</td></tr>
+        <tr><td>Q10 매수·Q1 매도</td><td class="num">2.070%</td><td class="num">0.257</td><td class="num">-29.74%</td><td class="num">17</td></tr>
+      </tbody>
+    </table>
+    <p>Q10의 11개 투자 달 평균은 4.82%, 양의 달 비율은 72.7%였다. 조건부 반등의 흔적은 있으나 신호가 너무 드물어 현금 대기 기준 장기 복리가 낮다. 거래비용도 빠진 메커니즘 진단이므로 전략 성과로 승격하지 않았다.</p>
+  </section>
+
+  <section>
+    <h2>Stage 20 유지와 연구 결론</h2>
+    <div class="callout evidence">
+      <p><strong>원시 이상현상은 버리지 않는다.</strong> 3·6개월 관계와 위기 제외 결과는 장기 옵션시장에서 풋 공포 프리미엄이 실제로 존재할 가능성을 뒷받침한다.</p>
+      <p>다만 현재 포트폴리오가 이미 VIX6로 같은 위험 상태를 반영한다. 추가 오버레이는 중복 노출과 과적합 위험만 늘릴 수 있어 보류한다.</p>
+    </div>
+    <table>
+      <thead><tr><th>동결 Stage 20, 2007-04~2026-07</th><th class="num">CAGR</th><th class="num">Sharpe</th><th class="num">MDD</th><th class="num">Calmar</th></tr></thead>
+      <tbody><tr><td>Stage20 VIX6</td><td class="num">9.397%</td><td class="num">0.987</td><td class="num">-14.015%</td><td class="num">0.671</td></tr></tbody>
+    </table>
+    <p>Stage 32는 기대수익 조정도, 위험예산 modifier도 만들지 않았다. Stage 20·30·31 파일은 분석 전후 동일하다.</p>
+  </section>
+
+  <section>
+    <h2>한계와 재현 파일</h2>
+    <ul>
+      <li>1·3·6개월 수익률이 겹쳐 horizon별 검정은 완전히 독립적이지 않다. 같은 horizon lag의 HAC를 썼다.</li>
+      <li>장기 수익률은 K200 최근월 선물이다. 연속선물 롤 효과가 일부 섞일 수 있다.</li>
+      <li>통제변수의 공통 시작은 2006-04다. 장기 전체와 통제 표본의 차이에는 시대효과가 포함된다.</li>
+      <li>전체 표본 분위 경계는 사후 통계다. expanding 진단은 과거 자료만 쓰지만 거래비용은 없다.</li>
+    </ul>
+    <table>
+      <thead><tr><th>파일</th><th>역할</th></tr></thead>
+      <tbody>
+        <tr><td><code>fear_premium_validation.py</code></td><td>신호·분위수·HAC·통제·위기 제외·인과 타이밍·무결성 감사</td></tr>
+        <tr><td><code>outputs/validation_report.json</code></td><td>고정 설계, 네 승격 게이트와 전체 결과</td></tr>
+        <tr><td><code>outputs/decile_forward_returns.csv</code></td><td>10분위별 1·3·6개월 수익률</td></tr>
+        <tr><td><code>outputs/controlled_predictive_regressions.csv</code></td><td>기존 위험변수 통제 결과</td></tr>
+        <tr><td><code>outputs/crisis_exclusion_robustness.csv</code></td><td>1998·2008·2020 제거 결과</td></tr>
+        <tr><td><code>outputs/causal_decile_timing_diagnostic.csv</code></td><td>expanding 분위 경계 진단</td></tr>
+      </tbody>
+    </table>
+    <p class="note">원본 옵션 IV XLSX와 K200 선물 XLSX는 읽기 전용으로 사용했다. 분석 전후 SHA-256·크기·수정시각이 동일하다.</p>
+  </section>
+
+  <footer>검증 표본: 1997-08~2026-07 · 통제 표본: 2006-04~2026-07 · Stage 20/30/31 동결</footer>
+</main>
+</body>
+</html>

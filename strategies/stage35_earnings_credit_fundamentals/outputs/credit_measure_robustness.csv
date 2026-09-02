@@ -1,0 +1,10 @@
+Feature,HorizonMonths,Observations,WideningStandardizedBeta,HACPValue,ExpectedSign,Traded
+AA_Widening_Primary,1,232,-0.008494129034242471,0.16241190502961955,negative,True
+AA_Widening_Primary,3,230,-0.029974355349793966,0.0007505063794827762,negative,True
+AA_Widening_Primary,6,227,-0.021676119800050075,0.02784657164033228,negative,True
+BBB_Widening_Robustness,1,232,-0.008185166357560465,0.2634091897893205,negative,False
+BBB_Widening_Robustness,3,230,-0.036409996725183406,0.004266737867131555,negative,False
+BBB_Widening_Robustness,6,227,-0.020881131175823072,0.2488023201744488,negative,False
+Quality_Widening_Robustness,1,232,0.003014856822263578,0.645833983147478,negative,False
+Quality_Widening_Robustness,3,230,0.0015724963650747261,0.895613567941534,negative,False
+Quality_Widening_Robustness,6,227,0.00976263051518652,0.5993126182023794,negative,False

@@ -1,0 +1,305 @@
+{
+  "source": "https://openassetpricing.com/SignalDoc-Browser.html",
+  "signal_map": {
+    "momentum_trend": [
+      "Mom12m",
+      "Mom6m",
+      "IntMom",
+      "High52",
+      "IndMom",
+      "MomVol"
+    ],
+    "reversal_crowding": [
+      "STreversal",
+      "MRreversal",
+      "LRreversal"
+    ],
+    "low_risk_tail": [
+      "RealizedVol",
+      "IdioVol3F",
+      "MaxRet",
+      "ReturnSkew",
+      "Beta"
+    ],
+    "liquidity_activity": [
+      "Illiquidity",
+      "DolVol",
+      "VolumeTrend",
+      "VolSD"
+    ]
+  },
+  "selection": {
+    "calibration_end": "2017-12",
+    "locked_start": "2018-01",
+    "standalone_oap_winner": "oap_momentum_domestic",
+    "standalone_oap_shift": 0.2,
+    "joint_structure_shift": 0.15,
+    "joint_proxy_shift": 0.2,
+    "signal_blend_structure_oap_weight": 0.75,
+    "signal_blend_structure_shift": 0.2,
+    "signal_blend_proxy_oap_weight": 0.75,
+    "signal_blend_proxy_shift": 0.2,
+    "trend_override_structure_mode": "existing",
+    "trend_override_structure_weight": 0.0,
+    "trend_override_structure_shift": 0.15,
+    "trend_override_proxy_mode": "risk_on_only",
+    "trend_override_proxy_weight": 0.25,
+    "trend_override_proxy_shift": 0.1,
+    "committee_method": "minimum_consensus",
+    "committee_shift": 0.2,
+    "committee_target_vol": 0.155,
+    "medium_horizon_target": "oap_path_loss_2m_5",
+    "medium_horizon_months": 2,
+    "medium_horizon_shift": 0.2
+  },
+  "prediction": {
+    "oap_momentum_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.5226890756302521,
+        "average_precision": 0.14772526855860188,
+        "brier_score": 0.1545312874663848,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.8064516129032258,
+        "average_precision": 0.32394866177203374,
+        "brier_score": 0.2111258394313977,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "oap_reversal_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.5378151260504201,
+        "average_precision": 0.15119565666490206,
+        "brier_score": 0.14687926957996933,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7967741935483871,
+        "average_precision": 0.32130911743914836,
+        "brier_score": 0.22160378068617528,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "oap_lowrisk_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.6117647058823529,
+        "average_precision": 0.15811989686760455,
+        "brier_score": 0.1424883788717144,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7946236559139785,
+        "average_precision": 0.2980945462435591,
+        "brier_score": 0.2173914553240878,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "oap_liquidity_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.5747899159663866,
+        "average_precision": 0.24688435886306337,
+        "brier_score": 0.14725536332705694,
+        "recall_at_top_20pct": 0.2857142857142857,
+        "precision_at_top_20pct": 0.10526315789473684
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.7956989247311828,
+        "average_precision": 0.29401650927078526,
+        "brier_score": 0.21975887690277088,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "oap_all_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.5025210084033613,
+        "average_precision": 0.12985082068566642,
+        "brier_score": 0.16248791947020347,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.8075268817204302,
+        "average_precision": 0.28173321250219435,
+        "brier_score": 0.2014221889544581,
+        "recall_at_top_20pct": 0.6,
+        "precision_at_top_20pct": 0.2857142857142857
+      }
+    },
+    "structure_plus_oap_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.522689075630252,
+        "average_precision": 0.15835719663359415,
+        "brier_score": 0.1667814904093907,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.8021505376344086,
+        "average_precision": 0.2937348202991242,
+        "brier_score": 0.17945717873945471,
+        "recall_at_top_20pct": 0.7,
+        "precision_at_top_20pct": 0.3333333333333333
+      }
+    },
+    "structure_indexvolume_plus_oap_domestic": {
+      "calibration": {
+        "observations": 92,
+        "events": 7,
+        "event_rate": 0.07608695652173914,
+        "roc_auc": 0.5462184873949579,
+        "average_precision": 0.16049247428557772,
+        "brier_score": 0.16719025419998285,
+        "recall_at_top_20pct": 0.42857142857142855,
+        "precision_at_top_20pct": 0.15789473684210525
+      },
+      "locked": {
+        "observations": 103,
+        "events": 10,
+        "event_rate": 0.0970873786407767,
+        "roc_auc": 0.8129032258064516,
+        "average_precision": 0.3258643769358055,
+        "brier_score": 0.1795767400878021,
+        "recall_at_top_20pct": 0.7,
+        "precision_at_top_20pct": 0.3333333333333333
+      }
+    }
+  },
+  "medium_horizon_prediction": {
+    "calibration": {
+      "observations": 91,
+      "events": 5,
+      "event_rate": 0.054945054945054944,
+      "roc_auc": 0.37906976744186044,
+      "average_precision": 0.0648383388950686,
+      "brier_score": 0.1962418392695381,
+      "recall_at_top_20pct": 0.2,
+      "precision_at_top_20pct": 0.05263157894736842
+    },
+    "locked": {
+      "observations": 102,
+      "events": 10,
+      "event_rate": 0.09803921568627451,
+      "roc_auc": 0.7565217391304349,
+      "average_precision": 0.3147992215625969,
+      "brier_score": 0.21932785769313395,
+      "recall_at_top_20pct": 0.4,
+      "precision_at_top_20pct": 0.19047619047619047
+    }
+  },
+  "bootstrap_vs_existing_structure_vol15": {
+    "JointStructureOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.4472,
+      "sharpe_delta_p05": -0.018952811432374962,
+      "sharpe_delta_median": -0.0013735098679283908,
+      "sharpe_delta_p95": 0.013124605165256377
+    },
+    "JointStructureIndexVolumeOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.6358,
+      "sharpe_delta_p05": -0.033416082355261986,
+      "sharpe_delta_median": 0.016435682979487387,
+      "sharpe_delta_p95": 0.09026555070059186
+    },
+    "SignalBlendStructureOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.1456,
+      "sharpe_delta_p05": -0.04993479059420146,
+      "sharpe_delta_median": -0.01746999965569307,
+      "sharpe_delta_p95": 0.008679596770046172
+    },
+    "SignalBlendStructureIndexVolumeOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.255,
+      "sharpe_delta_p05": -0.05048067336775419,
+      "sharpe_delta_median": -0.013542419114362048,
+      "sharpe_delta_p95": 0.019005490095094887
+    },
+    "TrendOverrideStructureOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.0,
+      "sharpe_delta_p05": 0.0,
+      "sharpe_delta_median": 0.0,
+      "sharpe_delta_p95": 0.0
+    },
+    "TrendOverrideStructureIndexVolumeOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.4698,
+      "sharpe_delta_p05": -0.03054847404021836,
+      "sharpe_delta_median": -0.001288815195174875,
+      "sharpe_delta_p95": 0.024101344035612454
+    },
+    "CalibratedOAPRiskCommittee": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.2862,
+      "sharpe_delta_p05": -0.03533460129669677,
+      "sharpe_delta_median": -0.009276300384083114,
+      "sharpe_delta_p95": 0.01678743833940603
+    },
+    "SelectedMediumHorizonOAPVol15": {
+      "block_length": 6,
+      "simulations": 5000,
+      "probability_sharpe_improves": 0.7352,
+      "sharpe_delta_p05": -0.04033524342952264,
+      "sharpe_delta_median": 0.02557920651019452,
+      "sharpe_delta_p95": 0.09406574877443415
+    }
+  },
+  "notes": [
+    "All selection and tuning use data through 2017 only.",
+    "2018-2026 is never used to select features, blend weights, or shift sizes.",
+    "OAP signals are translated to KRX sector-index analogues; they are not exact stock-level replications.",
+    "OAP Placebo/Dropped signals were excluded before testing."
+  ]
+}

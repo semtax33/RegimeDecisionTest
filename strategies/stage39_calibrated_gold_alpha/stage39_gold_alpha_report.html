@@ -1,0 +1,245 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stage39 Calibrated Gold Alpha</title>
+<style>body{margin:0;background:#f3f6f8;color:#182534;font:16px/1.72 "Malgun Gothic",sans-serif}header{padding:48px 7%;background:linear-gradient(120deg,#17364f,#18786b);color:white}main{max-width:1120px;margin:24px auto;padding:0 20px}section{background:#fff;border:1px solid #dce3e8;border-radius:14px;padding:27px;margin:18px 0}h1{font-size:2.4rem}h2{color:#18445f;border-bottom:2px solid #e4ebef;padding-bottom:8px}table{border-collapse:collapse;width:100%;font-size:.86rem;display:block;overflow:auto}th,td{padding:9px;border-bottom:1px solid #e2e7eb;text-align:right;white-space:nowrap}th{background:#edf3f6}td:first-child,th:first-child{text-align:left}img{width:100%;border:1px solid #dce3e8;border-radius:10px}.note{padding:14px;background:#edf7f4;border-left:5px solid #18786b}.warn{padding:14px;background:#fff5e5;border-left:5px solid #c98918}code{background:#edf1f4;padding:2px 5px}</style></head><body>
+<header><div>RegimeDecisionTest · Stage39</div><h1>인과적으로 보정한 금 복합상태 알파</h1><p>Stage36을 동결하고 실질금리·원달러·금 추세의 동일가중 상태를 expanding 양의 계수로 GLD μ에만 연결</p></header><main>
+<section><h2>1. 최종 판정</h2><p><strong>retain_stage36_and_close_gold_alpha_branch</strong></p><div class="note">현재 월 이전의 상태와 GLD 수익률만으로 비음 기울기를 재추정한다. 부호·배율·기간 grid는 없다.</div></section>
+<section><h2>2. 전략 구조</h2><p>실질금리가 낮고 하락하며, 원화가 약하고, USD 금 추세가 강할수록 상태점수가 높다. 현재 상태는 직전 60개월 이상이 있을 때만 거래되고, 과거 GLD 월수익률에 대한 expanding 단변량 기울기로 월간 μ 단위로 바뀐다.</p><pre>GoldState = mean(RealYieldSupport, FXSupport, GoldTrendSupport)
+beta_t = max(expanding slope(GoldState_s, GLDReturn_s), 0), s &lt; t
+DeltaMu_GLD,t = beta_t * causal_z(GoldState_t)</pre></section>
+<section><h2>3. 성과</h2><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Strategy</th>
+      <th>Period</th>
+      <th>CAGR</th>
+      <th>Volatility</th>
+      <th>Sharpe</th>
+      <th>MDD</th>
+      <th>AvgTurnover</th>
+      <th>TotalCost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Stage36_Frozen</td>
+      <td>full_2007_2026</td>
+      <td>10.499%</td>
+      <td>9.472%</td>
+      <td>1.1049</td>
+      <td>-12.407%</td>
+      <td>3.698%</td>
+      <td>2.654%</td>
+    </tr>
+    <tr>
+      <td>Stage36_Frozen</td>
+      <td>common_2010_2026</td>
+      <td>9.232%</td>
+      <td>8.719%</td>
+      <td>1.0592</td>
+      <td>-12.407%</td>
+      <td>2.795%</td>
+      <td>1.809%</td>
+    </tr>
+    <tr>
+      <td>Stage36_Frozen</td>
+      <td>locked_2018_2026</td>
+      <td>12.626%</td>
+      <td>10.178%</td>
+      <td>1.2235</td>
+      <td>-11.931%</td>
+      <td>2.616%</td>
+      <td>0.869%</td>
+    </tr>
+    <tr>
+      <td>Stage39_CalibratedGoldAlpha</td>
+      <td>full_2007_2026</td>
+      <td>10.350%</td>
+      <td>9.324%</td>
+      <td>1.1064</td>
+      <td>-12.368%</td>
+      <td>4.200%</td>
+      <td>3.059%</td>
+    </tr>
+    <tr>
+      <td>Stage39_CalibratedGoldAlpha</td>
+      <td>common_2010_2026</td>
+      <td>9.060%</td>
+      <td>8.529%</td>
+      <td>1.0625</td>
+      <td>-12.368%</td>
+      <td>3.380%</td>
+      <td>2.215%</td>
+    </tr>
+    <tr>
+      <td>Stage39_CalibratedGoldAlpha</td>
+      <td>locked_2018_2026</td>
+      <td>12.328%</td>
+      <td>9.901%</td>
+      <td>1.2282</td>
+      <td>-11.860%</td>
+      <td>3.245%</td>
+      <td>1.102%</td>
+    </tr>
+  </tbody>
+</table><img src="outputs/performance_comparison.png" alt="performance"></section>
+<section><h2>4. NAV</h2><img src="outputs/nav_comparison.png" alt="nav"></section>
+<section><h2>5. 메커니즘 회귀</h2><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Period</th>
+      <th>HorizonMonths</th>
+      <th>Observations</th>
+      <th>StandardizedBeta</th>
+      <th>HACPValue</th>
+      <th>SpearmanIC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>1</td>
+      <td>181</td>
+      <td>0.007440</td>
+      <td>0.044169</td>
+      <td>0.083304</td>
+    </tr>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>3</td>
+      <td>179</td>
+      <td>0.022582</td>
+      <td>0.002321</td>
+      <td>0.251614</td>
+    </tr>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>6</td>
+      <td>176</td>
+      <td>0.040237</td>
+      <td>0.000388</td>
+      <td>0.359177</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>1</td>
+      <td>181</td>
+      <td>0.007440</td>
+      <td>0.044169</td>
+      <td>0.083304</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>3</td>
+      <td>179</td>
+      <td>0.022582</td>
+      <td>0.002321</td>
+      <td>0.251614</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>6</td>
+      <td>176</td>
+      <td>0.040237</td>
+      <td>0.000388</td>
+      <td>0.359177</td>
+    </tr>
+    <tr>
+      <td>locked_2018_2026</td>
+      <td>1</td>
+      <td>103</td>
+      <td>0.005693</td>
+      <td>0.139103</td>
+      <td>0.088521</td>
+    </tr>
+    <tr>
+      <td>locked_2018_2026</td>
+      <td>3</td>
+      <td>101</td>
+      <td>0.018827</td>
+      <td>0.029285</td>
+      <td>0.179977</td>
+    </tr>
+    <tr>
+      <td>locked_2018_2026</td>
+      <td>6</td>
+      <td>98</td>
+      <td>0.020922</td>
+      <td>0.112885</td>
+      <td>0.128818</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>6. 12개월 블록 부트스트랩</h2><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Period</th>
+      <th>Metric</th>
+      <th>Mean</th>
+      <th>P05</th>
+      <th>P50</th>
+      <th>P95</th>
+      <th>ProbabilityPositive</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>delta_CAGR</td>
+      <td>-0.001559</td>
+      <td>-0.005231</td>
+      <td>-0.001453</td>
+      <td>0.001717</td>
+      <td>0.2485</td>
+    </tr>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>delta_Sharpe</td>
+      <td>0.002171</td>
+      <td>-0.024109</td>
+      <td>0.001865</td>
+      <td>0.030280</td>
+      <td>0.5515</td>
+    </tr>
+    <tr>
+      <td>full_2007_2026</td>
+      <td>delta_MDD</td>
+      <td>0.001347</td>
+      <td>-0.003161</td>
+      <td>0.000389</td>
+      <td>0.010228</td>
+      <td>0.6860</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>delta_CAGR</td>
+      <td>-0.001857</td>
+      <td>-0.006276</td>
+      <td>-0.001669</td>
+      <td>0.002007</td>
+      <td>0.2300</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>delta_Sharpe</td>
+      <td>0.003785</td>
+      <td>-0.030147</td>
+      <td>0.003203</td>
+      <td>0.039897</td>
+      <td>0.5665</td>
+    </tr>
+    <tr>
+      <td>common_2010_2026</td>
+      <td>delta_MDD</td>
+      <td>0.001479</td>
+      <td>-0.003797</td>
+      <td>0.000400</td>
+      <td>0.010679</td>
+      <td>0.7130</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>7. 인과성과 통제</h2><ul><li>목표 월에는 직전 월말까지의 KTB10Y, 공개 CPI, USDKRW, GLD만 사용</li><li>현재 월 이후 수익률은 calibration에 포함하지 않음</li><li>60개월 전에는 μ 조정 0</li><li>원자료와 Stage36 hash 실행 전후 비교</li><li>long-only, no leverage, 13% vol·−16% CDaR guard 유지</li></ul></section>
+<section><h2>8. 파일</h2><p><code>calibrated_gold_alpha_slsqp.py</code>, <code>outputs/stage39_calibratedgoldalpha_monthly.csv</code>, <code>outputs/validation_report.json</code></p></section>
+<section><h2>9. 주의</h2><p class="warn">동일한 역사에서 Stage38의 메커니즘을 확인한 뒤 Stage39의 calibration을 설계했으므로 완전한 외부표본은 아니다. 2018 잠금구간과 부트스트랩을 별도로 공개하지만 미래 성과를 보장하지 않는다.</p></section>
+</main></body></html>

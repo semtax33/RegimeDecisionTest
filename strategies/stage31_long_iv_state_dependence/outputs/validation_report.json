@@ -1,0 +1,863 @@
+{
+  "study": "Stage31_LongIV_StateDependence_Reliability",
+  "scope": "Validate the supplied state-dependence feedback with the 1997+ bucket-IV workbook, then test only parameter-free reliability shrinkage on Stage30. Raw workbooks and Stage30 ODS are unchanged.",
+  "source_audit": {
+    "long_iv": {
+      "source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_옵션내재변동성.xlsx",
+      "sheets": [
+        "최근월물",
+        "차근월물"
+      ],
+      "fixed_primary_formula": "near_put_otm2 - near_call_otm2",
+      "first_any_iv_date": "1997-07-07",
+      "last_any_iv_date": "2026-08-28",
+      "daily_rows": 9459,
+      "near_primary_observations": 7158,
+      "next_primary_observations": 7157,
+      "near_primary_missing_share": 0.2432603869330796,
+      "next_primary_missing_share": 0.24336610635373718,
+      "transformations": [
+        "fixed OTM2 put-minus-call difference",
+        "sign reversal only for alignment with bullish-positive Stage30 ODS"
+      ],
+      "winsorization": false,
+      "parameter_search": false
+    },
+    "k200_futures": {
+      "source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_K200선물데이터.xlsx",
+      "sheet": "최근월물",
+      "field": "종가 (P100400)",
+      "first_close_date": "1996-05-03",
+      "last_close_date": "2026-08-28",
+      "observations": 7598,
+      "nonpositive_close_excluded": 0
+    }
+  },
+  "fixed_research_design": {
+    "primary_long_iv_signal": "-(near PUT OTM2 IV - near CALL OTM2 IV)",
+    "robustness_only": [
+      "next-month OTM2 direction",
+      "equal-weight near/next OTM2 direction"
+    ],
+    "stage_signal": "unchanged Stage30 option_direction_score",
+    "macro_fragility": "p_Slowdown + p_Stagflation",
+    "states": "soft probability weights; no hard regime",
+    "rolling_method": "expanding past-only OLS/IC with Stage30's fixed 12-month minimum",
+    "candidate_change": "z^2/(1+z^2) reliability shrinkage only",
+    "searched_parameters": null
+  },
+  "hypothesis_decision_rules": {
+    "structural_break_support": "pre-specified 2018 interaction p-value below 10%",
+    "state_dependence_support": "continuous interaction p-value below 10%; no hard-state split",
+    "reliability_promotion": "full-period CAGR, Sharpe, and MDD all no worse than Stage30",
+    "rules_are_not_used_to_tune_a_parameter": true
+  },
+  "hypothesis_verdicts": {
+    "stage30_2018_structural_break_supported": false,
+    "long_iv_2018_structural_break_supported": false,
+    "ods_macro_fragility_state_dependence_supported": false,
+    "ods_vix6_state_dependence_supported": false,
+    "long_iv_is_a_direct_stage30_direction_replication": false,
+    "reliability_stage31_promoted": false
+  },
+  "long_iv_futures_era_diagnostics": [
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "full_1997_2026",
+      "Observations": 348,
+      "SpearmanIC": -0.1384421099,
+      "StandardizedBeta": -0.0193754825,
+      "HACBetaSE": 0.0117011345,
+      "HACBetaT": -1.6558635735,
+      "HACBetaPValue": 0.0977494499
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "full_1997_2026",
+      "Observations": 348,
+      "SpearmanIC": -0.1036443775,
+      "StandardizedBeta": -0.0109458148,
+      "HACBetaSE": 0.0117066623,
+      "HACBetaT": -0.9350073039,
+      "HACBetaPValue": 0.3497845353
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "full_1997_2026",
+      "Observations": 348,
+      "SpearmanIC": -0.1142866743,
+      "StandardizedBeta": -0.015977732,
+      "HACBetaSE": 0.0122061229,
+      "HACBetaT": -1.3089932155,
+      "HACBetaPValue": 0.1905366489
+    },
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "pre_2007",
+      "Observations": 113,
+      "SpearmanIC": -0.1768987001,
+      "StandardizedBeta": -0.0342344296,
+      "HACBetaSE": 0.0217716074,
+      "HACBetaT": -1.5724346405,
+      "HACBetaPValue": 0.1158497859
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "pre_2007",
+      "Observations": 113,
+      "SpearmanIC": -0.0279181379,
+      "StandardizedBeta": -0.0118842297,
+      "HACBetaSE": 0.0202743532,
+      "HACBetaT": -0.5861705984,
+      "HACBetaPValue": 0.5577608776
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "pre_2007",
+      "Observations": 113,
+      "SpearmanIC": -0.0872865038,
+      "StandardizedBeta": -0.0234032066,
+      "HACBetaSE": 0.0220749559,
+      "HACBetaT": -1.0601700255,
+      "HACBetaPValue": 0.289067255
+    },
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "early_2007_2017",
+      "Observations": 132,
+      "SpearmanIC": -0.1027533614,
+      "StandardizedBeta": -0.0004850835,
+      "HACBetaSE": 0.0079382702,
+      "HACBetaT": -0.0611069505,
+      "HACBetaPValue": 0.9512740338
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "early_2007_2017",
+      "Observations": 132,
+      "SpearmanIC": -0.1859033675,
+      "StandardizedBeta": -0.0074533435,
+      "HACBetaSE": 0.0083815803,
+      "HACBetaT": -0.8892527687,
+      "HACBetaPValue": 0.3738672489
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "early_2007_2017",
+      "Observations": 132,
+      "SpearmanIC": -0.1325393461,
+      "StandardizedBeta": -0.0033088272,
+      "HACBetaSE": 0.0086441766,
+      "HACBetaT": -0.3827810785,
+      "HACBetaPValue": 0.7018820921
+    },
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": -0.0891433602,
+      "StandardizedBeta": -0.0172138707,
+      "HACBetaSE": 0.0100273936,
+      "HACBetaT": -1.7166844493,
+      "HACBetaPValue": 0.086036843
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": -0.1687657612,
+      "StandardizedBeta": -0.0314172805,
+      "HACBetaSE": 0.007558345,
+      "HACBetaT": -4.1566348724,
+      "HACBetaPValue": 3.2297e-05
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": -0.1242689019,
+      "StandardizedBeta": -0.0276412074,
+      "HACBetaSE": 0.0111806901,
+      "HACBetaT": -2.4722273116,
+      "HACBetaPValue": 0.0134274108
+    }
+  ],
+  "structural_break_tests": [
+    {
+      "Test": "bucket_direction_near_2018_break",
+      "BreakMonth": "2018-01",
+      "Observations": 348,
+      "PreBreakStandardizedBeta": -0.0183120175670317,
+      "LateInteractionBeta": -0.02686168282040908,
+      "LateInteractionSE": 0.029011657167563678,
+      "LateInteractionT": -0.9258927425366668,
+      "LateInteractionPValue": 0.35450172328367524,
+      "PostBreakStandardizedBeta": -0.04517370038744078,
+      "RSquared": 0.04770976440075292
+    },
+    {
+      "Test": "stage30_ods_2018_break",
+      "BreakMonth": "2018-01",
+      "Observations": 244,
+      "PreBreakStandardizedBeta": -0.0006019004841259063,
+      "LateInteractionBeta": 0.007960738081995487,
+      "LateInteractionSE": 0.009564696913681312,
+      "LateInteractionT": 0.8323042699459167,
+      "LateInteractionPValue": 0.4052372210553947,
+      "PostBreakStandardizedBeta": 0.00735883759786958,
+      "RSquared": 0.011200629302545395
+    }
+  ],
+  "spot_return_robustness": [
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "full_2000_2026",
+      "Observations": 318,
+      "SpearmanIC": -0.1126296199,
+      "StandardizedBeta": -0.0043540131,
+      "HACBetaSE": 0.0054241894,
+      "HACBetaT": -0.802702988,
+      "HACBetaPValue": 0.4221464255
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "full_2000_2026",
+      "Observations": 318,
+      "SpearmanIC": -0.1180237855,
+      "StandardizedBeta": -0.0081647445,
+      "HACBetaSE": 0.0098055391,
+      "HACBetaT": -0.8326665542,
+      "HACBetaPValue": 0.4050328123
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "full_2000_2026",
+      "Observations": 318,
+      "SpearmanIC": -0.1227074229,
+      "StandardizedBeta": -0.0068985899,
+      "HACBetaSE": 0.0072961775,
+      "HACBetaT": -0.945507409,
+      "HACBetaPValue": 0.3443998901
+    },
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "pre_2007",
+      "Observations": 83,
+      "SpearmanIC": -0.154845685,
+      "StandardizedBeta": -0.0050117404,
+      "HACBetaSE": 0.0086798078,
+      "HACBetaT": -0.5774022279,
+      "HACBetaPValue": 0.5636677696
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "pre_2007",
+      "Observations": 83,
+      "SpearmanIC": -0.0764850671,
+      "StandardizedBeta": 0.0048848084,
+      "HACBetaSE": 0.0126235738,
+      "HACBetaT": 0.3869592315,
+      "HACBetaPValue": 0.6987863898
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "pre_2007",
+      "Observations": 83,
+      "SpearmanIC": -0.1374040995,
+      "StandardizedBeta": -0.0001200027,
+      "HACBetaSE": 0.0108738281,
+      "HACBetaT": -0.0110359184,
+      "HACBetaPValue": 0.9911947898
+    },
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "early_2007_2017",
+      "Observations": 132,
+      "SpearmanIC": -0.0847156037,
+      "StandardizedBeta": 0.0007493512,
+      "HACBetaSE": 0.00759775,
+      "HACBetaT": 0.0986280482,
+      "HACBetaPValue": 0.9214335993
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "early_2007_2017",
+      "Observations": 132,
+      "SpearmanIC": -0.1581825838,
+      "StandardizedBeta": -0.0054741361,
+      "HACBetaSE": 0.0081060559,
+      "HACBetaT": -0.6753143778,
+      "HACBetaPValue": 0.4994760511
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "early_2007_2017",
+      "Observations": 132,
+      "SpearmanIC": -0.1102565374,
+      "StandardizedBeta": -0.001707311,
+      "HACBetaSE": 0.0083213077,
+      "HACBetaT": -0.2051734022,
+      "HACBetaPValue": 0.8374366494
+    },
+    {
+      "Signal": "near_otm2_direction_primary",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": -0.0876055535,
+      "StandardizedBeta": -0.0163203945,
+      "HACBetaSE": 0.0099077579,
+      "HACBetaT": -1.6472338842,
+      "HACBetaPValue": 0.0995099816
+    },
+    {
+      "Signal": "next_otm2_direction_robustness",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": -0.162965571,
+      "StandardizedBeta": -0.0304631477,
+      "HACBetaSE": 0.0075870484,
+      "HACBetaT": -4.0151513416,
+      "HACBetaPValue": 5.94077e-05
+    },
+    {
+      "Signal": "equal_months_otm2_direction_robustness",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": -0.1216602874,
+      "StandardizedBeta": -0.0266103518,
+      "HACBetaSE": 0.0112168755,
+      "HACBetaT": -2.3723497567,
+      "HACBetaPValue": 0.0176753501
+    }
+  ],
+  "stage30_ods_era_diagnostics": [
+    {
+      "Signal": "stage30_option_direction_score",
+      "Period": "full_2006_2026",
+      "Observations": 244,
+      "SpearmanIC": 0.0261031188,
+      "StandardizedBeta": 0.0039847399,
+      "HACBetaSE": 0.0051245781,
+      "HACBetaT": 0.7775742388,
+      "HACBetaPValue": 0.4368200528
+    },
+    {
+      "Signal": "stage30_pure_direction_raw",
+      "Period": "full_2006_2026",
+      "Observations": 244,
+      "SpearmanIC": 0.0337558703,
+      "StandardizedBeta": 0.0033830218,
+      "HACBetaSE": 0.0058981824,
+      "HACBetaT": 0.5735702216,
+      "HACBetaPValue": 0.5662586676
+    },
+    {
+      "Signal": "stage30_option_direction_score",
+      "Period": "early_2007_2017",
+      "Observations": 129,
+      "SpearmanIC": -0.0651442308,
+      "StandardizedBeta": -0.0002791553,
+      "HACBetaSE": 0.0043184879,
+      "HACBetaT": -0.0646419064,
+      "HACBetaPValue": 0.948459118
+    },
+    {
+      "Signal": "stage30_pure_direction_raw",
+      "Period": "early_2007_2017",
+      "Observations": 129,
+      "SpearmanIC": -0.0466513864,
+      "StandardizedBeta": 0.000972296,
+      "HACBetaSE": 0.0048521774,
+      "HACBetaT": 0.2003834474,
+      "HACBetaPValue": 0.841180704
+    },
+    {
+      "Signal": "stage30_option_direction_score",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": 0.1108707112,
+      "StandardizedBeta": 0.0083426285,
+      "HACBetaSE": 0.0094831223,
+      "HACBetaT": 0.8797343561,
+      "HACBetaPValue": 0.3790032331
+    },
+    {
+      "Signal": "stage30_pure_direction_raw",
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanIC": 0.1207222247,
+      "StandardizedBeta": 0.0064004016,
+      "HACBetaSE": 0.0126874199,
+      "HACBetaT": 0.504468334,
+      "HACBetaPValue": 0.613932309
+    }
+  ],
+  "bucket_iv_vs_stage30_ods": [
+    {
+      "Period": "full_overlap",
+      "Observations": 244,
+      "SpearmanCorrelation": 0.1934511181,
+      "PearsonCorrelation": 0.2123505388
+    },
+    {
+      "Period": "early_2007_2017",
+      "Observations": 129,
+      "SpearmanCorrelation": 0.1550187157,
+      "PearsonCorrelation": 0.1437119389
+    },
+    {
+      "Period": "late_2018_2026",
+      "Observations": 103,
+      "SpearmanCorrelation": 0.2334775052,
+      "PearsonCorrelation": 0.309946213
+    }
+  ],
+  "soft_state_diagnostics": [
+    {
+      "Source": "Stage30_ODS",
+      "State": "Goldilocks",
+      "Observations": 244,
+      "EffectiveObservations": 185.7280717165,
+      "WeightSum": 48.2795673292,
+      "WeightedBeta": 0.0279539595,
+      "WeightedPearson": 0.0456964101,
+      "WeightedSpearmanIC": 0.0150893842
+    },
+    {
+      "Source": "Stage30_ODS",
+      "State": "Overheating",
+      "Observations": 244,
+      "EffectiveObservations": 111.1711747394,
+      "WeightSum": 28.5818924299,
+      "WeightedBeta": 0.0243286158,
+      "WeightedPearson": 0.0321265689,
+      "WeightedSpearmanIC": 0.0151739054
+    },
+    {
+      "Source": "Stage30_ODS",
+      "State": "Slowdown",
+      "Observations": 244,
+      "EffectiveObservations": 197.8589083303,
+      "WeightSum": 120.8456045591,
+      "WeightedBeta": 0.0209555782,
+      "WeightedPearson": 0.0447732567,
+      "WeightedSpearmanIC": 0.0109649037
+    },
+    {
+      "Source": "Stage30_ODS",
+      "State": "Stagflation",
+      "Observations": 244,
+      "EffectiveObservations": 155.8384434949,
+      "WeightSum": 46.2929356817,
+      "WeightedBeta": 0.082498972,
+      "WeightedPearson": 0.1290046035,
+      "WeightedSpearmanIC": 0.0878186289
+    },
+    {
+      "Source": "Stage30_ODS",
+      "State": "VIX6_LowStressSoft",
+      "Observations": 244,
+      "EffectiveObservations": 228.6276945668,
+      "WeightSum": 120.1327195497,
+      "WeightedBeta": 0.0365017096,
+      "WeightedPearson": 0.070470208,
+      "WeightedSpearmanIC": 0.0253305053
+    },
+    {
+      "Source": "Stage30_ODS",
+      "State": "VIX6_HighStressSoft",
+      "Observations": 244,
+      "EffectiveObservations": 229.4863565131,
+      "WeightSum": 123.8672804503,
+      "WeightedBeta": 0.0286208672,
+      "WeightedPearson": 0.0483683168,
+      "WeightedSpearmanIC": 0.0240058007
+    },
+    {
+      "Source": "LongIV_BucketDirection",
+      "State": "Goldilocks",
+      "Observations": 244,
+      "EffectiveObservations": 185.7280717165,
+      "WeightSum": 48.2795673292,
+      "WeightedBeta": -0.2963354435,
+      "WeightedPearson": -0.1058757652,
+      "WeightedSpearmanIC": -0.082821552
+    },
+    {
+      "Source": "LongIV_BucketDirection",
+      "State": "Overheating",
+      "Observations": 244,
+      "EffectiveObservations": 111.1711747394,
+      "WeightSum": 28.5818924299,
+      "WeightedBeta": -0.0110546071,
+      "WeightedPearson": -0.0038109032,
+      "WeightedSpearmanIC": -0.0476461878
+    },
+    {
+      "Source": "LongIV_BucketDirection",
+      "State": "Slowdown",
+      "Observations": 244,
+      "EffectiveObservations": 197.8589083303,
+      "WeightSum": 120.8456045591,
+      "WeightedBeta": -0.3276835632,
+      "WeightedPearson": -0.14265116,
+      "WeightedSpearmanIC": -0.1342074138
+    },
+    {
+      "Source": "LongIV_BucketDirection",
+      "State": "Stagflation",
+      "Observations": 244,
+      "EffectiveObservations": 155.8384434949,
+      "WeightSum": 46.2929356817,
+      "WeightedBeta": -0.0399671725,
+      "WeightedPearson": -0.0192579557,
+      "WeightedSpearmanIC": -0.0699346884
+    },
+    {
+      "Source": "LongIV_BucketDirection",
+      "State": "VIX6_LowStressSoft",
+      "Observations": 244,
+      "EffectiveObservations": 228.6276945668,
+      "WeightSum": 120.1327195497,
+      "WeightedBeta": -0.1692027748,
+      "WeightedPearson": -0.0715803162,
+      "WeightedSpearmanIC": -0.082358653
+    },
+    {
+      "Source": "LongIV_BucketDirection",
+      "State": "VIX6_HighStressSoft",
+      "Observations": 244,
+      "EffectiveObservations": 229.4863565131,
+      "WeightSum": 123.8672804503,
+      "WeightedBeta": -0.1766813573,
+      "WeightedPearson": -0.0737133189,
+      "WeightedSpearmanIC": -0.1022760667
+    }
+  ],
+  "interaction_tests": [
+    {
+      "Test": "Stage30_ODS_x_MacroFragility",
+      "Observations": 244,
+      "BaseSignalBetaAtStateZero": -0.021515279,
+      "InteractionBeta": 0.0802500869,
+      "InteractionSE": 0.2863339681,
+      "InteractionT": 0.2802674353,
+      "InteractionPValue": 0.7792723329,
+      "SignalBetaAtStateOne": 0.0587348079,
+      "StateBeta": 0.0348905599,
+      "RSquared": 0.0130384709
+    },
+    {
+      "Test": "Stage30_ODS_x_VIX6Stress",
+      "Observations": 244,
+      "BaseSignalBetaAtStateZero": 0.0908991152,
+      "InteractionBeta": -0.1299642036,
+      "InteractionSE": 0.3688475228,
+      "InteractionT": -0.352352112,
+      "InteractionPValue": 0.724574211,
+      "SignalBetaAtStateOne": -0.0390650884,
+      "StateBeta": 0.0866853439,
+      "RSquared": 0.0317502397
+    },
+    {
+      "Test": "LongIV_BucketDirection_x_MacroFragility",
+      "Observations": 244,
+      "BaseSignalBetaAtStateZero": -0.1474586956,
+      "InteractionBeta": -0.0570557548,
+      "InteractionSE": 1.2229476834,
+      "InteractionT": -0.0466542891,
+      "InteractionPValue": 0.9627887626,
+      "SignalBetaAtStateOne": -0.2045144504,
+      "StateBeta": 0.0261545264,
+      "RSquared": 0.0116980595
+    },
+    {
+      "Test": "LongIV_BucketDirection_x_VIX6Stress",
+      "Observations": 244,
+      "BaseSignalBetaAtStateZero": 0.0168878667,
+      "InteractionBeta": -0.1244061312,
+      "InteractionSE": 1.1405329288,
+      "InteractionT": -0.1090771937,
+      "InteractionPValue": 0.9131412638,
+      "SignalBetaAtStateOne": -0.1075182645,
+      "StateBeta": 0.0813471092,
+      "RSquared": 0.0271445949
+    }
+  ],
+  "performance": [
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0939740153,
+      "Volatility": 0.0959808832,
+      "Sharpe": 0.9865029238,
+      "Sortino": 1.8566616292,
+      "MDD": -0.1401480684,
+      "Calmar": 0.6705337891,
+      "FinalMultiple": 5.6772165405,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0268096176,
+      "TotalCost": 0.0186033023
+    },
+    {
+      "Strategy": "Stage30_ODS",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0978195045,
+      "Volatility": 0.1007183842,
+      "Sharpe": 0.979567329,
+      "Sortino": 1.8953497433,
+      "MDD": -0.1359901134,
+      "Calmar": 0.7193133539,
+      "FinalMultiple": 6.0757265719,
+      "PositiveMonths": 0.599137931,
+      "AvgTurnover": 0.0299226522,
+      "TotalCost": 0.0208122873
+    },
+    {
+      "Strategy": "Stage31_Reliability",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0947577319,
+      "Volatility": 0.0972681441,
+      "Sharpe": 0.9821096208,
+      "Sortino": 1.849842651,
+      "MDD": -0.1402722131,
+      "Calmar": 0.6755274604,
+      "FinalMultiple": 5.756366124,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0272514802,
+      "TotalCost": 0.0188877895
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0664933375,
+      "Volatility": 0.0907117841,
+      "Sharpe": 0.7562604472,
+      "Sortino": 1.3107717092,
+      "MDD": -0.1401480684,
+      "Calmar": 0.4744506168,
+      "FinalMultiple": 1.997791114,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0438158722,
+      "TotalCost": 0.0166792906
+    },
+    {
+      "Strategy": "Stage30_ODS",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0652130027,
+      "Volatility": 0.0910607586,
+      "Sharpe": 0.7404305236,
+      "Sortino": 1.2863595009,
+      "MDD": -0.1359901134,
+      "Calmar": 0.4795422337,
+      "FinalMultiple": 1.9721590431,
+      "PositiveMonths": 0.5891472868,
+      "AvgTurnover": 0.0477266245,
+      "TotalCost": 0.0182496084
+    },
+    {
+      "Strategy": "Stage31_Reliability",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0658215523,
+      "Volatility": 0.0906767433,
+      "Sharpe": 0.7495335751,
+      "Sortino": 1.2976217072,
+      "MDD": -0.1402722131,
+      "Calmar": 0.4692415612,
+      "FinalMultiple": 1.9843046645,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0443624874,
+      "TotalCost": 0.0168786772
+    },
+    {
+      "Strategy": "Stage20_VIX6",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1293924988,
+      "Volatility": 0.1018606281,
+      "Sharpe": 1.2502705269,
+      "Sortino": 2.5848541994,
+      "MDD": -0.1141902445,
+      "Calmar": 1.1331309376,
+      "FinalMultiple": 2.8417468176,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0055105221,
+      "TotalCost": 0.0019240117
+    },
+    {
+      "Strategy": "Stage30_ODS",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1400681931,
+      "Volatility": 0.1110687538,
+      "Sharpe": 1.240507271,
+      "Sortino": 2.6702605365,
+      "MDD": -0.1155359156,
+      "Calmar": 1.2123346435,
+      "FinalMultiple": 3.080748783,
+      "PositiveMonths": 0.6116504854,
+      "AvgTurnover": 0.0076244732,
+      "TotalCost": 0.0025626789
+    },
+    {
+      "Strategy": "Stage31_Reliability",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1321087885,
+      "Volatility": 0.104537557,
+      "Sharpe": 1.2440340035,
+      "Sortino": 2.5648153744,
+      "MDD": -0.1146808786,
+      "Calmar": 1.1519687507,
+      "FinalMultiple": 2.900948744,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0058211896,
+      "TotalCost": 0.0020091123
+    }
+  ],
+  "stage31_full_change_vs_stage30": {
+    "CAGR": -0.003061772668320417,
+    "Sharpe": 0.0025422917791482202,
+    "MDD": -0.004282099723960986,
+    "Volatility": -0.003450240191329529,
+    "Calmar": -0.04378589349209017
+  },
+  "reliability_diagnostic": [
+    {
+      "Period": "full_2007_2026",
+      "Months": 232,
+      "MeanReliability": 0.1100022758,
+      "MedianReliability": 0.0158843062,
+      "P90Reliability": 0.4278537098,
+      "PositiveRawSlopeShare": 0.4698275862,
+      "OriginalMeanPositiveSlope": 0.0060944095,
+      "ShrunkMeanPositiveSlope": 0.0014909555,
+      "OriginalMeanAbsoluteMuAdjustment": 0.0006569504,
+      "ShrunkMeanAbsoluteMuAdjustment": 0.00017373
+    },
+    {
+      "Period": "early_2007_2017",
+      "Months": 129,
+      "MeanReliability": 0.0484681191,
+      "MedianReliability": 0.0145720538,
+      "P90Reliability": 0.1613657197,
+      "PositiveRawSlopeShare": 0.519379845,
+      "OriginalMeanPositiveSlope": 0.0072623789,
+      "ShrunkMeanPositiveSlope": 0.0010063679,
+      "OriginalMeanAbsoluteMuAdjustment": 0.0007513855,
+      "ShrunkMeanAbsoluteMuAdjustment": 0.0001132154
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Months": 103,
+      "MeanReliability": 0.1870693263,
+      "MedianReliability": 0.0168569055,
+      "P90Reliability": 0.5011539236,
+      "PositiveRawSlopeShare": 0.4077669903,
+      "OriginalMeanPositiveSlope": 0.0046316129,
+      "ShrunkMeanPositiveSlope": 0.0020978662,
+      "OriginalMeanAbsoluteMuAdjustment": 0.0005386774,
+      "ShrunkMeanAbsoluteMuAdjustment": 0.0002495203
+    }
+  ],
+  "bootstrap_vs_stage30": [
+    {
+      "Metric": "delta_CAGR",
+      "Mean": -0.0032169963,
+      "P05": -0.0088896781,
+      "P50": -0.0027711099,
+      "P95": 0.0009857098,
+      "ProbabilityPositive": 0.137,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0038329577,
+      "P05": -0.020007531,
+      "P50": 0.0037207351,
+      "P95": 0.0295041283,
+      "ProbabilityPositive": 0.589,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Metric": "delta_MDD",
+      "Mean": -0.0019920313,
+      "P05": -0.0103210788,
+      "P50": -0.0004030966,
+      "P95": 0.0032094771,
+      "ProbabilityPositive": 0.4745,
+      "Replications": 2000,
+      "BlockMonths": 12
+    }
+  ],
+  "checks": {
+    "source_xlsx_files_unchanged": true,
+    "long_iv_starts_1997_07": true,
+    "bucket_signal_precedes_target_month": true,
+    "bucket_signal_date_is_in_prior_month": true,
+    "stage31_calibration_uses_past_months_only": true,
+    "reliability_is_between_zero_and_one": true,
+    "reliability_formula_matches_z_squared": true,
+    "stage31_changes_only_kospi200_mu": true,
+    "weights_sum_to_one": true,
+    "weights_are_long_only": true,
+    "no_leverage": true,
+    "all_stage31_solvers_succeeded": true,
+    "no_otm_bucket_or_window_search": true,
+    "no_hard_regime_switch": true,
+    "slsqp_unchanged": true,
+    "vix6_risk_engine_unchanged": true
+  },
+  "raw_files_unchanged": true,
+  "source_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_옵션내재변동성.xlsx": {
+      "sha256": "967f0a612eb8ccde36e47a5ad870e1a27c58bd43685dc9234ac4f7b46e403d6c",
+      "bytes": 1575666,
+      "last_write_time_ns": 1787984271153603300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_K200선물데이터.xlsx": {
+      "sha256": "4d37798c636a4716b7a7d03b71549d7195067e35718635da0db2420f019d0818",
+      "bytes": 5070236,
+      "last_write_time_ns": 1787983521685350100
+    }
+  },
+  "source_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_옵션내재변동성.xlsx": {
+      "sha256": "967f0a612eb8ccde36e47a5ad870e1a27c58bd43685dc9234ac4f7b46e403d6c",
+      "bytes": 1575666,
+      "last_write_time_ns": 1787984271153603300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_K200선물데이터.xlsx": {
+      "sha256": "4d37798c636a4716b7a7d03b71549d7195067e35718635da0db2420f019d0818",
+      "bytes": 5070236,
+      "last_write_time_ns": 1787983521685350100
+    }
+  },
+  "decision": "retain_stage20_official_keep_stage30_research"
+}

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="KOSPI200 옵션 VIX6 분해, VKOSPI 오버레이, 로지스틱 입력변수 및 최종 전략 선택 보고서">
+  <title>VIX6 Case 1 연구 보고서 | 최종 전략 선택과 알고리즘</title>
+  <style>
+    :root {
+      --bg: #f3f5f2;
+      --paper: #fffefa;
+      --ink: #17231f;
+      --muted: #617069;
+      --line: #dce3de;
+      --green: #0a6a50;
+      --green-2: #128063;
+      --green-soft: #e0f3ea;
+      --blue: #214f69;
+      --blue-soft: #e7f0f5;
+      --gold: #9b6714;
+      --gold-soft: #fff0cf;
+      --red: #9d3b35;
+      --red-soft: #fae9e6;
+      --shadow: 0 16px 44px rgba(18, 44, 35, .08);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 95% 3%, rgba(18,128,99,.11), transparent 28rem), var(--bg);
+      color: var(--ink);
+      font-family: Pretendard, "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      line-height: 1.72;
+      word-break: keep-all;
+    }
+    a { color: var(--green); text-underline-offset: 3px; }
+    code {
+      font-family: var(--mono); font-size: .91em; word-break: break-word;
+      padding: .1rem .34rem; border: 1px solid var(--line); border-radius: 6px;
+      background: rgba(33,79,105,.055);
+    }
+    .hero {
+      padding: 70px 28px 58px;
+      color: #f6fff9;
+      background: linear-gradient(118deg, #075740, #183f56);
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ""; position: absolute; width: 440px; height: 440px;
+      right: -120px; top: -240px; border-radius: 50%;
+      border: 58px solid rgba(255,255,255,.055);
+    }
+    .hero-inner { max-width: 1120px; margin: 0 auto; position: relative; z-index: 1; }
+    .kicker { letter-spacing: .16em; font-size: .78rem; opacity: .78; font-weight: 800; }
+    h1 { margin: .65rem 0 1rem; max-width: 850px; font-size: clamp(2.15rem, 5vw, 4.5rem); line-height: 1.08; letter-spacing: -.045em; }
+    .hero p { max-width: 820px; margin: 0; color: rgba(255,255,255,.82); font-size: 1.08rem; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.6rem; }
+    .hero-badges span { padding: .38rem .7rem; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.08); font-size: .85rem; }
+    .layout { max-width: 1220px; margin: 0 auto; padding: 34px 24px 72px; display: grid; grid-template-columns: 235px minmax(0, 1fr); gap: 28px; align-items: start; }
+    nav { position: sticky; top: 20px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,254,250,.92); box-shadow: var(--shadow); }
+    nav strong { display: block; margin-bottom: .8rem; color: var(--muted); font-size: .76rem; letter-spacing: .12em; }
+    nav a { display: block; padding: .46rem .55rem; color: var(--ink); text-decoration: none; border-radius: 8px; font-size: .9rem; }
+    nav a:hover { color: var(--green); background: var(--green-soft); }
+    main { min-width: 0; }
+    .section { margin-bottom: 24px; padding: clamp(24px, 4.5vw, 50px); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); scroll-margin-top: 24px; }
+    .lead-section { border-top: 5px solid var(--green); }
+    .eyebrow { margin: 0 0 .5rem; color: var(--green); font-weight: 800; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; }
+    h2 { margin: 0 0 1.15rem; font-size: clamp(1.55rem, 3vw, 2.25rem); line-height: 1.26; letter-spacing: -.035em; }
+    h3 { margin: 1.6rem 0 .65rem; font-size: 1.08rem; }
+    p { margin: .8rem 0; }
+    .lead { font-size: 1.12rem; color: #263a33; }
+    .callout { display: grid; gap: .1rem; margin: 1.45rem 0; padding: 1.15rem 1.25rem; border-radius: 14px; }
+    .callout.keep { background: var(--green-soft); border-left: 5px solid var(--green); }
+    .callout strong { font-size: .78rem; color: var(--green); letter-spacing: .1em; }
+    .callout span { font-size: 1.27rem; font-weight: 850; }
+    .callout small { color: var(--muted); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; }
+    table { width: 100%; border-collapse: collapse; min-width: 660px; }
+    th, td { padding: .82rem .9rem; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    th { background: #f0f4f1; color: var(--muted); font-size: .8rem; }
+    tr:last-child td { border-bottom: 0; }
+    tr.winner td { background: rgba(224,243,234,.62); font-weight: 750; }
+    .note { padding: 1rem 1.1rem; border-radius: 12px; background: var(--gold-soft); color: #5b471e; font-size: .94rem; }
+    .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 9px; align-items: stretch; margin: 1.4rem 0; }
+    .flow > div { display: grid; gap: .22rem; padding: .95rem; border: 1px solid var(--line); border-radius: 12px; background: #f8faf8; }
+    .flow b { width: 1.65rem; height: 1.65rem; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green); }
+    .flow span { font-weight: 800; } .flow small { color: var(--muted); } .flow i { align-self: center; color: var(--green); font-style: normal; font-size: 1.2rem; }
+    .factor-grid, .input-columns, .search-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 1.3rem 0; }
+    .factor-grid article, .input-columns > div, .search-grid article { padding: 1rem 1.05rem; border: 1px solid var(--line); border-radius: 13px; background: #fafbf9; }
+    .factor-grid h3 { margin-top: 0; color: var(--blue); }
+    .factor-grid p, .search-grid p { margin-bottom: 0; font-size: .93rem; color: #384942; }
+    .formula-list { display: grid; gap: 8px; margin: 1.2rem 0; }
+    .formula-list p { display: grid; grid-template-columns: minmax(300px, .9fr) 1fr; gap: 14px; align-items: center; margin: 0; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: 11px; }
+    .formula-list code { background: var(--blue-soft); color: var(--blue); font-weight: 750; }
+    .formula-list span { color: var(--muted); font-size: .93rem; }
+    ol, ul { padding-left: 1.25rem; } li { margin: .35rem 0; }
+    .input-columns h3 { margin-top: 0; } .input-columns ul { margin-bottom: 0; }
+    .search-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .search-grid strong { color: var(--green); font-size: 1.02rem; }
+    .audit-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0; list-style: none; }
+    .audit-list li { margin: 0; padding: .85rem 1rem; border-radius: 11px; background: var(--blue-soft); border: 1px solid #cfdee6; }
+    .file-list { display: grid; gap: 9px; }
+    .file-list a { display: grid; gap: .12rem; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: 11px; text-decoration: none; background: #fafbf9; }
+    .file-list a:hover { border-color: var(--green-2); background: var(--green-soft); }
+    .file-list b { color: var(--ink); font-family: var(--mono); font-size: .9rem; } .file-list span { color: var(--muted); font-size: .9rem; }
+    .footnote { border-left: 5px solid var(--gold); }
+    footer { padding: 0 24px 54px; text-align: center; color: var(--muted); font-size: .84rem; }
+    footer a { margin-left: .4rem; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; } nav { position: static; display: none; }
+      .flow { grid-template-columns: 1fr; } .flow i { transform: rotate(90deg); justify-self: center; }
+      .search-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 660px) {
+      .hero { padding: 50px 20px 42px; } .layout { padding: 20px 12px 50px; }
+      .section { padding: 24px 19px; border-radius: 14px; }
+      .factor-grid, .input-columns, .audit-list { grid-template-columns: 1fr; }
+      .formula-list p { grid-template-columns: 1fr; gap: 5px; }
+    }
+    @media print {
+      body { background: white; } nav { display: none; } .layout { display: block; max-width: none; padding: 0; }
+      .hero { padding: 35px; } .section { box-shadow: none; break-inside: avoid; } a { color: inherit; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="kicker">REGIME DECISION TEST · VIX6 CASE 1</div>
+      <h1>VIX6를 넣어도<br>최종 전략은 바꾸지 않았다</h1>
+      <p>KOSPI200 옵션 860,380행을 30일 변동성 곡면으로 재구성하고, 여섯 성분·가공 입력·오버레이를 같은 비용 조건에서 비교한 기록이다.</p>
+      <div class="hero-badges"><span>4개 투자자산</span><span>옵션은 신호 전용</span><span>15 tests passed</span><span>Post-lock exploratory</span></div>
+    </div>
+  </header>
+  <div class="layout">
+    <nav aria-label="보고서 목차">
+      <strong>CONTENTS</strong>
+      <a href="#decision">최종 결정</a><a href="#scoreboard">성과표</a>
+      <a href="#what-overlay">VKOSPI 오버레이</a><a href="#vix6">VIX6 여섯 성분</a>
+      <a href="#meta">메타 신호·상태</a><a href="#inputs">입력변수 전체</a>
+      <a href="#classifier">분류 알고리즘</a><a href="#search">후보·파라미터 탐색</a>
+      <a href="#why">효과 해석</a><a href="#audit">시차·재현성</a><a href="#files">관련 파일</a>
+    </nav>
+    <main><article id="report-body">
+  <section id="decision" class="section lead-section">
+    <p class="eyebrow">2026-08-28 · Case 1 연구 결산</p>
+    <h2>결론은 분명하다. 최종 전략은 바꾸지 않았다</h2>
+    <p class="lead">VKOSPI를 유지한 기존 최종 전략이 여전히 가장 균형이 좋았다. VIX6 분해값을 덧붙인 혼합 오버레이, 로지스틱 입력변수형, VKOSPI를 VIX6로 완전히 교체한 단독 오버레이를 모두 확인했지만 2018~2026년 CAGR·Sharpe·MDD를 동시에 개선한 대안은 없었다. 실제 채택본은 <code>Existing_Final_RobustVKOSPI</code> 그대로다.</p>
+    <div class="callout keep"><strong>채택 결과</strong><span>기존 Robust VKOSPI 오버레이 유지</span><small>2018~2026: CAGR 20.91% · Sharpe 1.497 · MDD -9.76%</small></div>
+    <p>그렇다고 이번 작업이 헛수고는 아니다. KOSPI200 옵션 종가와 내재변동성으로 Cboe식 여섯 성분을 근사했고, 이 값이 언제 위험예산을 줄이거나 다시 늘리는 데 도움이 되는지도 코드로 분리했다. 다만 좋은 설명변수와 좋은 투자규칙은 같은 말이 아니다. 사전 구간에서 좋아 보였던 입력변수형이 2018년 이후 약해진 사실까지 확인했기 때문에, 성과가 나쁜 후보를 억지로 최종본에 섞지 않았다.</p>
+  </section>
+
+  <section id="scoreboard" class="section">
+    <h2>같은 조건으로 맞춘 최종 성과</h2>
+    <p>비교 대상은 모두 KODEX200, 채권, 원화 환산 금, 원화 환산 유가만 거래한다. 옵션은 신호 계산에만 쓰며 포트폴리오 자산으로 편입하지 않는다. 거래비용, 환전비용, 일별 리밸런싱 밴드, 신호일 다음 거래일 시가 체결 규칙도 동일하게 적용했다.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>2018~2026</th><th>CAGR</th><th>Sharpe</th><th>MDD</th><th>판정</th></tr></thead>
+      <tbody>
+        <tr class="winner"><td>기존 Robust VKOSPI</td><td>20.91%</td><td>1.497</td><td>-9.76%</td><td>유지</td></tr>
+        <tr><td>VIX6 혼합 오버레이</td><td>20.93%</td><td>1.497</td><td>-9.76%</td><td>Sharpe 소폭 하락</td></tr>
+        <tr><td>VIX6 로지스틱 입력</td><td>19.99%</td><td>1.462</td><td>-10.15%</td><td>세 지표 열세</td></tr>
+        <tr><td>VIX6 단독 오버레이</td><td>21.48%</td><td>1.395</td><td>-9.88%</td><td>CAGR 외 열세</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">혼합형의 Sharpe 차이는 -0.00022로 아주 작다. 그래도 사용자가 요구한 기준은 ‘CAGR·Sharpe·MDD 동시 개선’이므로 통과로 처리하지 않았다. 단독형은 CAGR이 0.58%p 높았지만 변동성이 커져 Sharpe가 0.102 낮아졌고 낙폭도 0.12%p 깊어졌다.</p>
+  </section>
+
+  <section id="what-overlay" class="section">
+    <h2>VKOSPI 오버레이가 구체적으로 하는 일</h2>
+    <p>기본 월간 전략은 거시국면과 로지스틱 꼬리위험 확률을 보고 네 자산의 월초 비중을 정한다. VKOSPI 오버레이는 이 배분을 갈아엎는 두 번째 전략이 아니다. 월중 공포가 급하게 커질 때 이미 정해진 위험예산 가운데 일부만 방어자산으로 옮기는 안전장치다.</p>
+    <div class="flow">
+      <div><b>1</b><span>월간 기본 비중</span><small>거시국면 + 균형가중 로지스틱</small></div>
+      <i>→</i><div><b>2</b><span>VKOSPI 스트레스</span><small>수준·충격·가속도 확인</small></div>
+      <i>→</i><div><b>3</b><span>위험예산 이동</span><small>KODEX200·USO 일부 축소</small></div>
+      <i>→</i><div><b>4</b><span>금으로 대피</span><small>밴드 초과 시 다음 시가 체결</small></div>
+    </div>
+    <p>현재 채택된 설정은 가속도 모드다. VKOSPI의 252일 백분위가 0.90을 넘고 5일 충격의 표준화값이 1.0을 넘는 정도를 합쳐 스트레스를 0~1로 만든다. 최대 이동폭은 위험자산 비중의 35%이며, 목표비중과 현재비중의 차이에서 계산한 회전율이 20% 밴드를 넘을 때만 월중에 다시 거래한다. 이렇게 하면 MDD를 낮추면서 잦은 거래도 피한다.</p>
+  </section>
+
+  <section id="vix6" class="section">
+    <h2>VIX6 분해를 KOSPI200 옵션에 옮긴 방법</h2>
+    <p>Cboe의 VIX Decomposition은 변동성 곡면의 하루 변화를 여섯 갈래로 나눈다. 다만 보유한 KOSPI200 옵션 파일에는 bid·ask가 없어서 공식 VIX 포인트 기여도를 그대로 복제할 수 없다. 여기서는 주간장 종가와 기존 내재변동성을 사용한 ‘Cboe-inspired close-IV proxy’를 만들었다. 공식 산식과 같다고 주장하지 않으며, 위험의 종류를 구분하는 연구용 근사치로만 쓴다.</p>
+    <div class="factor-grid">
+      <article><h3>Sticky Strike</h3><p>기초자산이 움직여도 행사가격별 IV 곡면이 그대로 붙어 있다고 가정했을 때 생기는 예상 변화다. 전일 고정 행사가격 구간의 기울기에 선물가격 로그수익률을 곱한다.</p></article>
+      <article><h3>Parallel Shift</h3><p>ATM IV의 실제 변화에서 Sticky Strike 예상분을 뺀 값이다. 방향과 무관하게 곡면 전체가 위로 들리는 공통 공포를 잡는다.</p></article>
+      <article><h3>Put Skew</h3><p>15~45 델타 풋 구간이 ATM에 비해 얼마나 더 비싸졌는지의 일간 변화다. 하락보험 수요가 어깨 구간으로 번지는 정도를 본다.</p></article>
+      <article><h3>Call Skew</h3><p>15~45 델타 콜 구간이 ATM보다 얼마나 가팔라졌는지 측정한다. 상승 꼬리와 상방 쏠림을 분리한다.</p></article>
+      <article><h3>Downside Convexity</h3><p>1~15 델타 극외가격 풋 IV가 선형으로 연장한 풋 스큐보다 더 휘어진 정도의 변화다. 깊은 하락 꼬리 가격을 나타낸다.</p></article>
+      <article><h3>Upside Convexity</h3><p>1~15 델타 극외가격 콜 IV의 추가 굴곡 변화다. 급등이나 상방 이벤트 위험이 콜 꼬리에 붙는 상황을 구분한다.</p></article>
+    </div>
+    <h3>표면을 하루짜리 30일물로 맞추는 순서</h3>
+    <ol>
+      <li>계약명에서 콜·풋, 만기월, 행사가격을 읽고 주간장 자료만 남긴다.</li>
+      <li>콜·풋 종가 차이가 가장 작은 세 행사가격의 중앙값으로 합성 선물가격 <code>F = K + C - P</code>를 구한다.</li>
+      <li>Black-76 델타로 ATM, 15~45 델타 어깨, 1~15 델타 꼬리 구간을 나눈다.</li>
+      <li>30일을 사이에 둔 두 만기의 분산을 만기까지 남은 일수로 보간한다.</li>
+      <li>고정 행사가격 이동, 평행이동, 스큐, 볼록성의 하루 변화를 계산하고 756일 이동 중앙값과 MAD로 강건 표준화한다.</li>
+    </ol>
+    <p>산출된 표면은 2000-01-17부터 2026-08-27까지 4,236거래일이다. 최종 전략의 일별 실행일 5,043개 가운데 옵션 신호가 붙는 날은 4,046개로 80.23%다. 옵션값이 없는 날은 기존 VKOSPI 신호만 사용하므로 오래된 구간을 억지로 채우지 않았다.</p>
+  </section>
+
+  <section id="meta" class="section">
+    <h2>여섯 성분을 실제 판단값으로 바꾸는 법</h2>
+    <p>개별 성분의 부호 하나로 매매하면 잡음이 많다. 그래서 관련 성분을 묶어 위험의 방향, 폭, 반응속도를 따로 본다.</p>
+    <div class="formula-list">
+      <p><code>LeftTail = z(PutSkew) + z(DownsideConvexity)</code><span>하락보험과 깊은 풋 꼬리</span></p>
+      <p><code>RightTail = z(CallSkew) + z(UpsideConvexity)</code><span>상방 이벤트와 콜 꼬리</span></p>
+      <p><code>Asymmetry = LeftTail - RightTail</code><span>좌측 꼬리가 상대적으로 우세한지</span></p>
+      <p><code>Breadth = z(5일 ParallelShift 합)</code><span>공포가 곡면 전체로 번졌는지</span></p>
+      <p><code>Reaction = z(5일 StickyStrike 합)</code><span>가격 하락에 곡면이 얼마나 빠르게 반응했는지</span></p>
+    </div>
+    <p>상태 분류는 Calm, Early Warning, Confirmed Risk-Off, Panic, Recovery 다섯 가지다. 꼬리만 먼저 움직이면 Early Warning, 평행이동이나 가격 하락까지 붙으면 Confirmed Risk-Off, 기존 VKOSPI 스트레스와 반응속도가 함께 치솟으면 Panic으로 본다. 왼쪽 꼬리 압력이 내려오기 시작하면 Recovery다. 상태를 나눠 보니 공포가 이미 정점인 날 뒤늦게 방어비중을 더 늘리는 행동을 줄이고, 꼬리가 잦아들 때 위험예산을 되돌리는 아이디어를 따로 검증할 수 있었다.</p>
+  </section>
+
+  <section id="inputs" class="section">
+    <h2>사용한 입력변수 전체 목록</h2>
+    <p>최종 채택 전략의 로지스틱 분류기는 VKOSPI를 설명변수로 직접 넣지 않는다. VKOSPI는 분류가 끝난 뒤 일별 위험예산을 조절한다. 아래 16개가 기본 로지스틱 입력이며, VIX6 입력형에서는 뒤의 6개를 추가해 22개로 비교했다.</p>
+    <div class="input-columns">
+      <div><h3>기본 배분·거시</h3><ul><li><code>base_USO</code></li><li><code>base_GLD</code></li><li><code>base_KODEX200</code></li><li><code>p_inflation_high</code></li></ul></div>
+      <div><h3>전략 가격·위험</h3><ul><li><code>proxy_mom1</code></li><li><code>proxy_mom6</code></li><li><code>proxy_vol6</code></li><li><code>daily_mom21</code></li><li><code>daily_mom252</code></li><li><code>daily_vol21</code></li><li><code>daily_downvol21</code></li><li><code>daily_mean_corr63</code></li></ul></div>
+      <div><h3>Open Asset Pricing 합성변수</h3><ul><li><code>oap_momentum_trend_stress</code></li><li><code>oap_reversal_crowding_stress</code></li><li><code>oap_low_risk_tail_stress</code></li><li><code>oap_liquidity_activity_stress</code></li></ul></div>
+      <div><h3>시험한 VIX6 월별 가공값</h3><ul><li><code>asymmetry_mean</code></li><li><code>asymmetry_max</code></li><li><code>breadth_z_mean</code></li><li><code>breadth_z_max</code></li><li><code>reaction_z_mean</code></li><li><code>left_impulse_z_max</code></li></ul></div>
+    </div>
+    <p class="note">거시 입력의 원천은 GDP·수출·BSI의 성장 수준과 3개월 변화, CPI·PPI·수입물가의 물가 수준과 3개월 변화다. SJM은 사용하지 않는다. 현재값 85%, 3개월 변화 20%를 반영한 투명한 거시 합성확률로 성장·물가의 높고 낮음을 분류한다.</p>
+  </section>
+
+  <section id="classifier" class="section">
+    <h2>어떤 알고리즘으로 분류했나</h2>
+    <p>월간 꼬리위험 분류기는 L2 규제를 건 균형가중 로지스틱 회귀다. 희귀한 급락월을 보통월과 같은 비중으로 학습하면 거의 모든 달을 정상으로 찍기 쉽기 때문에 <code>class_weight="balanced"</code>를 쓴다. 입력값은 중앙값으로 결측치를 채운 다음 표준화한다. 기존 최종본의 규제강도는 <code>C=0.10</code>이고 VIX6 입력형의 사전 구간 승자는 <code>C=0.03</code>이었다.</p>
+    <p>정답 라벨은 다음 두 달의 월간 경로에서 누적손익 최저점이 -5% 아래로 내려갔는지다. 매월 확장학습을 하되, 라벨을 만들 때 미래 두 달이 필요하므로 최근 두 달은 학습에서 빼는 2개월 엠바고를 둔다. 최소 36개월, 급락 4건, 비급락 12건이 쌓이기 전에는 예측하지 않는다. 예측확률은 최대 20%의 방어 이동에 쓰고, 이후 목표 변동성 15%로 레버리지를 조절한다.</p>
+    <p>VIX6 입력형에서 표준화 계수의 평균 절댓값이 가장 컸던 변수는 <code>proxy_mom6</code> 0.250이었다. VIX6 가운데서는 <code>left_impulse_z_max</code> 0.127, <code>breadth_z_mean</code> 0.094가 상위에 들었다. 분해값이 완전히 무시된 것은 아니다. 기존의 21일 하방변동성·모멘텀·상관 변수와 정보가 겹쳐 2018년 이후 일반화 성능은 오히려 낮아졌다.</p>
+  </section>
+
+  <section id="search" class="section">
+    <h2>‘반복적인 후보·파라미터 탐색’에서 실제로 반복한 것</h2>
+    <p>가장 높은 백테스트 숫자를 곧바로 고르지 않았다. 한 후보를 만들고, 2007~2012년 보정구간과 2013~2017년 검증구간을 따로 계산하고, 두 구간에서 모두 버티는 후보만 남기는 절차를 반복했다. 점수는 CAGR 1%p, Sharpe 0.05, MDD 1%p 변화를 같은 크기로 맞춘 뒤 두 구간 중 나쁜 쪽을 우선했다.</p>
+    <div class="search-grid">
+      <article><strong>혼합 오버레이 720개</strong><p>꼬리 임계값, 곡면 확산 임계값, 조기경보·확정위험 가중치, 회복·우측꼬리·패닉 완화율을 먼저 훑었다. 그다음 최대 이동폭, 리밸런싱 밴드, 채권·금 라우팅을 조합했다. 사전 두 구간의 세 지표를 모두 개선한 후보는 없어서 종합점수가 가장 높은 회복 완화형을 연구 후보로 남겼다.</p></article>
+      <article><strong>로지스틱 입력 28개</strong><p>VIX6 요약변수를 7개 묶음으로 만들고 L2 규제강도 0.01, 0.03, 0.10, 0.30을 결합했다. 월평균·월중 극값 6개를 더한 <code>monthly6, C=0.03</code>만 사전 두 구간의 CAGR과 Sharpe를 함께 높이고 MDD를 유지했다.</p></article>
+      <article><strong>단독 오버레이 64개</strong><p>VKOSPI 스트레스를 0으로 고정한 뒤 VIX6 꼬리·확산 임계, 조기경보·확정위험 강도, 최대 이동폭, 밴드를 작은 격자로 비교했다. 모든 후보가 사전 검증 Sharpe에서 기존보다 약해 확대 탐색을 중단했다.</p></article>
+    </div>
+    <p>이번 비교는 사후 탐색이라는 한계를 안고 있다. 사용자의 추가 요청을 받아 2018년 이후 결과를 확인한 뒤 대안을 더 시험했으므로 엄밀한 의미의 손대지 않은 잠금 실험은 아니다. 후보 순위는 2018년 이전 자료로 정했다. 다만 최종 유지·교체 판단에는 사용자의 조건에 따라 2018~2026년 결과를 사용했다. 보고서와 JSON에 이 사실을 그대로 기록했다.</p>
+  </section>
+
+  <section id="why" class="section">
+    <h2>효과가 난 부분과 나지 않은 부분</h2>
+    <p>혼합형이 CAGR을 아주 조금 올린 이유는 회복 신호다. 왼쪽 꼬리가 정점을 지나 내려오고 있는데 기존 VKOSPI 스트레스가 남아 있는 날, 방어 이동을 일부 풀어 위험자산 복귀를 앞당겼다. 2018년 이후 이 조건이 발생한 뒤 KOSPI200의 향후 5일 평균수익률은 1.73%였고 3% 이상 급락 비율은 4.76%였다. 다만 복귀를 앞당긴 만큼 수익의 일별 흔들림도 미세하게 늘어 Sharpe 개선으로 이어지지 않았다.</p>
+    <p>단독형은 강한 상승장에서 방어 횟수가 줄어 CAGR은 높아졌다. 그 대신 VKOSPI가 제공하던 넓은 시장 공포 수준을 놓쳤다. 종가 IV 프록시는 호가 기반 VIX보다 잡음이 많고 옵션 공백일도 있다. 그 결과 변동성과 낙폭이 커졌다. 입력변수형은 사전 구간에서는 작동했으나, 가격 모멘텀과 하방변동성에 이미 담긴 정보를 다시 세는 문제가 생겼다. 규제강도를 낮춰도 이 중복을 완전히 없애지 못했다.</p>
+    <p>지금 데이터에서 VIX6의 자리는 ‘기대수익을 맞히는 새 엔진’보다 ‘위험의 성격을 설명하는 보조 계기판’에 가깝다. 향후 bid·ask와 더 촘촘한 호가를 확보하면 공식 가중치에 가까운 VIX 포인트 기여도로 다시 만들 가치가 있다. 지금은 실거래 최종 전략을 바꾸지 않고, 연구 피처와 상태 진단을 남겨 두는 편이 낫다.</p>
+  </section>
+
+  <section id="audit" class="section">
+    <h2>재현성과 룩어헤드 점검</h2>
+    <ul class="audit-list">
+      <li>기존 최종 전략의 월수익 재현 최대 오차: <code>9.89e-17</code></li>
+      <li>월별 VIX6 가공값: 신호월이 목표월보다 정확히 1개월 앞섬</li>
+      <li>일별 오버레이: 모든 유효 신호일이 실제 체결일 시가보다 앞섬</li>
+      <li>로지스틱 라벨 엠바고: 2개월</li>
+      <li>분해 항등식 최대 잔차: <code>0.0</code></li>
+      <li>자동 테스트: 15개 통과</li>
+      <li>투자 가능한 자산: KODEX200, BOND, GLD, USO 네 개뿐</li>
+    </ul>
+  </section>
+
+  <section id="files" class="section">
+    <h2>코드와 결과 파일</h2>
+    <div class="file-list">
+      <a href="../../strategies/stage08_options/vix6_case1_strategy.py"><b>vix6_case1_strategy.py</b><span>옵션 정리, 30일 표면, 여섯 성분, 상태 분류, 혼합 오버레이</span></a>
+      <a href="../../strategies/stage08_options/vix6_case1_model_comparison.py"><b>vix6_case1_model_comparison.py</b><span>입력변수 탐색, 단독 오버레이, 네 전략 비교와 최종 선택</span></a>
+      <a href="../../tests/test_vix6_case1_strategy.py"><b>test_vix6_case1_strategy.py</b><span>만기, 분해, 시차, 4자산, 최종 선택 회귀 테스트</span></a>
+      <a href="../../results/vix6_case1_features_daily.csv"><b>vix6_case1_features_daily.csv</b><span>일별 VIX6 프록시와 메타 신호</span></a>
+      <a href="../../results/vix6_case1_input_features_monthly.csv"><b>vix6_case1_input_features_monthly.csv</b><span>다음 달 예측에 쓰는 월별 가공 입력</span></a>
+      <a href="../../results/vix6_case1_final_model_comparison.csv"><b>vix6_case1_final_model_comparison.csv</b><span>기간별 네 전략 성과표</span></a>
+      <a href="../../results/vix6_case1_final_selection.json"><b>vix6_case1_final_selection.json</b><span>선택 근거, 모든 입력변수, 시차 감사 결과</span></a>
+    </div>
+  </section>
+
+  <section class="section footnote">
+    <h2>해석할 때 기억할 점</h2>
+    <p>이 결과는 과거 자료와 지정된 비용 가정으로 계산한 연구 결과다. 미래 수익을 보장하지 않는다. 특히 KOSPI200 옵션 분해값은 bid·ask가 없는 종가 IV 근사치이므로 Cboe의 공식 VIX 포인트 분해와 구분해야 한다. 최종 채택본을 그대로 유지한 결정은 보수적인 선택이다. VIX6 파일과 코드는 이후 더 나은 옵션 호가가 들어왔을 때 다시 검증할 수 있도록 별도 산출물로 보존했다.</p>
+  </section>
+</article>
+</main>
+  </div>
+  <footer>
+    2026-08-28 · RegimeDecisionTest · humanize-korean strict pass
+    <a href="https://cdn.cboe.com/resources/vix/VIX-Decomposition-2025-08-01.pdf">Cboe VIX Decomposition 공식 자료</a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "growth_balanced_accuracy": 0.8632497930307819,
+  "inflation_balanced_accuracy": 0.8887599597741163,
+  "quadrant_accuracy": 0.771551724137931,
+  "n_months": 232,
+  "growth_confusion": [
+    [
+      110,
+      19
+    ],
+    [
+      13,
+      90
+    ]
+  ],
+  "inflation_confusion": [
+    [
+      129,
+      10
+    ],
+    [
+      14,
+      79
+    ]
+  ]
+}

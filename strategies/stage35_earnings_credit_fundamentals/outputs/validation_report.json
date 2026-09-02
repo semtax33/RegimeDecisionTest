@@ -1,0 +1,1311 @@
+{
+  "study": "Stage35_EarningsCreditFundamentalConfirmation",
+  "decision": "promote_stage35_fundamental_dual_role",
+  "promoted_strategy": "Stage35_FundamentalDualRole",
+  "scope": "Stage20 is frozen. Forward EPS one-month revision drives equity mu; AA- corporate spread easing drives equity mu; widening also confirms the pre-existing VIX6 equity stress adjustment.",
+  "fixed_design": {
+    "eps_direction_signal": "vendor Forward EPS 12M one-month revision percent",
+    "credit_signal": "20-observation change in AA- corporate 3Y minus KTB 3Y",
+    "credit_return_direction": "easing positive",
+    "credit_risk_direction": "widening positive",
+    "controls": [
+      "vix6_stress_score",
+      "recent_1m_return",
+      "realized_vol_21d",
+      "macro_fragility"
+    ],
+    "return_horizons_months": [
+      1,
+      3,
+      6
+    ],
+    "causal_calibration_months": 60,
+    "strategy_mapping": {
+      "EPSAlpha": "non-negative expanding return slope times causal EPS z",
+      "CreditAlpha": "non-negative expanding return slope times causal easing z",
+      "CreditRiskConfirmation": "existing KODEX VIX6 stress mu times 2×causal widening rank; KODEX variance times 1+causal widening rank",
+      "ValuationAnchor": "non-negative expanding 12M return slope times valuation gap z divided by 12; only fully observed targets",
+      "FundamentalDualRole": "EPS causal mu + slow valuation mu + credit-confirmed existing stress mu and KODEX variance; no credit return mu"
+    },
+    "searched_parameters": null,
+    "candidate_selection": "only FundamentalDualRole may be promoted; component paths are mechanism attribution, not a best-of search"
+  },
+  "data_audit": {
+    "earnings_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_fwdPE.EPS.rev.xlsx",
+    "credit_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_국고채.회사채.xlsx",
+    "daily_rows": 9564,
+    "first_date": "1990-01-02",
+    "last_date": "2026-08-28",
+    "earnings_first_valid": "2000-02-25",
+    "credit_first_valid": "1995-05-30",
+    "eps_revision_provider_field_used": true,
+    "eps_revision_formula": "vendor EPS(Fwd.12M) one-month revision percentage",
+    "computed_revision_role": "source cross-check only",
+    "provider_computed_revision_correlation": 0.4580566581047895,
+    "eps_level_stale_share": 0.7912154948909562,
+    "credit_primary_formula": "(AA- unsecured 3Y yield - KTB 3Y yield) 20-observation change",
+    "credit_primary_role": "widening=funding stress; easing=positive equity-return input",
+    "bbb_and_quality_role": "robustness diagnostics only",
+    "earnings_yield_gap_role": "slow valuation diagnostic only",
+    "winsorization": false,
+    "parameter_grid": false
+  },
+  "return_audit": {
+    "rows": 320,
+    "first_month": "2000-01",
+    "last_month": "2026-08",
+    "columns": [
+      "KODEX200",
+      "BOND",
+      "GLD",
+      "USO"
+    ]
+  },
+  "macro_audit": {
+    "rows": 794,
+    "first_date": "1960-07-31 00:00:00",
+    "last_date": "2026-08-31 00:00:00",
+    "columns": [
+      "GDP_YoY",
+      "Export_YoY",
+      "BSI",
+      "CPI_YoY",
+      "PPI_YoY",
+      "ImportPrice_YoY"
+    ]
+  },
+  "market_audit": {
+    "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
+    "bond_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\krx_bond_index.csv",
+    "kodex_proxy_source": "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\compass.db",
+    "foreign_prices_converted_to_krw": true,
+    "bond_atr_uses_close_to_close_proxy": true,
+    "kodex_volume_segments_normalized_separately": true,
+    "assets": {
+      "KODEX200": {
+        "rows": 6535,
+        "start": "2000-01-04",
+        "end": "2026-08-25",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      },
+      "BOND": {
+        "rows": 7469,
+        "start": "2006-03-02",
+        "end": "2026-08-12",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 7469
+      },
+      "GLD": {
+        "rows": 5474,
+        "start": "2004-11-18",
+        "end": "2026-08-24",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      },
+      "USO": {
+        "rows": 5125,
+        "start": "2006-04-10",
+        "end": "2026-08-24",
+        "missing_close": 0,
+        "missing_high": 0,
+        "missing_low": 0,
+        "missing_volume": 0
+      }
+    }
+  },
+  "gate_results": {
+    "eps_gates": {
+      "full_1m_positive_p_below_10pct": true,
+      "early_and_locked_1m_beta_positive": true,
+      "full_3m_positive_p_below_10pct": true
+    },
+    "credit_return_gates": {
+      "full_3m_easing_positive_p_below_10pct": true,
+      "early_and_locked_3m_beta_positive": true
+    },
+    "credit_risk_gates": {
+      "positive_at_three_of_four_risk_targets": true,
+      "significant_for_drawdown_or_tail": true
+    },
+    "valuation_gates": {
+      "positive_p_below_10pct_at_6m_and_12m": true,
+      "twelve_month_ic_positive_p_below_10pct": true
+    },
+    "eps_pass": true,
+    "credit_return_pass": true,
+    "credit_risk_pass": true,
+    "valuation_pass": true,
+    "mechanism_pass": true,
+    "performance_gates": {
+      "cagr_at_least_10pct": true,
+      "sharpe_at_least_1": true,
+      "sharpe_above_stage20": true,
+      "mdd_not_worse_than_stage20": true,
+      "bootstrap_cagr_probability_positive_at_least_60pct": true,
+      "bootstrap_sharpe_probability_positive_at_least_60pct": true,
+      "bootstrap_mdd_probability_positive_at_least_50pct": true,
+      "early_cagr_and_sharpe_above_stage20": true,
+      "locked_cagr_and_sharpe_not_below_stage20": true,
+      "locked_mdd_not_worse_by_more_than_1pctpt": true
+    },
+    "performance_pass": true,
+    "promoted_strategy": "Stage35_FundamentalDualRole",
+    "decision": "promote_stage35_fundamental_dual_role"
+  },
+  "return_predictive_regressions": [
+    {
+      "HorizonMonths": 1,
+      "Model": "EPSOnly",
+      "Observations": 232,
+      "EPSStandardizedBeta": 0.0158880033,
+      "EPSHACPValue": 0.0525215041,
+      "EPSSpearmanIC": 0.0721517667,
+      "CreditEasingStandardizedBeta": null,
+      "CreditHACPValue": null,
+      "CreditSpearmanIC": 0.0250149436,
+      "AdjustedR2": 0.0492012128,
+      "HACLags": 1
+    },
+    {
+      "HorizonMonths": 1,
+      "Model": "EPSFullControls",
+      "Observations": 232,
+      "EPSStandardizedBeta": 0.018086253,
+      "EPSHACPValue": 0.0267957659,
+      "EPSSpearmanIC": 0.0721517667,
+      "CreditEasingStandardizedBeta": null,
+      "CreditHACPValue": null,
+      "CreditSpearmanIC": 0.0250149436,
+      "AdjustedR2": 0.0703949989,
+      "HACLags": 1
+    },
+    {
+      "HorizonMonths": 1,
+      "Model": "CreditOnly",
+      "Observations": 232,
+      "EPSStandardizedBeta": null,
+      "EPSHACPValue": null,
+      "EPSSpearmanIC": 0.0721517667,
+      "CreditEasingStandardizedBeta": 0.0102793567,
+      "CreditHACPValue": 0.0136780126,
+      "CreditSpearmanIC": 0.0250149436,
+      "AdjustedR2": 0.018067492,
+      "HACLags": 1
+    },
+    {
+      "HorizonMonths": 1,
+      "Model": "CreditFullControls",
+      "Observations": 232,
+      "EPSStandardizedBeta": null,
+      "EPSHACPValue": null,
+      "EPSSpearmanIC": 0.0721517667,
+      "CreditEasingStandardizedBeta": 0.0111961466,
+      "CreditHACPValue": 0.0618241543,
+      "CreditSpearmanIC": 0.0250149436,
+      "AdjustedR2": 0.0452993109,
+      "HACLags": 1
+    },
+    {
+      "HorizonMonths": 1,
+      "Model": "JointFullControls",
+      "Observations": 232,
+      "EPSStandardizedBeta": 0.0178696709,
+      "EPSHACPValue": 0.0301231831,
+      "EPSSpearmanIC": 0.0721517667,
+      "CreditEasingStandardizedBeta": 0.0109082387,
+      "CreditHACPValue": 0.0607793858,
+      "CreditSpearmanIC": 0.0250149436,
+      "AdjustedR2": 0.0876676534,
+      "HACLags": 1
+    },
+    {
+      "HorizonMonths": 3,
+      "Model": "EPSOnly",
+      "Observations": 230,
+      "EPSStandardizedBeta": 0.0336655785,
+      "EPSHACPValue": 0.0309324884,
+      "EPSSpearmanIC": 0.1153897366,
+      "CreditEasingStandardizedBeta": null,
+      "CreditHACPValue": null,
+      "CreditSpearmanIC": 0.0995638119,
+      "AdjustedR2": 0.067231033,
+      "HACLags": 3
+    },
+    {
+      "HorizonMonths": 3,
+      "Model": "EPSFullControls",
+      "Observations": 230,
+      "EPSStandardizedBeta": 0.0315580319,
+      "EPSHACPValue": 0.0158473639,
+      "EPSSpearmanIC": 0.1153897366,
+      "CreditEasingStandardizedBeta": null,
+      "CreditHACPValue": null,
+      "CreditSpearmanIC": 0.0995638119,
+      "AdjustedR2": 0.2197276284,
+      "HACLags": 3
+    },
+    {
+      "HorizonMonths": 3,
+      "Model": "CreditOnly",
+      "Observations": 230,
+      "EPSStandardizedBeta": null,
+      "EPSHACPValue": null,
+      "EPSSpearmanIC": 0.1153897366,
+      "CreditEasingStandardizedBeta": 0.0191839632,
+      "CreditHACPValue": 0.0433517359,
+      "CreditSpearmanIC": 0.0995638119,
+      "AdjustedR2": 0.0188692638,
+      "HACLags": 3
+    },
+    {
+      "HorizonMonths": 3,
+      "Model": "CreditFullControls",
+      "Observations": 230,
+      "EPSStandardizedBeta": null,
+      "EPSHACPValue": null,
+      "EPSSpearmanIC": 0.1153897366,
+      "CreditEasingStandardizedBeta": 0.0347139476,
+      "CreditHACPValue": 8.28652e-05,
+      "CreditSpearmanIC": 0.0995638119,
+      "AdjustedR2": 0.2369035367,
+      "HACLags": 3
+    },
+    {
+      "HorizonMonths": 3,
+      "Model": "JointFullControls",
+      "Observations": 230,
+      "EPSStandardizedBeta": 0.0310986477,
+      "EPSHACPValue": 0.0199773598,
+      "EPSSpearmanIC": 0.1153897366,
+      "CreditEasingStandardizedBeta": 0.0343473495,
+      "CreditHACPValue": 2.52917e-05,
+      "CreditSpearmanIC": 0.0995638119,
+      "AdjustedR2": 0.2784105607,
+      "HACLags": 3
+    },
+    {
+      "HorizonMonths": 6,
+      "Model": "EPSOnly",
+      "Observations": 227,
+      "EPSStandardizedBeta": 0.0318935984,
+      "EPSHACPValue": 0.3371433542,
+      "EPSSpearmanIC": 0.0269110282,
+      "CreditEasingStandardizedBeta": null,
+      "CreditHACPValue": null,
+      "CreditSpearmanIC": 0.0463303985,
+      "AdjustedR2": 0.0154006774,
+      "HACLags": 6
+    },
+    {
+      "HorizonMonths": 6,
+      "Model": "EPSFullControls",
+      "Observations": 227,
+      "EPSStandardizedBeta": 0.0392670842,
+      "EPSHACPValue": 0.095829974,
+      "EPSSpearmanIC": 0.0269110282,
+      "CreditEasingStandardizedBeta": null,
+      "CreditHACPValue": null,
+      "CreditSpearmanIC": 0.0463303985,
+      "AdjustedR2": 0.1996964779,
+      "HACLags": 6
+    },
+    {
+      "HorizonMonths": 6,
+      "Model": "CreditOnly",
+      "Observations": 227,
+      "EPSStandardizedBeta": null,
+      "EPSHACPValue": null,
+      "EPSSpearmanIC": 0.0269110282,
+      "CreditEasingStandardizedBeta": 0.0136986636,
+      "CreditHACPValue": 0.2786219861,
+      "CreditSpearmanIC": 0.0463303985,
+      "AdjustedR2": -0.0007834158,
+      "HACLags": 6
+    },
+    {
+      "HorizonMonths": 6,
+      "Model": "CreditFullControls",
+      "Observations": 227,
+      "EPSStandardizedBeta": null,
+      "EPSHACPValue": null,
+      "EPSSpearmanIC": 0.0269110282,
+      "CreditEasingStandardizedBeta": 0.0266901614,
+      "CreditHACPValue": 0.0026067635,
+      "CreditSpearmanIC": 0.0463303985,
+      "AdjustedR2": 0.1859877873,
+      "HACLags": 6
+    },
+    {
+      "HorizonMonths": 6,
+      "Model": "JointFullControls",
+      "Observations": 227,
+      "EPSStandardizedBeta": 0.0398161226,
+      "EPSHACPValue": 0.0886346526,
+      "EPSSpearmanIC": 0.0269110282,
+      "CreditEasingStandardizedBeta": 0.0275118926,
+      "CreditHACPValue": 0.007184452,
+      "CreditSpearmanIC": 0.0463303985,
+      "AdjustedR2": 0.20786884,
+      "HACLags": 6
+    }
+  ],
+  "stability_regressions": [
+    {
+      "Period": "early_2007_2017",
+      "Test": "EPS_1M",
+      "Observations": 129,
+      "StandardizedBeta": 0.0046619631,
+      "HACPValue": 0.3222612712,
+      "ExpectedSign": "positive"
+    },
+    {
+      "Period": "early_2007_2017",
+      "Test": "Credit_3M",
+      "Observations": 129,
+      "StandardizedBeta": 0.0387390305,
+      "HACPValue": 0.0011010288,
+      "ExpectedSign": "positive"
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Test": "EPS_1M",
+      "Observations": 103,
+      "StandardizedBeta": 0.0305910468,
+      "HACPValue": 0.0222092482,
+      "ExpectedSign": "positive"
+    },
+    {
+      "Period": "locked_2018_2026",
+      "Test": "Credit_3M",
+      "Observations": 101,
+      "StandardizedBeta": 0.0149819251,
+      "HACPValue": 0.2097764473,
+      "ExpectedSign": "positive"
+    }
+  ],
+  "credit_risk_regressions": [
+    {
+      "Target": "future_realized_vol_1m",
+      "Observations": 231,
+      "Events": null,
+      "CreditWideningStandardizedBeta": 0.0050869558,
+      "CreditWideningHACPValue": 0.5266045193,
+      "ExpectedSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.6007696961,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_max_drawdown_1m",
+      "Observations": 231,
+      "Events": null,
+      "CreditWideningStandardizedBeta": 0.0049130508,
+      "CreditWideningHACPValue": 0.1658476164,
+      "ExpectedSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.2535473956,
+      "HACLags": 1
+    },
+    {
+      "Target": "future_max_drawdown_3m",
+      "Observations": 231,
+      "Events": null,
+      "CreditWideningStandardizedBeta": 0.0108744563,
+      "CreditWideningHACPValue": 0.0325008356,
+      "ExpectedSign": "positive",
+      "FitScoreName": "AdjustedR2",
+      "FitScore": 0.2101714312,
+      "HACLags": 3
+    },
+    {
+      "Target": "future_left_tail_1m",
+      "Observations": 232,
+      "Events": 8.0,
+      "CreditWideningStandardizedBeta": 0.1893972697,
+      "CreditWideningHACPValue": 0.4215532305,
+      "ExpectedSign": "positive",
+      "FitScoreName": "McFaddenPseudoR2",
+      "FitScore": 0.1392230883,
+      "HACLags": 1
+    }
+  ],
+  "valuation_diagnostic": [
+    {
+      "HorizonMonths": 6,
+      "Observations": 227,
+      "ValuationGapStandardizedBeta": 0.0343399827,
+      "ValuationGapHACPValue": 0.0830852391,
+      "SpearmanIC": 0.0833977951,
+      "SpearmanICPValue": 0.210657498,
+      "Role": "eligible_slow_anchor_after_gate"
+    },
+    {
+      "HorizonMonths": 12,
+      "Observations": 221,
+      "ValuationGapStandardizedBeta": 0.1146001216,
+      "ValuationGapHACPValue": 0.0676857663,
+      "SpearmanIC": 0.1613427908,
+      "SpearmanICPValue": 0.0163646033,
+      "Role": "eligible_slow_anchor_after_gate"
+    }
+  ],
+  "credit_robustness_diagnostics": [
+    {
+      "Feature": "AA_Widening_Primary",
+      "HorizonMonths": 1,
+      "Observations": 232,
+      "WideningStandardizedBeta": -0.008494129,
+      "HACPValue": 0.162411905,
+      "ExpectedSign": "negative",
+      "Traded": true
+    },
+    {
+      "Feature": "AA_Widening_Primary",
+      "HorizonMonths": 3,
+      "Observations": 230,
+      "WideningStandardizedBeta": -0.0299743553,
+      "HACPValue": 0.0007505064,
+      "ExpectedSign": "negative",
+      "Traded": true
+    },
+    {
+      "Feature": "AA_Widening_Primary",
+      "HorizonMonths": 6,
+      "Observations": 227,
+      "WideningStandardizedBeta": -0.0216761198,
+      "HACPValue": 0.0278465716,
+      "ExpectedSign": "negative",
+      "Traded": true
+    },
+    {
+      "Feature": "BBB_Widening_Robustness",
+      "HorizonMonths": 1,
+      "Observations": 232,
+      "WideningStandardizedBeta": -0.0081851664,
+      "HACPValue": 0.2634091898,
+      "ExpectedSign": "negative",
+      "Traded": false
+    },
+    {
+      "Feature": "BBB_Widening_Robustness",
+      "HorizonMonths": 3,
+      "Observations": 230,
+      "WideningStandardizedBeta": -0.0364099967,
+      "HACPValue": 0.0042667379,
+      "ExpectedSign": "negative",
+      "Traded": false
+    },
+    {
+      "Feature": "BBB_Widening_Robustness",
+      "HorizonMonths": 6,
+      "Observations": 227,
+      "WideningStandardizedBeta": -0.0208811312,
+      "HACPValue": 0.2488023202,
+      "ExpectedSign": "negative",
+      "Traded": false
+    },
+    {
+      "Feature": "Quality_Widening_Robustness",
+      "HorizonMonths": 1,
+      "Observations": 232,
+      "WideningStandardizedBeta": 0.0030148568,
+      "HACPValue": 0.6458339831,
+      "ExpectedSign": "negative",
+      "Traded": false
+    },
+    {
+      "Feature": "Quality_Widening_Robustness",
+      "HorizonMonths": 3,
+      "Observations": 230,
+      "WideningStandardizedBeta": 0.0015724964,
+      "HACPValue": 0.8956135679,
+      "ExpectedSign": "negative",
+      "Traded": false
+    },
+    {
+      "Feature": "Quality_Widening_Robustness",
+      "HorizonMonths": 6,
+      "Observations": 227,
+      "WideningStandardizedBeta": 0.0097626305,
+      "HACPValue": 0.5993126182,
+      "ExpectedSign": "negative",
+      "Traded": false
+    }
+  ],
+  "false_positive_regression": [
+    {
+      "Observations": 204,
+      "FalsePositiveEvents": 106,
+      "CreditWideningStandardizedBeta": 0.1730140476,
+      "CreditWideningHACPValue": 0.1495419051,
+      "ExpectedSign": "negative",
+      "McFaddenPseudoR2": 0.0194127034
+    }
+  ],
+  "fundamental_state_table": [
+    {
+      "State": "EPS Down / Credit Easing",
+      "Months": 42,
+      "MeanFutureReturn1M": 0.0038682542,
+      "MeanFutureReturn3M": 0.0271330634,
+      "MeanFutureRealizedVol1M": 0.1718175925,
+      "MeanFutureMaxDrawdown3M": 0.0916069531,
+      "FutureLeftTailRate1M": 0.0476190476,
+      "MeanStage20KODEXWeight": 0.2232975894
+    },
+    {
+      "State": "EPS Down / Credit Stress",
+      "Months": 70,
+      "MeanFutureReturn1M": 0.0006548512,
+      "MeanFutureReturn3M": 0.0062156945,
+      "MeanFutureRealizedVol1M": 0.2047254752,
+      "MeanFutureMaxDrawdown3M": 0.1002395301,
+      "FutureLeftTailRate1M": 0.0428571429,
+      "MeanStage20KODEXWeight": 0.242056266
+    },
+    {
+      "State": "EPS Up / Credit Easing",
+      "Months": 60,
+      "MeanFutureReturn1M": 0.0198236857,
+      "MeanFutureReturn3M": 0.0552723979,
+      "MeanFutureRealizedVol1M": 0.1873185907,
+      "MeanFutureMaxDrawdown3M": 0.0839062739,
+      "FutureLeftTailRate1M": 0.0,
+      "MeanStage20KODEXWeight": 0.2501206344
+    },
+    {
+      "State": "EPS Up / Credit Stress",
+      "Months": 60,
+      "MeanFutureReturn1M": 0.0188812885,
+      "MeanFutureReturn3M": 0.0543428227,
+      "MeanFutureRealizedVol1M": 0.1980694804,
+      "MeanFutureMaxDrawdown3M": 0.1016127831,
+      "FutureLeftTailRate1M": 0.05,
+      "MeanStage20KODEXWeight": 0.2927969151
+    }
+  ],
+  "performance_comparison": [
+    {
+      "Strategy": "Stage20_Frozen",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0939740153,
+      "Volatility": 0.0959808832,
+      "Sharpe": 0.9865029238,
+      "Sortino": 1.8566616292,
+      "MDD": -0.1401480684,
+      "Calmar": 0.6705337891,
+      "FinalMultiple": 5.6772165405,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0268096176,
+      "TotalCost": 0.0186033023
+    },
+    {
+      "Strategy": "Stage20_Frozen",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0664933375,
+      "Volatility": 0.0907117841,
+      "Sharpe": 0.7562604472,
+      "Sortino": 1.3107717092,
+      "MDD": -0.1401480684,
+      "Calmar": 0.4744506168,
+      "FinalMultiple": 1.997791114,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0438158722,
+      "TotalCost": 0.0166792906
+    },
+    {
+      "Strategy": "Stage20_Frozen",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1293924988,
+      "Volatility": 0.1018606281,
+      "Sharpe": 1.2502705269,
+      "Sortino": 2.5848541994,
+      "MDD": -0.1141902445,
+      "Calmar": 1.1331309376,
+      "FinalMultiple": 2.8417468176,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0055105221,
+      "TotalCost": 0.0019240117
+    },
+    {
+      "Strategy": "Stage35_NoChangeReproduction",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0939740392,
+      "Volatility": 0.0959808827,
+      "Sharpe": 0.9865031564,
+      "Sortino": 1.8566623832,
+      "MDD": -0.1401480618,
+      "Calmar": 0.6705339908,
+      "FinalMultiple": 5.6772189358,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.026809597,
+      "TotalCost": 0.0186032886
+    },
+    {
+      "Strategy": "Stage35_NoChangeReproduction",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0664933645,
+      "Volatility": 0.0907117758,
+      "Sharpe": 0.7562607882,
+      "Sortino": 1.3107725228,
+      "MDD": -0.1401480618,
+      "Calmar": 0.4744508315,
+      "FinalMultiple": 1.9977916572,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0438158364,
+      "TotalCost": 0.0166792774
+    },
+    {
+      "Strategy": "Stage35_NoChangeReproduction",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1293925185,
+      "Volatility": 0.1018606366,
+      "Sharpe": 1.2502706035,
+      "Sortino": 2.58485471,
+      "MDD": -0.1141902425,
+      "Calmar": 1.1331311306,
+      "FinalMultiple": 2.8417472439,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0055105205,
+      "TotalCost": 0.0019240111
+    },
+    {
+      "Strategy": "Stage35_EPSAlpha",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0986403454,
+      "Volatility": 0.0997086004,
+      "Sharpe": 0.9960981904,
+      "Sortino": 1.9141077741,
+      "MDD": -0.1401480618,
+      "Calmar": 0.7038295363,
+      "FinalMultiple": 6.1641591425,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0287417606,
+      "TotalCost": 0.0201598362
+    },
+    {
+      "Strategy": "Stage35_EPSAlpha",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0664933645,
+      "Volatility": 0.0907117758,
+      "Sharpe": 0.7562607882,
+      "Sortino": 1.3107725228,
+      "MDD": -0.1401480618,
+      "Calmar": 0.4744508315,
+      "FinalMultiple": 1.9977916572,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0438158364,
+      "TotalCost": 0.0166792774
+    },
+    {
+      "Strategy": "Stage35_EPSAlpha",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1402723155,
+      "Volatility": 0.109385326,
+      "Sharpe": 1.2596878012,
+      "Sortino": 2.6849104783,
+      "MDD": -0.1061281825,
+      "Calmar": 1.3217254098,
+      "FinalMultiple": 3.0854864771,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0098625783,
+      "TotalCost": 0.0034805587
+    },
+    {
+      "Strategy": "Stage35_CreditAlpha",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0836998761,
+      "Volatility": 0.0974756732,
+      "Sharpe": 0.8753138413,
+      "Sortino": 1.6069343297,
+      "MDD": -0.1702372595,
+      "Calmar": 0.4916660217,
+      "FinalMultiple": 4.7305081149,
+      "PositiveMonths": 0.5905172414,
+      "AvgTurnover": 0.0489618603,
+      "TotalCost": 0.0345457634
+    },
+    {
+      "Strategy": "Stage35_CreditAlpha",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0554321397,
+      "Volatility": 0.0913367549,
+      "Sharpe": 0.6371570602,
+      "Sortino": 1.0471708555,
+      "MDD": -0.1702372595,
+      "Calmar": 0.3256169646,
+      "FinalMultiple": 1.7859771028,
+      "PositiveMonths": 0.5813953488,
+      "AvgTurnover": 0.0655088037,
+      "TotalCost": 0.0251510153
+    },
+    {
+      "Strategy": "Stage35_CreditAlpha",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1201734385,
+      "Volatility": 0.1042810941,
+      "Sharpe": 1.1439761076,
+      "Sortino": 2.3945962768,
+      "MDD": -0.1122408882,
+      "Calmar": 1.0706743372,
+      "FinalMultiple": 2.6486947159,
+      "PositiveMonths": 0.6019417476,
+      "AvgTurnover": 0.0282380184,
+      "TotalCost": 0.009394748
+    },
+    {
+      "Strategy": "Stage35_CreditRiskConfirmation",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.0913444633,
+      "Volatility": 0.0907938868,
+      "Sharpe": 1.0109017684,
+      "Sortino": 1.9389998155,
+      "MDD": -0.1382223894,
+      "Calmar": 0.6608514269,
+      "FinalMultiple": 5.4191240182,
+      "PositiveMonths": 0.6120689655,
+      "AvgTurnover": 0.0256438189,
+      "TotalCost": 0.0177122652
+    },
+    {
+      "Strategy": "Stage35_CreditRiskConfirmation",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0671517721,
+      "Volatility": 0.0896209636,
+      "Sharpe": 0.7712881926,
+      "Sortino": 1.3603592893,
+      "MDD": -0.1382223894,
+      "Calmar": 0.48582413,
+      "FinalMultiple": 2.0110901617,
+      "PositiveMonths": 0.5891472868,
+      "AvgTurnover": 0.0416680595,
+      "TotalCost": 0.0157920809
+    },
+    {
+      "Strategy": "Stage35_CreditRiskConfirmation",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.122419115,
+      "Volatility": 0.0920217792,
+      "Sharpe": 1.305819547,
+      "Sortino": 2.8219345161,
+      "MDD": -0.0957675951,
+      "Calmar": 1.2782937156,
+      "FinalMultiple": 2.6946201226,
+      "PositiveMonths": 0.640776699,
+      "AvgTurnover": 0.0055746245,
+      "TotalCost": 0.0019201843
+    },
+    {
+      "Strategy": "Stage35_ValuationAnchor",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1105259349,
+      "Volatility": 0.1091525677,
+      "Sharpe": 1.0182335963,
+      "Sortino": 1.9339845153,
+      "MDD": -0.1379893519,
+      "Calmar": 0.8009743748,
+      "FinalMultiple": 7.5896480572,
+      "PositiveMonths": 0.6206896552,
+      "AvgTurnover": 0.0316068955,
+      "TotalCost": 0.0223638918
+    },
+    {
+      "Strategy": "Stage35_ValuationAnchor",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.085005126,
+      "Volatility": 0.0967292596,
+      "Sharpe": 0.8938873983,
+      "Sortino": 1.6013376037,
+      "MDD": -0.1379893519,
+      "Calmar": 0.6160267063,
+      "FinalMultiple": 2.4037635321,
+      "PositiveMonths": 0.6124031008,
+      "AvgTurnover": 0.0393153677,
+      "TotalCost": 0.0151450574
+    },
+    {
+      "Strategy": "Stage35_ValuationAnchor",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.1433372597,
+      "Volatility": 0.1228667045,
+      "Sharpe": 1.1561300619,
+      "Sortino": 2.3081812454,
+      "MDD": -0.1340726736,
+      "Calmar": 1.0691012256,
+      "FinalMultiple": 3.1574021138,
+      "PositiveMonths": 0.6310679612,
+      "AvgTurnover": 0.0219525955,
+      "TotalCost": 0.0072188344
+    },
+    {
+      "Strategy": "Stage35_FundamentalDualRole",
+      "Period": "full_2007_2026",
+      "Start": "2007-04",
+      "End": "2026-07",
+      "Months": 232.0,
+      "CAGR": 0.1060756884,
+      "Volatility": 0.10042664,
+      "Sharpe": 1.0573641671,
+      "Sortino": 2.0670233104,
+      "MDD": -0.1374348684,
+      "Calmar": 0.7718251538,
+      "FinalMultiple": 7.0227471888,
+      "PositiveMonths": 0.6163793103,
+      "AvgTurnover": 0.0366169163,
+      "TotalCost": 0.0261425176
+    },
+    {
+      "Strategy": "Stage35_FundamentalDualRole",
+      "Period": "early_2007_2017",
+      "Start": "2007-04",
+      "End": "2017-12",
+      "Months": 129.0,
+      "CAGR": 0.0810672778,
+      "Volatility": 0.0932446197,
+      "Sharpe": 0.8844676923,
+      "Sortino": 1.6110563438,
+      "MDD": -0.1374348684,
+      "Calmar": 0.5898596097,
+      "FinalMultiple": 2.3116217016,
+      "PositiveMonths": 0.5968992248,
+      "AvgTurnover": 0.0449661462,
+      "TotalCost": 0.0174149849
+    },
+    {
+      "Strategy": "Stage35_FundamentalDualRole",
+      "Period": "locked_2018_2026",
+      "Start": "2018-01",
+      "End": "2026-07",
+      "Months": 103.0,
+      "CAGR": 0.138214488,
+      "Volatility": 0.1086111393,
+      "Sharpe": 1.2511579373,
+      "Sortino": 2.6336216221,
+      "MDD": -0.1198359357,
+      "Calmar": 1.1533642822,
+      "FinalMultiple": 3.0380175026,
+      "PositiveMonths": 0.640776699,
+      "AvgTurnover": 0.0261601138,
+      "TotalCost": 0.0087275327
+    }
+  ],
+  "bootstrap_vs_stage20": [
+    {
+      "Candidate": "Stage35_NoChangeReproduction",
+      "Metric": "delta_CAGR",
+      "Mean": 2.44e-08,
+      "P05": -1e-10,
+      "P50": 2.31e-08,
+      "P95": 5.37e-08,
+      "ProbabilityPositive": 0.949,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_NoChangeReproduction",
+      "Metric": "delta_Sharpe",
+      "Mean": 2.295e-07,
+      "P05": -3.33e-08,
+      "P50": 2.225e-07,
+      "P95": 5.344e-07,
+      "ProbabilityPositive": 0.9175,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_NoChangeReproduction",
+      "Metric": "delta_MDD",
+      "Mean": 4.46e-08,
+      "P05": -6.2e-09,
+      "P50": 6.5e-09,
+      "P95": 2.134e-07,
+      "ProbabilityPositive": 0.894,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_EPSAlpha",
+      "Metric": "delta_CAGR",
+      "Mean": 0.004733537,
+      "P05": -1e-09,
+      "P50": 0.0045414841,
+      "P95": 0.0136274484,
+      "ProbabilityPositive": 0.948,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_EPSAlpha",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.010353666,
+      "P05": -0.0078179506,
+      "P50": 0.0063641058,
+      "P95": 0.0383161947,
+      "ProbabilityPositive": 0.8255,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_EPSAlpha",
+      "Metric": "delta_MDD",
+      "Mean": 0.001992081,
+      "P05": -5.56e-08,
+      "P50": 4.14e-08,
+      "P95": 0.008062062,
+      "ProbabilityPositive": 0.8745,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_CreditAlpha",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0101166437,
+      "P05": -0.0217629835,
+      "P50": -0.0102126641,
+      "P95": 0.0012048222,
+      "ProbabilityPositive": 0.0705,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_CreditAlpha",
+      "Metric": "delta_Sharpe",
+      "Mean": -0.1150257025,
+      "P05": -0.2418022891,
+      "P50": -0.1121892239,
+      "P95": 0.008084319,
+      "ProbabilityPositive": 0.0635,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_CreditAlpha",
+      "Metric": "delta_MDD",
+      "Mean": -0.017931687,
+      "P05": -0.0513490903,
+      "P50": -0.018491128,
+      "P95": 0.0071696464,
+      "ProbabilityPositive": 0.2755,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_CreditRiskConfirmation",
+      "Metric": "delta_CAGR",
+      "Mean": -0.0026230443,
+      "P05": -0.0109124105,
+      "P50": -0.0021714266,
+      "P95": 0.0046117904,
+      "ProbabilityPositive": 0.3015,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_CreditRiskConfirmation",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.024195656,
+      "P05": -0.0242547202,
+      "P50": 0.0224505187,
+      "P95": 0.0797714837,
+      "ProbabilityPositive": 0.768,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_CreditRiskConfirmation",
+      "Metric": "delta_MDD",
+      "Mean": 0.0077444238,
+      "P05": -0.0015330033,
+      "P50": 0.0054202724,
+      "P95": 0.0205604033,
+      "ProbabilityPositive": 0.9105,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_ValuationAnchor",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0169419331,
+      "P05": -0.0019324335,
+      "P50": 0.0163888379,
+      "P95": 0.0386446962,
+      "ProbabilityPositive": 0.9265,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_ValuationAnchor",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0286200419,
+      "P05": -0.1357920398,
+      "P50": 0.0286120689,
+      "P95": 0.1928989033,
+      "ProbabilityPositive": 0.616,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_ValuationAnchor",
+      "Metric": "delta_MDD",
+      "Mean": -0.0181038359,
+      "P05": -0.0729669912,
+      "P50": -0.011240574,
+      "P95": 0.0226871246,
+      "ProbabilityPositive": 0.288,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_FundamentalDualRole",
+      "Metric": "delta_CAGR",
+      "Mean": 0.0124174985,
+      "P05": -0.0032894232,
+      "P50": 0.0116955471,
+      "P95": 0.0302484161,
+      "ProbabilityPositive": 0.897,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_FundamentalDualRole",
+      "Metric": "delta_Sharpe",
+      "Mean": 0.0674039399,
+      "P05": -0.0852736831,
+      "P50": 0.0674782063,
+      "P95": 0.2184345816,
+      "ProbabilityPositive": 0.7635,
+      "Replications": 2000,
+      "BlockMonths": 12
+    },
+    {
+      "Candidate": "Stage35_FundamentalDualRole",
+      "Metric": "delta_MDD",
+      "Mean": -0.0014568122,
+      "P05": -0.0507108572,
+      "P50": 0.0027132,
+      "P95": 0.0328260213,
+      "ProbabilityPositive": 0.572,
+      "Replications": 2000,
+      "BlockMonths": 12
+    }
+  ],
+  "reproduction_audit": {
+    "months": 232,
+    "max_absolute_return_error": 2.1228842964592098e-07,
+    "max_absolute_weight_error": 2.5799523781788736e-06
+  },
+  "solver_audit": {
+    "Stage35_NoChangeReproduction": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -8.111499527618804e-10,
+      "minimum_cdar_slack": -9.92200710481228e-10,
+      "volatility_guard_binding_months": 57,
+      "cdar_guard_binding_months": 28
+    },
+    "Stage35_EPSAlpha": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.528997035879172e-10,
+      "minimum_cdar_slack": -9.92200710481228e-10,
+      "volatility_guard_binding_months": 57,
+      "cdar_guard_binding_months": 28
+    },
+    "Stage35_CreditAlpha": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.872822004375337e-10,
+      "minimum_cdar_slack": -8.667812856355539e-10,
+      "volatility_guard_binding_months": 72,
+      "cdar_guard_binding_months": 31
+    },
+    "Stage35_CreditRiskConfirmation": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.016999369393375e-10,
+      "minimum_cdar_slack": -5.249819190478178e-10,
+      "volatility_guard_binding_months": 59,
+      "cdar_guard_binding_months": 24
+    },
+    "Stage35_ValuationAnchor": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -8.985928945381971e-10,
+      "minimum_cdar_slack": -5.041045358922247e-11,
+      "volatility_guard_binding_months": 91,
+      "cdar_guard_binding_months": 25
+    },
+    "Stage35_FundamentalDualRole": {
+      "months": 232,
+      "successes": 232,
+      "fallbacks": 0,
+      "maximum_weight_sum_error": 2.220446049250313e-16,
+      "minimum_volatility_slack": -9.641515086311614e-10,
+      "minimum_cdar_slack": -8.771791626394077e-10,
+      "volatility_guard_binding_months": 101,
+      "cdar_guard_binding_months": 18
+    }
+  },
+  "checks": {
+    "source_files_unchanged": true,
+    "stage20_and_stage34_files_unchanged": true,
+    "fundamental_signal_precedes_target": true,
+    "first_2007_signal_has_presample_calibration": true,
+    "fixed_1m_eps_and_20d_credit_signals": true,
+    "no_acceleration_curve_or_threshold_search": true,
+    "valuation_anchor_uses_only_fully_observed_12m_targets": true,
+    "no_leverage_long_only_sum_to_one": true,
+    "no_change_mode_reproduces_stage20_returns": true,
+    "no_change_mode_reproduces_stage20_weights": true,
+    "all_candidate_solvers_feasible": true
+  },
+  "source_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_fwdPE.EPS.rev.xlsx": {
+      "sha256": "36a65e5cf1bf060f74544e49a38ee72bcab6c989d0a1772bce4bffad53ce23fe",
+      "bytes": 264194,
+      "last_write_time_ns": 1787981344413035000
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_국고채.회사채.xlsx": {
+      "sha256": "8bd43c6737db28b7d3c431035a21f5bebedeb7d57c442e3bc9b39c11bc1a1e34",
+      "bytes": 580123,
+      "last_write_time_ns": 1788005499789890400
+    }
+  },
+  "source_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_fwdPE.EPS.rev.xlsx": {
+      "sha256": "36a65e5cf1bf060f74544e49a38ee72bcab6c989d0a1772bce4bffad53ce23fe",
+      "bytes": 264194,
+      "last_write_time_ns": 1787981344413035000
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\raw_data\\260829_국고채.회사채.xlsx": {
+      "sha256": "8bd43c6737db28b7d3c431035a21f5bebedeb7d57c442e3bc9b39c11bc1a1e34",
+      "bytes": 580123,
+      "last_write_time_ns": 1788005499789890400
+    }
+  },
+  "frozen_manifest_before": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\daily_technical_confidence_slsqp.py": {
+      "sha256": "fd24ae62eeba1abd1e5ba13f96bd7cbdca3cb4d2b2d7bac13ece7cf3d6f92736",
+      "bytes": 40129,
+      "last_write_time_ns": 1787999468405997800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage34_futures_basis_oi_confirmation\\futures_basis_oi_confirmation_slsqp.py": {
+      "sha256": "d47a32b94327cfa01a2f783ded02e72520528cb95697e5a6ee39755ddce17995",
+      "bytes": 57278,
+      "last_write_time_ns": 1788015658665901100
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\daily_technical_confidence_monthly.csv": {
+      "sha256": "183fbd4b7b91fc43fa111e78c0fd10b84bc668638efebe35a4a31bb7b9755463",
+      "bytes": 445768,
+      "last_write_time_ns": 1787999495298758300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\stage14_static_recomputed_monthly.csv": {
+      "sha256": "6bba1f2a31d080dfe6184dbb996dbd6057771ea9abc7e0f40645245c784eebf4",
+      "bytes": 216251,
+      "last_write_time_ns": 1787999495258948800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\monthly_technical_signals.csv": {
+      "sha256": "8a7813ef44147ed86671b0eb7c9cb9a9b70a17e34bf80e72baea4ad144e4839d",
+      "bytes": 126948,
+      "last_write_time_ns": 1787999495311758000
+    }
+  },
+  "frozen_manifest_after": {
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\daily_technical_confidence_slsqp.py": {
+      "sha256": "fd24ae62eeba1abd1e5ba13f96bd7cbdca3cb4d2b2d7bac13ece7cf3d6f92736",
+      "bytes": 40129,
+      "last_write_time_ns": 1787999468405997800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage34_futures_basis_oi_confirmation\\futures_basis_oi_confirmation_slsqp.py": {
+      "sha256": "d47a32b94327cfa01a2f783ded02e72520528cb95697e5a6ee39755ddce17995",
+      "bytes": 57278,
+      "last_write_time_ns": 1788015658665901100
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\daily_technical_confidence_monthly.csv": {
+      "sha256": "183fbd4b7b91fc43fa111e78c0fd10b84bc668638efebe35a4a31bb7b9755463",
+      "bytes": 445768,
+      "last_write_time_ns": 1787999495298758300
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\stage14_static_recomputed_monthly.csv": {
+      "sha256": "6bba1f2a31d080dfe6184dbb996dbd6057771ea9abc7e0f40645245c784eebf4",
+      "bytes": 216251,
+      "last_write_time_ns": 1787999495258948800
+    },
+    "D:\\Programming\\python_example\\RegimeDecisionTest\\strategies\\stage20_daily_technical_confidence\\outputs\\monthly_technical_signals.csv": {
+      "sha256": "8a7813ef44147ed86671b0eb7c9cb9a9b70a17e34bf80e72baea4ad144e4839d",
+      "bytes": 126948,
+      "last_write_time_ns": 1787999495311758000
+    }
+  }
+}

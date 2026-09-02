@@ -1,0 +1,10 @@
+Statistic,ExistingDynamic,RobustWinner
+TradingDays,2240.0,2240.0
+StressPositiveDays,791.0,837.0
+StressAbove025Days,466.0,255.0
+TransferPositiveDays,791.0,837.0
+AverageStress,0.11645342727046426,0.07429019963941198
+MaximumStress,1.0,1.0
+AverageTransfer,0.029113356817616065,0.02600156987379419
+MaximumTransfer,0.25,0.35
+AverageTurnover,0.007490864591802105,0.007494780094288452

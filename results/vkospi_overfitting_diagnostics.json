@@ -1,0 +1,73 @@
+{
+  "candidate_count": 810,
+  "strict_pass_count": 2,
+  "strict_pass_rate": 0.0024691358024691358,
+  "selection_windows": {
+    "outer": "2007-04 through 2017-12",
+    "inner_validation": "2013-01 through 2017-12",
+    "warning": "The inner window is nested inside the outer window, so the two gates are not independent tests."
+  },
+  "winner_score": 0.8895061728395062,
+  "runner_up_score": 0.8832561728395061,
+  "winner_runner_score_gap": 0.006250000000000089,
+  "one_axis_neighborhood_count": 14,
+  "one_axis_neighborhood_strict_count": 2,
+  "locked_bootstrap": {
+    "probability_cagr_improves": 0.5748,
+    "probability_sharpe_improves": 0.868,
+    "probability_mdd_improves": 0.6438,
+    "probability_all_three_improve": 0.404,
+    "cagr_delta_p05": -0.005050286185517105,
+    "cagr_delta_median": 0.0007678814802936085,
+    "cagr_delta_p95": 0.007818952638349952,
+    "sharpe_delta_p05": -0.007863806710123277,
+    "sharpe_delta_median": 0.03375132049083884,
+    "sharpe_delta_p95": 0.10119500526590004,
+    "mdd_delta_p05": -0.003350845454909157,
+    "mdd_delta_median": 0.0005830550756168451,
+    "mdd_delta_p95": 0.02116328305169146
+  },
+  "locked_years_robust_outperformed": 6,
+  "locked_years_total": 9,
+  "subperiod_deltas_robust_minus_existing": {
+    "early_calibration_2007_04_2012_12": {
+      "CAGR": 0.0010824300214835603,
+      "Sharpe": 0.004087860925635178,
+      "MDD": 5.7040571728061984e-05
+    },
+    "locked_early_2018_01_2021_12": {
+      "CAGR": 0.006717042475006263,
+      "Sharpe": 0.08362757190810943,
+      "MDD": -0.0006555646485959521
+    },
+    "locked_late_2022_01_2026_07": {
+      "CAGR": -0.003617613823022392,
+      "Sharpe": 0.0007619270922769594,
+      "MDD": 0.0015524164077285185
+    },
+    "validation_2013_01_2017_12": {
+      "CAGR": 0.00017872804733909398,
+      "Sharpe": 0.0032666795827198114,
+      "MDD": 0.00033837419043591943
+    }
+  },
+  "controls_present": [
+    "all coded selection ends at 2017-12",
+    "2018-01 onward is a locked evaluation window",
+    "strict CAGR, Sharpe and MDD gates are required in both pre-lock windows",
+    "paired six-month block bootstrap and doubled-cost audit are reported"
+  ],
+  "residual_overfitting_risks": [
+    "810 candidates create multiple-comparison selection pressure",
+    "the inner 2013-2017 window is a subset of 2007-2017, not an independent validation set",
+    "the winning score is only slightly above the runner-up score",
+    "the macro constants and within-mode stress weights were fixed heuristics, not preregistered estimates",
+    "revised macro data and repeated project-level experimentation can create researcher degrees of freedom",
+    "no deflated Sharpe ratio, White reality check, CSCV/PBO, or external-market replication has been completed"
+  ],
+  "conclusion": "Code-level leakage controls are present, but overfitting cannot be ruled out. Evidence is suggestive rather than confirmatory.",
+  "tail_probability_reproduction": {
+    "observations": 194,
+    "max_absolute_probability_difference": 7.771561172376096e-15
+  }
+}

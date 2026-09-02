@@ -1,0 +1,13 @@
+Frequency,Feature,Target,SpearmanIC,Observations
+daily,pure_direction_raw,KOSPI200_forward_5d,-0.016996764709924023,3931
+daily,pure_direction_raw,KOSPI200_forward_20d,0.006864701368137696,3916
+daily,option_direction_score,KOSPI200_forward_5d,-0.02039245254737015,3931
+daily,option_direction_score,KOSPI200_forward_20d,-0.005152663406622169,3916
+daily,z_option_erp_proxy,KOSPI200_forward_5d,0.08616826545691283,4736
+daily,z_option_erp_proxy,KOSPI200_forward_20d,0.1331751792711224,4721
+monthly,pure_direction_raw,KODEX200_target_month_return,0.033755870289828134,244
+monthly,option_direction_score,KODEX200_target_month_return,0.026103118843165678,244
+monthly,z_option_erp_proxy,KODEX200_target_month_return,0.15048180778079293,244
+monthly,pure_direction_raw,VIX6_VKOSPI_stress_score_correlation,0.21487805386790165,244
+monthly,option_direction_score,VIX6_VKOSPI_stress_score_correlation,0.19181653548950167,244
+monthly,z_option_erp_proxy,VIX6_VKOSPI_stress_score_correlation,0.8523476724012242,244
