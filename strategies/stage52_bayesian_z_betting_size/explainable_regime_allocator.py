@@ -48,7 +48,6 @@ import pandas as pd
 from scipy.stats import norm
 from sklearn.linear_model import BayesianRidge
 
-
 # ---------------------------------------------------------------------------
 # 1. 도메인 계약과 선언된 가정
 # ---------------------------------------------------------------------------
@@ -260,7 +259,9 @@ class RiskFreeRateRepository:
         series = pd.Series(rates, index=dates, dtype=float).dropna()
         series = series.loc[~series.index.duplicated(keep="last")].sort_index()
         if series.empty:
-            raise ValueError(f"{source} has no usable {self.config.risk_free_rate_item}")
+            raise ValueError(
+                f"{source} has no usable {self.config.risk_free_rate_item}"
+            )
         return series / 100.0
 
     def daily_returns(self, index: pd.DatetimeIndex) -> pd.Series:
@@ -377,9 +378,7 @@ class MonthlyAssetReturnRepository:
             )
             data["symbol"] = symbol
             rows.append(data[["date", "symbol", "open", "close"]])
-        result = pd.concat(rows, ignore_index=True).dropna(
-            subset=["date", "close"]
-        )
+        result = pd.concat(rows, ignore_index=True).dropna(subset=["date", "close"])
         if cache.exists():
             cached = pd.read_csv(cache, parse_dates=["date"])
             result = pd.concat(
@@ -431,16 +430,11 @@ class MonthlyAssetReturnRepository:
             ignore_index=True,
         )
 
-        bond_source = _find_unicode_safe_file(
-            self.paths.raw_data, "krx_bond_index.csv"
-        )
+        bond_source = _find_unicode_safe_file(self.paths.raw_data, "krx_bond_index.csv")
         bond = pd.read_csv(bond_source, encoding="cp949")
         bond["date"] = pd.to_datetime(bond.iloc[:, 0])
         bond["open"] = (
-            bond.iloc[:, 1]
-            .astype(str)
-            .str.replace(",", "", regex=False)
-            .astype(float)
+            bond.iloc[:, 1].astype(str).str.replace(",", "", regex=False).astype(float)
         )
         bond["close"] = bond["open"]
         bond["symbol"] = "BOND"
@@ -466,9 +460,7 @@ class MonthlyAssetReturnRepository:
             first = clean.groupby("month", sort=True).first()
             value = first["open"].astype(float)
             if asset in {"GLD", "GSG"}:
-                aligned_fx = fx.reindex(
-                    pd.DatetimeIndex(first["date"]), method="ffill"
-                )
+                aligned_fx = fx.reindex(pd.DatetimeIndex(first["date"]), method="ffill")
                 value = value * aligned_fx.to_numpy(dtype=float)
             first_open[asset] = value
 
@@ -478,9 +470,9 @@ class MonthlyAssetReturnRepository:
         returns = raw_returns.copy()
         risk_free_audit: dict[str, Any] | None = None
         if self.config.use_risk_free_rate:
-            risk_free = RiskFreeRateRepository(
-                self.paths, self.config
-            ).monthly_returns(raw_returns.index)
+            risk_free = RiskFreeRateRepository(self.paths, self.config).monthly_returns(
+                raw_returns.index
+            )
             returns = raw_returns.sub(risk_free, axis=0)
             risk_free_audit = {
                 **RiskFreeRateRepository(self.paths, self.config).audit(),
@@ -491,7 +483,9 @@ class MonthlyAssetReturnRepository:
         audit = {
             "market_cache": str(self.paths.cache / "market_daily.csv"),
             "monthly_return_definition": "first-open(t+1)/first-open(t)-1",
-            "return_type": "excess_return" if self.config.use_risk_free_rate else "simple_return",
+            "return_type": (
+                "excess_return" if self.config.use_risk_free_rate else "simple_return"
+            ),
             "risk_free_enabled": self.config.use_risk_free_rate,
             "risk_free": risk_free_audit,
             "foreign_assets_in_krw": True,
@@ -562,9 +556,11 @@ class DailyRiskReturnRepository:
                 "For GSG, run Stage52 with --refresh-monthly-market-cache first."
             )
 
-        actual = market["KODEX200"].loc[
-            market["KODEX200"].index > pd.Timestamp("2009-03-31")
-        ].dropna(subset=["close"])
+        actual = (
+            market["KODEX200"]
+            .loc[market["KODEX200"].index > pd.Timestamp("2009-03-31")]
+            .dropna(subset=["close"])
+        )
         compass = _find_unicode_safe_file(self.paths.raw_data, "compass.db")
         with sqlite3.connect(compass) as connection:
             proxy = pd.read_sql(
@@ -582,9 +578,7 @@ class DailyRiskReturnRepository:
         proxy = proxy.loc[proxy.index < first_actual]
         kodex = pd.concat([proxy, actual]).sort_index()
 
-        bond_source = _find_unicode_safe_file(
-            self.paths.raw_data, "krx_bond_index.csv"
-        )
+        bond_source = _find_unicode_safe_file(self.paths.raw_data, "krx_bond_index.csv")
         bond_raw = pd.read_csv(bond_source, encoding="cp949")
         bond_close = pd.to_numeric(
             bond_raw.iloc[:, 1].astype(str).str.replace(",", "", regex=False),
@@ -612,7 +606,10 @@ class DailyRiskReturnRepository:
             "GSG": foreign["GSG"],
         }
         close = pd.concat(
-            {asset: frames[asset]["close"].dropna().astype(float) for asset in self.config.assets},
+            {
+                asset: frames[asset]["close"].dropna().astype(float)
+                for asset in self.config.assets
+            },
             axis=1,
         ).sort_index()
         calendar = pd.date_range(close.index.min(), close.index.max(), freq="B")
@@ -622,9 +619,9 @@ class DailyRiskReturnRepository:
         daily_returns = daily_returns.loc[:, self.config.assets]
         risk_free_audit: dict[str, Any] | None = None
         if self.config.use_risk_free_rate:
-            risk_free = RiskFreeRateRepository(
-                self.paths, self.config
-            ).daily_returns(pd.DatetimeIndex(daily_returns.index))
+            risk_free = RiskFreeRateRepository(self.paths, self.config).daily_returns(
+                pd.DatetimeIndex(daily_returns.index)
+            )
             daily_returns = daily_returns.sub(risk_free, axis=0)
             risk_free_audit = {
                 **RiskFreeRateRepository(self.paths, self.config).audit(),
@@ -633,7 +630,9 @@ class DailyRiskReturnRepository:
         audit = {
             "ohlcv_cache": str(cache),
             "foreign_assets_in_krw": True,
-            "return_type": "excess_return" if self.config.use_risk_free_rate else "simple_return",
+            "return_type": (
+                "excess_return" if self.config.use_risk_free_rate else "simple_return"
+            ),
             "risk_free_enabled": self.config.use_risk_free_rate,
             "risk_free": risk_free_audit,
             "business_day_forward_fill_limit": 5,
@@ -686,12 +685,9 @@ class MacroRegimeRepository:
             skiprows=6,
         )
         gdp.columns = ["GDP_QoQ", "GDP_YoY"]
-        gdp.index = (
-            pd.PeriodIndex(gdp.index, freq="Q")
-            .asfreq("M", how="end")
-            .to_timestamp("M")
-            + pd.offsets.MonthEnd(1)
-        )
+        gdp.index = pd.PeriodIndex(gdp.index, freq="Q").asfreq(
+            "M", how="end"
+        ).to_timestamp("M") + pd.offsets.MonthEnd(1)
         gdp = gdp.resample("ME").ffill()
 
         trade = pd.read_excel(
@@ -707,22 +703,25 @@ class MacroRegimeRepository:
                 .str.replace(",", "", regex=False)
                 .astype(float)
             )
-        trade.index = pd.to_datetime(trade.index, format="%Y.%m") + pd.offsets.MonthEnd(1)
+        trade.index = pd.to_datetime(trade.index, format="%Y.%m") + pd.offsets.MonthEnd(
+            1
+        )
         trade["Export_YoY"] = trade["수출 금액"].pct_change(12) * 100.0
 
         bsi = pd.read_csv(
             _find_unicode_safe_file(raw, "기업경기조사(전망).csv"), encoding="cp949"
         )
         bsi = bsi.loc[
-            bsi["업종코드별"].eq("제 조 업")
-            & bsi["BSI코드별"].eq("업황전망BSI 1)")
+            bsi["업종코드별"].eq("제 조 업") & bsi["BSI코드별"].eq("업황전망BSI 1)")
         ].iloc[:, 2:4]
         bsi["시점"] = (
             bsi["시점"]
             .str.replace("월", "", regex=False)
             .str.replace(" ", "", regex=False)
         )
-        bsi["시점"] = pd.to_datetime(bsi["시점"], format="%Y.%m") + pd.offsets.MonthEnd(1)
+        bsi["시점"] = pd.to_datetime(bsi["시점"], format="%Y.%m") + pd.offsets.MonthEnd(
+            1
+        )
         bsi = bsi.set_index("시점")
         bsi.columns = ["BSI"]
 
@@ -748,7 +747,9 @@ class MacroRegimeRepository:
             skiprows=6,
         )
         prices.columns = ["ExportPrice_YoY", "ImportPrice_YoY"]
-        prices.index = pd.to_datetime(prices.index, format="%Y-%m") + pd.offsets.MonthEnd(2)
+        prices.index = pd.to_datetime(
+            prices.index, format="%Y-%m"
+        ) + pd.offsets.MonthEnd(2)
 
         return pd.concat(
             [
@@ -876,9 +877,9 @@ class BayesianRegimeReturnForecaster:
             )
 
         columns = tuple(standard_deviations.index[usable])
-        x = (predictors.loc[:, columns] - means.loc[list(columns)])
+        x = predictors.loc[:, columns] - means.loc[list(columns)]
         x = x / standard_deviations.loc[list(columns)]
-        current_x = (current.loc[list(columns)] - means.loc[list(columns)])
+        current_x = current.loc[list(columns)] - means.loc[list(columns)]
         current_x = current_x / standard_deviations.loc[list(columns)]
 
         model = BayesianRidge(
@@ -935,9 +936,7 @@ class BayesianRegimeReturnForecaster:
         self, feature_history: pd.DataFrame, current_features: pd.Series
     ) -> dict[str, ForecastEstimate]:
         return {
-            asset: self._fit_one(
-                feature_history, f"return_{asset}", current_features
-            )
+            asset: self._fit_one(feature_history, f"return_{asset}", current_features)
             for asset in self.config.assets
         }
 
@@ -980,12 +979,8 @@ class LedoitWolfMonthlyCovarianceForecaster:
         theta_ii = cross - variances[:, None] * sample
         theta_jj = cross.T - variances[None, :] * sample
         ratio = np.outer(1.0 / standard_deviations, standard_deviations)
-        rho_off = (average_correlation / 2.0) * (
-            ratio * theta_ii + ratio.T * theta_jj
-        )
-        rho_hat = float(
-            np.diag(pi_matrix).sum() + rho_off[off_diagonal].sum()
-        )
+        rho_off = (average_correlation / 2.0) * (ratio * theta_ii + ratio.T * theta_jj)
+        rho_hat = float(np.diag(pi_matrix).sum() + rho_off[off_diagonal].sum())
         distance = target - sample
         gamma_hat = float((distance * distance).sum())
         shrinkage = (
@@ -1018,9 +1013,7 @@ class LedoitWolfMonthlyCovarianceForecaster:
     ) -> CovarianceEstimate:
         cutoff = (decision_month - 1).to_timestamp("M")
         window = daily_returns.loc[:cutoff, self.config.assets]
-        window = window.dropna(how="any").tail(
-            self.config.covariance_lookback_days
-        )
+        window = window.dropna(how="any").tail(self.config.covariance_lookback_days)
         if len(window) < self.config.covariance_lookback_days:
             raise ValueError(
                 f"{decision_month}: {len(window)} complete daily rows, "
@@ -1056,18 +1049,16 @@ class TransactionCostModel:
             [config.assets.index("GLD"), config.assets.index("GSG")]
         )
 
-    def expected_cost(
-        self, weights: np.ndarray, pretrade_weights: np.ndarray
-    ) -> float:
+    def expected_cost(self, weights: np.ndarray, pretrade_weights: np.ndarray) -> float:
         change = weights - pretrade_weights
         # sqrt(x^2 + epsilon)은 |x|의 미분 가능한 근사다. 경제 파라미터가 아니라
-        # SLSQP가 0에서 안정적으로 gradient를 계산하기 위한 수치 장치다.
         smooth_change = np.sqrt(change**2 + self.config.numerical_epsilon)
         trading = float(smooth_change.sum()) * self.config.proportional_trade_cost
         net_foreign_change = float(change[self.foreign_indices].sum())
-        foreign_exchange = math.sqrt(
-            net_foreign_change**2 + self.config.numerical_epsilon
-        ) * self.config.foreign_exchange_cost
+        foreign_exchange = (
+            math.sqrt(net_foreign_change**2 + self.config.numerical_epsilon)
+            * self.config.foreign_exchange_cost
+        )
         return trading + foreign_exchange
 
     def realized_costs(
@@ -1097,9 +1088,7 @@ def _project_to_long_only_simplex(weights: np.ndarray) -> np.ndarray:
     return projected / projected.sum()
 
 
-def _conditional_drawdown_at_risk(
-    returns: np.ndarray, confidence: float
-) -> float:
+def _conditional_drawdown_at_risk(returns: np.ndarray, confidence: float) -> float:
     """과거 경로의 최악 (1-confidence) drawdown 평균을 음수로 반환한다.
 
     이는 현재 비중을 과거 전체에 고정 보유했다고 가정한 역사적 stress measure다.
@@ -1176,7 +1165,7 @@ class BayesianZBettingSizeAllocator:
         )
         z_score = np.where(np.isfinite(z_score), z_score, 0.0)
         betting_size = np.clip(2.0 * norm.cdf(z_score) - 1.0, 0.0, 1.0)
-        #betting_size=(expected_returns>=0).astype(int)  # 단순화된 베팅 사이즈 계산
+        # betting_size=(expected_returns>=0).astype(int)  # 단순화된 베팅 사이즈 계산
         betting_sum = float(betting_size.sum())
         used_equal_weight_fallback = betting_sum <= self.config.numerical_epsilon
         if used_equal_weight_fallback:
@@ -1273,9 +1262,7 @@ class BacktestEngine:
             if len(historical_returns) < 12:
                 continue
             try:
-                covariance = self.covariance_forecaster.forecast(
-                    daily_returns, month
-                )
+                covariance = self.covariance_forecaster.forecast(daily_returns, month)
             except ValueError:
                 continue
 
@@ -1358,9 +1345,9 @@ class BacktestEngine:
                 )
                 for feature in self.config.forecast_features:
                     feature_name = feature.removeprefix("p_")
-                    row[f"regime_beta_{asset}_{feature_name}"] = (
-                        estimate.coefficients[feature]
-                    )
+                    row[f"regime_beta_{asset}_{feature_name}"] = estimate.coefficients[
+                        feature
+                    ]
                     row[f"standardized_regime_beta_{asset}_{feature_name}"] = (
                         estimate.standardized_coefficients[feature]
                     )
@@ -1401,9 +1388,7 @@ def _performance_summary(returns: pd.Series) -> dict[str, float]:
     )
     drawdown = wealth / wealth.cummax() - 1.0
     maximum_drawdown = float(drawdown.min())
-    downside = float(
-        np.sqrt(np.mean(np.minimum(clean, 0.0) ** 2)) * math.sqrt(12.0)
-    )
+    downside = float(np.sqrt(np.mean(np.minimum(clean, 0.0) ** 2)) * math.sqrt(12.0))
     return {
         "Months": float(len(clean)),
         "CAGR": float(cagr),
@@ -1411,9 +1396,9 @@ def _performance_summary(returns: pd.Series) -> dict[str, float]:
         "Sharpe": sharpe,
         "Sortino": float(clean.mean() * 12.0 / downside) if downside > 0 else math.nan,
         "MDD": maximum_drawdown,
-        "Calmar": float(cagr / abs(maximum_drawdown))
-        if maximum_drawdown < 0
-        else math.nan,
+        "Calmar": (
+            float(cagr / abs(maximum_drawdown)) if maximum_drawdown < 0 else math.nan
+        ),
         "FinalMultiple": float(wealth.iloc[-1]),
         "PositiveMonths": float((clean > 0.0).mean()),
     }
@@ -1449,8 +1434,7 @@ def analysis_periods(
         "locked_2018_2026": (config.locked_month, monthly_result.index.max()),
     }
     return {
-        name: monthly_result.loc[start:end]
-        for name, (start, end) in periods.items()
+        name: monthly_result.loc[start:end] for name, (start, end) in periods.items()
     }
 
 
@@ -1503,10 +1487,7 @@ def save_weight_artifacts(
         weights.rename_axis("month").to_csv(output / f"weights_{period}.csv")
 
         dates = pd.PeriodIndex(view.index, freq="M").to_timestamp()
-        series = [
-            view[f"w_{asset}"].to_numpy(dtype=float)
-            for asset in config.assets
-        ]
+        series = [view[f"w_{asset}"].to_numpy(dtype=float) for asset in config.assets]
         fig, ax = plt.subplots(figsize=(12.0, 5.0))
         ax.stackplot(dates, series, labels=config.assets, alpha=0.92)
         ax.set_title(f"Stage52 Portfolio Weights - {period}")
@@ -1593,9 +1574,7 @@ def save_pnl_comparison_artifacts(
             axis=1,
         )
         comparison.index = comparison.index.astype(str)
-        comparison.rename_axis("month").to_csv(
-            output / f"pnl_comparison_{period}.csv"
-        )
+        comparison.rename_axis("month").to_csv(output / f"pnl_comparison_{period}.csv")
 
         dates = pd.PeriodIndex(view.index, freq="M").to_timestamp()
         fig, ax = plt.subplots(figsize=(12.0, 5.0))
@@ -1614,9 +1593,7 @@ def save_pnl_comparison_artifacts(
     asset_performance = individual_asset_performance_table(
         monthly_result, monthly_returns, config
     )
-    asset_performance.to_csv(
-        output / "individual_asset_performance.csv", index=False
-    )
+    asset_performance.to_csv(output / "individual_asset_performance.csv", index=False)
     return asset_performance
 
 
@@ -1656,15 +1633,9 @@ def regime_beta_table(
                         ],
                         "expected_return": row[f"expected_return_{asset}"],
                         "predictive_std": row[f"predictive_std_{asset}"],
-                        "training_observations": row[
-                            f"training_observations_{asset}"
-                        ],
-                        "last_training_month": row[
-                            f"last_training_month_{asset}"
-                        ],
-                        "used_mean_fallback": row[
-                            f"used_mean_fallback_{asset}"
-                        ],
+                        "training_observations": row[f"training_observations_{asset}"],
+                        "last_training_month": row[f"last_training_month_{asset}"],
+                        "used_mean_fallback": row[f"used_mean_fallback_{asset}"],
                     }
                 )
     return pd.DataFrame(rows)
@@ -1688,11 +1659,11 @@ def validation_report(
         "finite_returns": bool(np.isfinite(result["return"]).all()),
         "finite_weights": bool(np.isfinite(weights.to_numpy()).all()),
         "long_only": bool(weights.min().min() >= -1e-8),
-        "fully_invested": bool(
-            np.allclose(weights.sum(axis=1), 1.0, atol=1e-8)
-        ),
+        "fully_invested": bool(np.allclose(weights.sum(axis=1), 1.0, atol=1e-8)),
         "macro_signal_strictly_lagged": bool(
-            (pd.PeriodIndex(result["macro_signal_month"], freq="M") < result.index).all()
+            (
+                pd.PeriodIndex(result["macro_signal_month"], freq="M") < result.index
+            ).all()
         ),
         "training_strictly_precedes_decision": bool(all(training_lag_checks)),
         "covariance_strictly_lagged": bool(
@@ -1720,13 +1691,9 @@ def validation_report(
         "start": str(result.index.min()),
         "end": str(result.index.max()),
         "fallback_solver_months": int(result["used_fallback"].sum()),
-        "equal_weight_fallback_months": int(
-            result["used_equal_weight_fallback"].sum()
-        ),
+        "equal_weight_fallback_months": int(result["used_equal_weight_fallback"].sum()),
         "binding_constraints": {
-            "annual_volatility": int(
-                result["volatility_slack"].abs().lt(1e-6).sum()
-            ),
+            "annual_volatility": int(result["volatility_slack"].abs().lt(1e-6).sum()),
             "historical_cdar": int(result["cdar_slack"].abs().lt(1e-6).sum()),
         },
         "known_statistical_limitations": {
@@ -1778,9 +1745,9 @@ def run_research(
 
     paths = RepositoryPaths.from_this_file()
     config = StrategyConfig(use_risk_free_rate=use_risk_free_rate)
-    monthly_returns, monthly_audit = MonthlyAssetReturnRepository(
-        paths, config
-    ).load(refresh_monthly_market_cache)
+    monthly_returns, monthly_audit = MonthlyAssetReturnRepository(paths, config).load(
+        refresh_monthly_market_cache
+    )
     if config.use_risk_free_rate:
         monthly_risk_free_returns = RiskFreeRateRepository(
             paths, config
@@ -1829,9 +1796,7 @@ def run_research(
         )
         monthly_result.to_csv(paths.output / "monthly_results.csv")
         regime_betas.to_csv(paths.output / "regime_betas.csv", index=False)
-        weight_summary = save_weight_artifacts(
-            monthly_result, config, paths.output
-        )
+        weight_summary = save_weight_artifacts(monthly_result, config, paths.output)
         individual_asset_performance = save_pnl_comparison_artifacts(
             monthly_result, monthly_returns, config, paths.output
         )
@@ -1839,9 +1804,7 @@ def run_research(
         with (paths.output / "validation_report.json").open(
             "w", encoding="utf-8"
         ) as handle:
-            json.dump(
-                _json_ready(report), handle, ensure_ascii=False, indent=2
-            )
+            json.dump(_json_ready(report), handle, ensure_ascii=False, indent=2)
     return {
         "historical_monthly_returns": monthly_returns,
         "monthly_risk_free_returns": monthly_risk_free_returns,
