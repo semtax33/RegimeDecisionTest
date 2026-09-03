@@ -39,7 +39,7 @@
   },
   "data_audit": {
     "monthly_returns": {
-      "market_cache": "/Users/juho/project/RegimeDecisionTest/cache/market_daily.csv",
+      "market_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\market_daily.csv",
       "monthly_return_definition": "first-open(t+1)/first-open(t)-1",
       "foreign_assets_in_krw": true,
       "rows": 244,
@@ -47,7 +47,7 @@
       "end": "2026-07"
     },
     "daily_risk_returns": {
-      "ohlcv_cache": "/Users/juho/project/RegimeDecisionTest/cache/regime_lightgbm_ohlcv.csv",
+      "ohlcv_cache": "D:\\Programming\\python_example\\RegimeDecisionTest\\cache\\regime_lightgbm_ohlcv.csv",
       "foreign_assets_in_krw": true,
       "business_day_forward_fill_limit": 5,
       "rows": 6951,
