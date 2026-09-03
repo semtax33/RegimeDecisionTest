@@ -154,6 +154,12 @@ class ForecastEstimate:
     observations: int
     last_training_month: pd.Period | None
     used_unconditional_fallback: bool
+    intercept: float
+    standardized_intercept: float
+    coefficients: dict[str, float]
+    standardized_coefficients: dict[str, float]
+    feature_means: dict[str, float]
+    feature_standard_deviations: dict[str, float]
 
 
 @dataclass(frozen=True)
@@ -663,14 +669,23 @@ class BayesianRegimeReturnForecaster:
         features = self.config.forecast_features
         complete = history[[target, *features]].dropna()
         minimum = self.config.observations_per_parameter * (len(features) + 1)
+        zero_coefficients = {feature: 0.0 for feature in features}
+        empty_feature_statistics = {feature: float("nan") for feature in features}
         if len(complete) < minimum or current[list(features)].isna().any():
             available = history[target].dropna()
+            fallback_mean = float(available.mean())
             return ForecastEstimate(
-                mean=float(available.mean()),
+                mean=fallback_mean,
                 predictive_std=float(available.std(ddof=1)),
                 observations=int(len(available)),
                 last_training_month=available.index.max() if len(available) else None,
                 used_unconditional_fallback=True,
+                intercept=fallback_mean,
+                standardized_intercept=fallback_mean,
+                coefficients=zero_coefficients.copy(),
+                standardized_coefficients=zero_coefficients.copy(),
+                feature_means=empty_feature_statistics.copy(),
+                feature_standard_deviations=empty_feature_statistics.copy(),
             )
 
         predictors = complete.loc[:, features].astype(float)
@@ -679,12 +694,19 @@ class BayesianRegimeReturnForecaster:
         usable = standard_deviations.gt(self.config.numerical_epsilon)
         if not usable.any():
             available = history[target].dropna()
+            fallback_mean = float(available.mean())
             return ForecastEstimate(
-                mean=float(available.mean()),
+                mean=fallback_mean,
                 predictive_std=float(available.std(ddof=1)),
                 observations=int(len(available)),
                 last_training_month=available.index.max() if len(available) else None,
                 used_unconditional_fallback=True,
+                intercept=fallback_mean,
+                standardized_intercept=fallback_mean,
+                coefficients=zero_coefficients.copy(),
+                standardized_coefficients=zero_coefficients.copy(),
+                feature_means=empty_feature_statistics.copy(),
+                feature_standard_deviations=empty_feature_statistics.copy(),
             )
 
         columns = tuple(standard_deviations.index[usable])
@@ -710,12 +732,32 @@ class BayesianRegimeReturnForecaster:
         prediction, prediction_std = model.predict(
             current_x.to_numpy(dtype=float).reshape(1, -1), return_std=True
         )
+        standardized_coefficients = {feature: 0.0 for feature in features}
+        coefficients = {feature: 0.0 for feature in features}
+        feature_means = {feature: float(means.loc[feature]) for feature in features}
+        feature_standard_deviations = {
+            feature: float(standard_deviations.loc[feature]) for feature in features
+        }
+        raw_intercept = float(model.intercept_)
+        for feature, standardized_beta in zip(columns, model.coef_):
+            feature_mean = float(means.loc[feature])
+            feature_std = float(standard_deviations.loc[feature])
+            raw_beta = float(standardized_beta / feature_std)
+            standardized_coefficients[feature] = float(standardized_beta)
+            coefficients[feature] = raw_beta
+            raw_intercept -= raw_beta * feature_mean
         return ForecastEstimate(
             mean=float(prediction[0]),
             predictive_std=float(prediction_std[0]),
             observations=int(len(complete)),
             last_training_month=complete.index.max(),
             used_unconditional_fallback=False,
+            intercept=raw_intercept,
+            standardized_intercept=float(model.intercept_),
+            coefficients=coefficients,
+            standardized_coefficients=standardized_coefficients,
+            feature_means=feature_means,
+            feature_standard_deviations=feature_standard_deviations,
         )
 
     def forecast(
@@ -1163,6 +1205,24 @@ class BacktestEngine:
                 row[f"used_mean_fallback_{asset}"] = (
                     estimate.used_unconditional_fallback
                 )
+                row[f"regime_intercept_{asset}"] = estimate.intercept
+                row[f"standardized_regime_intercept_{asset}"] = (
+                    estimate.standardized_intercept
+                )
+                for feature in self.config.forecast_features:
+                    feature_name = feature.removeprefix("p_")
+                    row[f"regime_beta_{asset}_{feature_name}"] = (
+                        estimate.coefficients[feature]
+                    )
+                    row[f"standardized_regime_beta_{asset}_{feature_name}"] = (
+                        estimate.standardized_coefficients[feature]
+                    )
+                    row[f"regime_feature_mean_{asset}_{feature_name}"] = (
+                        estimate.feature_means[feature]
+                    )
+                    row[f"regime_feature_std_{asset}_{feature_name}"] = (
+                        estimate.feature_standard_deviations[feature]
+                    )
             rows.append(row)
 
             # 월말 drift: 다음 리밸런싱 직전 비중은 보유자산별 실현수익률에 따라
@@ -1233,6 +1293,56 @@ def performance_table(
                 "TotalCost": float(view[["trade_cost", "fx_cost"]].sum().sum()),
             }
         )
+    return pd.DataFrame(rows)
+
+
+def regime_beta_table(
+    monthly_result: pd.DataFrame, config: StrategyConfig
+) -> pd.DataFrame:
+    """Bayesian ridge regime coefficients in long form.
+
+    ``regime_beta`` is on the original 0~1 regime-score scale. ``standardized``
+    beta is the coefficient learned on the internally standardized feature.
+    """
+
+    rows: list[dict[str, Any]] = []
+    for month, row in monthly_result.iterrows():
+        for asset in config.assets:
+            for feature in config.forecast_features:
+                feature_name = feature.removeprefix("p_")
+                rows.append(
+                    {
+                        "month": month,
+                        "asset": asset,
+                        "feature": feature,
+                        "feature_name": feature_name,
+                        "regime_beta": row[f"regime_beta_{asset}_{feature_name}"],
+                        "standardized_regime_beta": row[
+                            f"standardized_regime_beta_{asset}_{feature_name}"
+                        ],
+                        "regime_intercept": row[f"regime_intercept_{asset}"],
+                        "standardized_regime_intercept": row[
+                            f"standardized_regime_intercept_{asset}"
+                        ],
+                        "feature_mean": row[
+                            f"regime_feature_mean_{asset}_{feature_name}"
+                        ],
+                        "feature_std": row[
+                            f"regime_feature_std_{asset}_{feature_name}"
+                        ],
+                        "expected_return": row[f"expected_return_{asset}"],
+                        "predictive_std": row[f"predictive_std_{asset}"],
+                        "training_observations": row[
+                            f"training_observations_{asset}"
+                        ],
+                        "last_training_month": row[
+                            f"last_training_month_{asset}"
+                        ],
+                        "used_mean_fallback": row[
+                            f"used_mean_fallback_{asset}"
+                        ],
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -1352,6 +1462,7 @@ def run_research(
     )
     monthly_result = engine.run(monthly_returns, regime_scores, daily_returns)
     performance = performance_table(monthly_result, config)
+    regime_betas = regime_beta_table(monthly_result, config)
     report = validation_report(
         monthly_result,
         config,
@@ -1365,6 +1476,7 @@ def run_research(
     if save:
         paths.output.mkdir(parents=True, exist_ok=True)
         monthly_result.to_csv(paths.output / "monthly_results.csv")
+        regime_betas.to_csv(paths.output / "regime_betas.csv", index=False)
         performance.to_csv(paths.output / "performance.csv", index=False)
         with (paths.output / "validation_report.json").open(
             "w", encoding="utf-8"
@@ -1374,6 +1486,7 @@ def run_research(
             )
     return {
         "monthly_result": monthly_result,
+        "regime_betas": regime_betas,
         "performance": performance,
         "validation_report": report,
         "config": asdict(config),

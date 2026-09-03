@@ -23,7 +23,6 @@ from strategies.stage07_zero_tune_vkospi.zero_tune_strategy import (
     load_vkospi_daily,
 )
 
-
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 VIX6_FEATURE_PATH = ROOT / "results" / "vix6_case1_features_daily.csv"
@@ -66,7 +65,6 @@ SLSQP_MAX_ITERATIONS = 300
 SLSQP_TOLERANCE = 1e-9
 NUMERICAL_EPSILON = 1e-12
 
-
 def causal_expanding_midrank(series: pd.Series) -> pd.Series:
     """Causal empirical CDF with mid-ranks and no fitted window or scale.
 
@@ -81,12 +79,10 @@ def causal_expanding_midrank(series: pd.Series) -> pd.Series:
         value = float(raw_value) if pd.notna(raw_value) else np.nan
         if not np.isfinite(value):
             continue
-        left = bisect_left(ordered, value)
-        right = bisect_right(ordered, value)
-        equal_after_insertion = right - left + 1
-        result.loc[index] = (
-            left + 0.5 * equal_after_insertion
-        ) / (len(ordered) + 1)
+        left = bisect_left(ordered, value)  # 나보다 작은 값의 개수
+        right = bisect_right(ordered, value)  # 나보다 큰 값의 개수
+        equal_after_insertion = right - left + 1  # 나와 같은 값의 개수
+        result.loc[index] = (left + 0.5 * equal_after_insertion) / (len(ordered) + 1)
         insort(ordered, value)
     return result
 
@@ -95,9 +91,7 @@ def _read_vix6_components() -> pd.DataFrame:
     """Load only the six decomposition outputs needed by the risk model."""
 
     if not VIX6_FEATURE_PATH.exists():
-        raise FileNotFoundError(
-            f"VIX6 feature cache is missing: {VIX6_FEATURE_PATH}"
-        )
+        raise FileNotFoundError(f"VIX6 feature cache is missing: {VIX6_FEATURE_PATH}")
     frame = pd.read_csv(VIX6_FEATURE_PATH, index_col=0, parse_dates=True)
     components = [
         "sticky_strike",
@@ -130,51 +124,35 @@ def build_daily_stress_features() -> pd.DataFrame:
     being mistaken for a completed recovery.
     """
 
-    vkospi = load_vkospi_daily()[["close"]].rename(
-        columns={"close": "vkospi_close"}
-    )
+    vkospi = load_vkospi_daily()[["close"]].rename(columns={"close": "vkospi_close"})
     vix6 = _read_vix6_components()
     daily = vkospi.join(vix6, how="inner").sort_index()
     daily = daily[~daily.index.duplicated(keep="last")]
 
-    daily["vkospi_log_change_5"] = np.log(daily["vkospi_close"]).diff(
-        ONE_WEEK
-    )
-    daily["vix6_left_impulse"] = (
-        daily["put_skew"] + daily["downside_convexity"]
-    )
-    daily["vix6_right_impulse"] = (
-        daily["call_skew"] + daily["upside_convexity"]
-    )
+    daily["vkospi_log_change_5"] = np.log(daily["vkospi_close"]).diff(ONE_WEEK)
+    daily["vix6_left_impulse"] = daily["put_skew"] + daily["downside_convexity"]
+    daily["vix6_right_impulse"] = daily["call_skew"] + daily["upside_convexity"]
     daily["vix6_tail_asymmetry"] = (
         daily["vix6_left_impulse"] - daily["vix6_right_impulse"]
     )
 
-    daily["level_component"] = causal_expanding_midrank(
-        daily["vkospi_close"]
+    daily["level_component"] = causal_expanding_midrank(daily["vkospi_close"])
+    daily["vkospi_shock_rank"] = causal_expanding_midrank(daily["vkospi_log_change_5"])
+    daily["parallel_shift_rank"] = causal_expanding_midrank(daily["parallel_shift"])
+    daily["shock_component"] = daily[["vkospi_shock_rank", "parallel_shift_rank"]].mean(
+        axis=1
     )
-    daily["vkospi_shock_rank"] = causal_expanding_midrank(
-        daily["vkospi_log_change_5"]
-    )
-    daily["parallel_shift_rank"] = causal_expanding_midrank(
-        daily["parallel_shift"]
-    )
-    daily["shock_component"] = daily[
-        ["vkospi_shock_rank", "parallel_shift_rank"]
-    ].mean(axis=1)
-    daily["left_impulse_rank"] = causal_expanding_midrank(
-        daily["vix6_left_impulse"]
-    )
+    daily["left_impulse_rank"] = causal_expanding_midrank(daily["vix6_left_impulse"])
     daily["tail_asymmetry_rank"] = causal_expanding_midrank(
         daily["vix6_tail_asymmetry"]
     )
-    daily["tail_component"] = daily[
-        ["left_impulse_rank", "tail_asymmetry_rank"]
-    ].mean(axis=1)
+    daily["tail_component"] = daily[["left_impulse_rank", "tail_asymmetry_rank"]].mean(
+        axis=1
+    )
 
-    three_blocks = daily[
-        ["level_component", "shock_component", "tail_component"]
-    ].mean(axis=1)
+    three_blocks = daily[["level_component", "shock_component", "tail_component"]].mean(
+        axis=1
+    )
     daily["persistence_component"] = three_blocks.rolling(
         ONE_TRADING_MONTH, min_periods=1
     ).mean()
@@ -186,19 +164,19 @@ def build_daily_stress_features() -> pd.DataFrame:
             "persistence_component",
         ]
     ].mean(axis=1)
-    one_week_mean = daily["stress_raw"].rolling(
-        ONE_WEEK, min_periods=1
-    ).mean()
-    daily["stress_score"] = pd.concat(
-        [daily["stress_raw"], one_week_mean], axis=1
-    ).max(axis=1).clip(0.0, 1.0)
+    one_week_mean = daily["stress_raw"].rolling(ONE_WEEK, min_periods=1).mean()
+    daily["stress_score"] = (
+        pd.concat([daily["stress_raw"], one_week_mean], axis=1)
+        .max(axis=1)
+        .clip(0.0, 1.0)
+    )
     recovery_intensity = (one_week_mean - daily["stress_raw"]).clip(lower=0.0)
     daily["recovery_score"] = causal_expanding_midrank(
         recovery_intensity.where(recovery_intensity > 0.0)
     ).fillna(0.0)
     return daily.replace([np.inf, -np.inf], np.nan)
 
-
+# stress는 daily가 나은듯
 def build_monthly_stress_signals(
     target_months: pd.PeriodIndex,
     daily: pd.DataFrame | None = None,
@@ -221,11 +199,25 @@ def build_monthly_stress_signals(
     for target_month in target_months:
         signal_month = target_month - 1
         month_end = signal_month.to_timestamp("M")
-        known = valid.loc[:month_end]
+        month_start = signal_month.to_timestamp("D", "start")
+        print(month_start, month_end)
+        known = valid.loc[month_start:month_end]
+        # import matplotlib.pyplot as plt
+        # plt.plot(known.index, known['stress_score'])
+        # plt.title(f"Stress Score for {signal_month}")
+        # plt.xlabel("Date")
+        # plt.ylabel("Stress Score")
+        # plt.grid()
+        # plt.show()
         if known.empty:
             continue
         signal_date = known.index[-1]
         current = known.iloc[-1]
+        #print("Stress Score")
+        #print(known.iloc[-1])
+        #current=known.mean()  # Use the average of the month instead of the last day to reduce noise
+        #print(current)
+        #exit()
         rows.append(
             {
                 "target_month": target_month,
@@ -237,6 +229,166 @@ def build_monthly_stress_signals(
     monthly = pd.DataFrame(rows).set_index("target_month")
     monthly.index = pd.PeriodIndex(monthly.index, freq="M")
     return monthly
+
+# def build_monthly_stress_features() -> pd.DataFrame:
+#     """Build monthly VKOSPI/VIX6 stress features aligned to monthly allocation."""
+
+#     vkospi = load_vkospi_daily()[["close"]].rename(
+#         columns={"close": "vkospi_close"}
+#     )
+#     vix6 = _read_vix6_components()
+
+#     daily = vkospi.join(vix6, how="inner").sort_index()
+#     daily = daily[~daily.index.duplicated(keep="last")]
+
+#     daily["vix6_left_impulse"] = (
+#         daily["put_skew"] + daily["downside_convexity"]
+#     )
+#     daily["vix6_right_impulse"] = (
+#         daily["call_skew"] + daily["upside_convexity"]
+#     )
+#     daily["vix6_tail_asymmetry"] = (
+#         daily["vix6_left_impulse"] - daily["vix6_right_impulse"]
+#     )
+
+#     monthly = pd.DataFrame(index=daily.index.to_period("M").unique())
+
+#     month_group = daily.groupby(daily.index.to_period("M"))
+
+#     monthly["vkospi_close"] = month_group["vkospi_close"].last()
+#     monthly["vkospi_log_change_1m"] = np.log(monthly["vkospi_close"]).diff()
+
+#     monthly["parallel_shift_1m"] = month_group["parallel_shift"].sum()
+#     monthly["left_impulse_1m"] = month_group["vix6_left_impulse"].sum()
+#     monthly["right_impulse_1m"] = month_group["vix6_right_impulse"].sum()
+#     monthly["tail_asymmetry_1m"] = (
+#         monthly["left_impulse_1m"] - monthly["right_impulse_1m"]
+#     )
+
+#     monthly["level_component"] = causal_expanding_midrank(
+#         monthly["vkospi_close"]
+#     )
+
+#     monthly["vkospi_shock_rank"] = causal_expanding_midrank(
+#         monthly["vkospi_log_change_1m"]
+#     )
+#     monthly["parallel_shift_rank"] = causal_expanding_midrank(
+#         monthly["parallel_shift_1m"]
+#     )
+#     monthly["shock_component"] = monthly[
+#         ["vkospi_shock_rank", "parallel_shift_rank"]
+#     ].mean(axis=1)
+
+#     monthly["left_impulse_rank"] = causal_expanding_midrank(
+#         monthly["left_impulse_1m"]
+#     )
+#     monthly["tail_asymmetry_rank"] = causal_expanding_midrank(
+#         monthly["tail_asymmetry_1m"]
+#     )
+#     monthly["tail_component"] = monthly[
+#         ["left_impulse_rank", "tail_asymmetry_rank"]
+#     ].mean(axis=1)
+
+#     monthly["stress_score"] = monthly[
+#         ["level_component", "shock_component", "tail_component"]
+#     ].mean(axis=1).clip(0.0, 1.0)
+
+#     monthly["recovery_intensity"] = (
+#         monthly["stress_score"].shift(1) - monthly["stress_score"]
+#     ).clip(lower=0.0)
+
+#     monthly["recovery_score"] = causal_expanding_midrank(
+#         monthly["recovery_intensity"].where(
+#             monthly["recovery_intensity"] > 0.0
+#         )
+#     ).fillna(0.0)
+#     monthly["stress_signal_month"] = monthly.index - 1
+#     monthly["stress_signal_date"] = (monthly.index - 1).to_timestamp("M")
+
+#     return monthly.replace([np.inf, -np.inf], np.nan)
+
+def build_monthly_stress_features() -> pd.DataFrame:
+    """Build monthly VKOSPI/VIX6 stress features aligned to next-month allocation."""
+
+    vkospi = load_vkospi_daily()[["close"]].rename(
+        columns={"close": "vkospi_close"}
+    )
+    vix6 = _read_vix6_components()
+
+    daily = vkospi.join(vix6, how="inner").sort_index()
+    daily = daily[~daily.index.duplicated(keep="last")]
+
+    daily["vix6_left_impulse"] = (
+        daily["put_skew"] + daily["downside_convexity"]
+    )
+    daily["vix6_right_impulse"] = (
+        daily["call_skew"] + daily["upside_convexity"]
+    )
+    daily["vix6_tail_asymmetry"] = (
+        daily["vix6_left_impulse"] - daily["vix6_right_impulse"]
+    )
+
+    signal_month_index = daily.index.to_period("M")
+    month_group = daily.groupby(signal_month_index)
+
+    monthly = pd.DataFrame(index=signal_month_index.unique())
+    monthly.index.name = "stress_signal_month"
+
+    monthly["vkospi_close"] = month_group["vkospi_close"].last()
+    monthly["vkospi_log_change_1m"] = np.log(monthly["vkospi_close"]).diff()
+
+    monthly["parallel_shift_1m"] = month_group["parallel_shift"].sum()
+    monthly["left_impulse_1m"] = month_group["vix6_left_impulse"].sum()
+    monthly["right_impulse_1m"] = month_group["vix6_right_impulse"].sum()
+    monthly["tail_asymmetry_1m"] = (
+        monthly["left_impulse_1m"] - monthly["right_impulse_1m"]
+    )
+
+    monthly["level_component"] = causal_expanding_midrank(
+        monthly["vkospi_close"]
+    )
+
+    monthly["vkospi_shock_rank"] = causal_expanding_midrank(
+        monthly["vkospi_log_change_1m"]
+    )
+    monthly["parallel_shift_rank"] = causal_expanding_midrank(
+        monthly["parallel_shift_1m"]
+    )
+    monthly["shock_component"] = monthly[
+        ["vkospi_shock_rank", "parallel_shift_rank"]
+    ].mean(axis=1)
+
+    monthly["left_impulse_rank"] = causal_expanding_midrank(
+        monthly["left_impulse_1m"]
+    )
+    monthly["tail_asymmetry_rank"] = causal_expanding_midrank(
+        monthly["tail_asymmetry_1m"]
+    )
+    monthly["tail_component"] = monthly[
+        ["left_impulse_rank", "tail_asymmetry_rank"]
+    ].mean(axis=1)
+
+    monthly["stress_score"] = monthly[
+        ["level_component", "shock_component", "tail_component"]
+    ].mean(axis=1).clip(0.0, 1.0)
+
+    monthly["recovery_intensity"] = (
+        monthly["stress_score"].shift(1) - monthly["stress_score"]
+    ).clip(lower=0.0)
+
+    monthly["recovery_score"] = causal_expanding_midrank(
+        monthly["recovery_intensity"].where(
+            monthly["recovery_intensity"] > 0.0
+        )
+    ).fillna(0.0)
+
+    monthly["stress_signal_month"] = monthly.index
+    monthly["stress_signal_date"] = monthly.index.to_timestamp("M")
+
+    monthly.index = monthly.index + 1
+    monthly.index.name = "target_month"
+
+    return monthly.replace([np.inf, -np.inf], np.nan)
 
 
 def _weighted_mean_and_covariance(
@@ -331,12 +483,9 @@ def estimate_conditional_moments(
         # it says that a new regime estimate must accumulate roughly one annual
         # cycle before it receives the same credibility as the unconditional
         # expanding estimate.
-        credibility = effective_sample / (
-            effective_sample + ONE_CALENDAR_YEAR
-        )
+        credibility = effective_sample / (effective_sample + ONE_CALENDAR_YEAR)
         regime_mean = (
-            credibility * raw_regime_mean
-            + (1.0 - credibility) * unconditional_mean
+            credibility * raw_regime_mean + (1.0 - credibility) * unconditional_mean
         )
         regime_covariance = (
             credibility * raw_regime_covariance
@@ -349,23 +498,39 @@ def estimate_conditional_moments(
         def reliable_slope(feature: np.ndarray) -> tuple[np.ndarray, float]:
             feature_mean = float(np.average(feature, weights=regime_weights))
             centered_feature = feature - feature_mean
-            denominator = float(
-                np.sum(regime_weights * centered_feature**2)
-            )
+            denominator = float(np.sum(regime_weights * centered_feature**2))
             if denominator <= NUMERICAL_EPSILON:
                 return np.zeros(len(ASSETS), dtype=float), feature_mean
             raw_slope = (
                 (regime_weights * centered_feature)[:, None]
                 * (values - raw_regime_mean)
-            ).sum(axis=0) / denominator
+            ).sum(
+                axis=0
+            ) / denominator  # Regime 확률 기반 가중 OLS 기울기를 추정
             covariance_numerator = raw_slope * denominator
             reliability = np.divide(
                 covariance_numerator**2,
                 denominator * weighted_asset_variance,
                 out=np.zeros(len(ASSETS), dtype=float),
                 where=weighted_asset_variance > NUMERICAL_EPSILON,
-            ).clip(0.0, 1.0)
+            ).clip(
+                0.0, 1.0
+            )  # R-squared를 계산하여 신뢰도를 추정
             return raw_slope * reliability, feature_mean
+
+        def ols_slope(feature: np.ndarray) -> tuple[np.ndarray, float]:
+            feature_mean = float(np.average(feature, weights=regime_weights))
+            centered_feature = feature - feature_mean
+            denominator = float(np.sum(regime_weights * centered_feature**2))
+            if denominator <= NUMERICAL_EPSILON:
+                return np.zeros(len(ASSETS), dtype=float), feature_mean
+            raw_slope = (
+                (regime_weights * centered_feature)[:, None]
+                * (values - raw_regime_mean)
+            ).sum(
+                axis=0
+            ) / denominator  # Regime 확률 기반 가중 OLS 기울기를 추정
+            return raw_slope, feature_mean
 
         # R-squared is a parameter-free reliability weight. A weak historical
         # relationship cannot create a large expected-return forecast merely
@@ -380,9 +545,7 @@ def estimate_conditional_moments(
         # comes entirely from the causal regime-weighted regression. Bond and gold
         # signs remain data-driven because inflation and deflation crises affect
         # those defensive assets differently.
-        beta[ASSETS.index("KODEX200")] = min(
-            beta[ASSETS.index("KODEX200")], 0.0
-        )
+        beta[ASSETS.index("KODEX200")] = min(beta[ASSETS.index("KODEX200")], 0.0)
         beta[ASSETS.index("USO")] = min(beta[ASSETS.index("USO")], 0.0)
         recovery_beta[ASSETS.index("KODEX200")] = max(
             recovery_beta[ASSETS.index("KODEX200")], 0.0
@@ -424,9 +587,8 @@ def estimate_conditional_moments(
     if use_short_term_stress:
         expected_return = macro_mean + stress_adjustment
         covariance = (
-            (1.0 - current_s) * macro_covariance
-            + current_s * high_stress_covariance
-        )
+            1.0 - current_s
+        ) * macro_covariance + current_s * high_stress_covariance
     else:
         expected_return = macro_mean
         covariance = macro_covariance
@@ -477,9 +639,9 @@ def _portfolio_trade_cost(weights: np.ndarray, pretrade: np.ndarray) -> float:
         - pretrade[ASSETS.index("GLD")]
         - pretrade[ASSETS.index("USO")]
     )
-    foreign = math.sqrt(
-        foreign_change**2 + NUMERICAL_EPSILON
-    ) * FOREIGN_WEIGHT_CHANGE_COST
+    foreign = (
+        math.sqrt(foreign_change**2 + NUMERICAL_EPSILON) * FOREIGN_WEIGHT_CHANGE_COST
+    )
     return domestic + foreign
 
 
@@ -506,12 +668,15 @@ def solve_conditional_weights(
         current_recovery=current_recovery,
         use_short_term_stress=use_short_term_stress,
     )
+    # print("Conditional moments estimated:")
+    # print(history.head())
+    # exit()
+    benchmark=history['KODEX200']
+    access_returns=expected_return-expected_return[ASSETS.index('KODEX200')]
     common = history.index.intersection(historical_stress.dropna().index)
     historical_asset_returns = history.loc[common, ASSETS].to_numpy(dtype=float)
     risk_aversion = (
-        float(np.clip(current_stress, 0.0, 1.0))
-        if use_short_term_stress
-        else 0.0
+        float(np.clip(current_stress, 0.0, 1.0)) if use_short_term_stress else 0.0
     )
     initial = (
         project_to_bounded_simplex(pretrade)
@@ -523,9 +688,7 @@ def solve_conditional_weights(
         monthly_return = float(weights @ expected_return)
         monthly_variance = max(float(weights @ covariance @ weights), 0.0)
         realized_history = historical_asset_returns @ weights
-        downside_semivariance = float(
-            np.mean(np.minimum(realized_history, 0.0) ** 2)
-        )
+        downside_semivariance = float(np.mean(np.minimum(realized_history, 0.0) ** 2))
         trade_cost = _portfolio_trade_cost(weights, pretrade)
         monthly_utility = (
             monthly_return
@@ -548,9 +711,7 @@ def solve_conditional_weights(
         return -portfolio_values(weights)["monthly_utility"]
 
     def annual_volatility(weights: np.ndarray) -> float:
-        return math.sqrt(
-            max(float(weights @ covariance @ weights), 0.0) * 12.0
-        )
+        return math.sqrt(max(float(weights @ covariance @ weights), 0.0) * 12.0)
 
     constraints = [
         {"type": "eq", "fun": lambda weights: float(weights.sum() - 1.0)},
@@ -652,9 +813,7 @@ def run_conditional_backtest(
         current_recovery = float(stress_signals.loc[month, "recovery_score"])
         weights, detail = solve_conditional_weights(
             history=history,
-            historical_probabilities=probabilities.loc[
-                probabilities.index < month
-            ],
+            historical_probabilities=probabilities.loc[probabilities.index < month],
             current_probabilities=current_probability,
             historical_stress=stress_signals.loc[
                 stress_signals.index < month, "stress_score"
@@ -694,12 +853,8 @@ def run_conditional_backtest(
             {
                 "month": month,
                 "macro_signal_month": current_probability["signal_month"],
-                "stress_signal_month": stress_signals.loc[
-                    month, "stress_signal_month"
-                ],
-                "stress_signal_date": stress_signals.loc[
-                    month, "stress_signal_date"
-                ],
+                "stress_signal_month": stress_signals.loc[month, "stress_signal_month"],
+                "stress_signal_date": stress_signals.loc[month, "stress_signal_date"],
                 "use_short_term_stress": use_short_term_stress,
                 "stress_score": current_stress,
                 "recovery_score": current_recovery,
@@ -786,15 +941,12 @@ def build_overlay_attribution(
         attribution["return_stress_aware"] - attribution["return_base"]
     )
     attribution["stress_score"] = stress_aware.loc[common, "stress_score"]
-    attribution["base_risky_weight"] = macro_only.loc[common, risky_columns].sum(
-        axis=1
-    )
+    attribution["base_risky_weight"] = macro_only.loc[common, risky_columns].sum(axis=1)
     attribution["stress_aware_risky_weight"] = stress_aware.loc[
         common, risky_columns
     ].sum(axis=1)
     attribution["risk_reduction"] = (
-        attribution["base_risky_weight"]
-        - attribution["stress_aware_risky_weight"]
+        attribution["base_risky_weight"] - attribution["stress_aware_risky_weight"]
     )
     attribution["KODEX200_return"] = returns.loc[common, "KODEX200"]
 
@@ -804,12 +956,9 @@ def build_overlay_attribution(
     numerical_action = attribution["risk_reduction"] > 1e-6
     attribution["risk_off_action"] = numerical_action
     attribution["positive_equity_month"] = attribution["KODEX200_return"] > 0.0
-    attribution["crash_month"] = (
-        attribution["KODEX200_return"] <= crash_threshold
-    )
+    attribution["crash_month"] = attribution["KODEX200_return"] <= crash_threshold
     attribution["false_positive"] = (
-        attribution["risk_off_action"]
-        & attribution["positive_equity_month"]
+        attribution["risk_off_action"] & attribution["positive_equity_month"]
     )
     attribution["caught_crash"] = (
         attribution["risk_off_action"] & attribution["crash_month"]
@@ -825,13 +974,9 @@ def build_overlay_attribution(
         "overlay_cumulative_return": float(
             (1.0 + attribution["overlay_alpha"]).prod() - 1.0
         ),
-        "average_monthly_overlay_alpha": float(
-            attribution["overlay_alpha"].mean()
-        ),
+        "average_monthly_overlay_alpha": float(attribution["overlay_alpha"].mean()),
         "cagr_change": float(aware_metrics["CAGR"] - base_metrics["CAGR"]),
-        "sharpe_change": float(
-            aware_metrics["Sharpe"] - base_metrics["Sharpe"]
-        ),
+        "sharpe_change": float(aware_metrics["Sharpe"] - base_metrics["Sharpe"]),
         "mdd_change": float(aware_metrics["MDD"] - base_metrics["MDD"]),
         "risk_off_months": int(attribution["risk_off_action"].sum()),
         "false_positive_months": int(attribution["false_positive"].sum()),
@@ -854,9 +999,7 @@ def _solver_summary(path: pd.DataFrame) -> dict[str, Any]:
         "volatility_guard_binding_months": int(
             (path["volatility_slack"].abs() < 1e-6).sum()
         ),
-        "cdar_guard_binding_months": int(
-            (path["cdar_slack"].abs() < 1e-6).sum()
-        ),
+        "cdar_guard_binding_months": int((path["cdar_slack"].abs() < 1e-6).sum()),
     }
 
 
@@ -867,7 +1010,7 @@ def run_research(save: bool = True) -> dict[str, Any]:
     probabilities, _ = build_macro_probabilities(returns)
     daily_stress = build_daily_stress_features()
     stress_signals = build_monthly_stress_signals(returns.index, daily_stress)
-
+    #stress_signals = build_monthly_stress_features()
     macro_only = run_conditional_backtest(
         returns, probabilities, stress_signals, use_short_term_stress=False
     )
@@ -914,15 +1057,15 @@ def run_research(save: bool = True) -> dict[str, Any]:
             )
         ),
         "all_weights_are_long_only": bool(
-            (
-                stress_aware[[f"w_{asset}" for asset in ASSETS]] >= -1e-10
-            ).all().all()
+            (stress_aware[[f"w_{asset}" for asset in ASSETS]] >= -1e-10).all().all()
         ),
         "no_weight_exceeds_concentration_guard": bool(
             (
                 stress_aware[[f"w_{asset}" for asset in ASSETS]]
                 <= MAX_SINGLE_ASSET_WEIGHT + 1e-10
-            ).all().all()
+            )
+            .all()
+            .all()
         ),
         "no_leverage": bool(
             np.allclose(

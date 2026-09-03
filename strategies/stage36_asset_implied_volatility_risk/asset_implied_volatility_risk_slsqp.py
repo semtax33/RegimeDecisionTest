@@ -17,7 +17,6 @@ from strategies.stage35_earnings_credit_fundamentals import (
     earnings_credit_fundamentals_slsqp as stage35,
 )
 
-
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 GVZ_CSV = ROOT / "raw_data" / "GVZCLS.csv"
@@ -81,9 +80,7 @@ def _load_fred_csv(path: Path, value_column: str) -> pd.Series:
     missing = required.difference(raw.columns)
     if missing:
         raise ValueError(f"{path.name} is missing columns: {sorted(missing)}")
-    raw["observation_date"] = pd.to_datetime(
-        raw["observation_date"], errors="coerce"
-    )
+    raw["observation_date"] = pd.to_datetime(raw["observation_date"], errors="coerce")
     raw[value_column] = pd.to_numeric(raw[value_column], errors="coerce")
     series = (
         raw.dropna(subset=["observation_date"])
@@ -98,19 +95,19 @@ def _rank_after_prior_history(series: pd.Series) -> tuple[pd.Series, pd.Series]:
     """Causal expanding midrank, disabled until 252 prior valid observations."""
 
     rank = stage35.causal_expanding_midrank(series)
-    prior_count = (
-        series.notna().shift(1).fillna(False).astype(int).cumsum().astype(int)
-    )
+    prior_count = series.notna().shift(1).fillna(False).astype(int).cumsum().astype(int)
     return rank.where(prior_count >= MIN_SENSOR_HISTORY), prior_count
 
 
 def load_asset_implied_volatility_daily() -> tuple[pd.DataFrame, dict[str, Any]]:
-    gvz = _load_fred_csv(GVZ_CSV, "GVZCLS").rename("gvz")
-    ovx = _load_fred_csv(OVX_CSV, "OVXCLS").rename("ovx")
+    gvz = _load_fred_csv(GVZ_CSV, "GVZCLS").rename("gvz")  # Gold ETF Volatility Index
+    ovx = _load_fred_csv(OVX_CSV, "OVXCLS").rename("ovx")  # Oil ETF Volatility Index
     daily = pd.concat([gvz, ovx], axis=1).sort_index()
     for sensor in ("gvz", "ovx"):
         rank, prior_count = _rank_after_prior_history(daily[sensor])
-        daily[f"{sensor}_causal_rank"] = rank
+        daily[f"{sensor}_causal_rank"] = (
+            rank  # 경험적분포에서 현재 변동성이 어느정도 위치인지 확인
+        )
         daily[f"{sensor}_prior_valid_observations"] = prior_count
     audit = {
         "gvz_source": str(GVZ_CSV.resolve()),
@@ -224,14 +221,13 @@ def build_asset_risk_research_frame(
         frame = frame.join(risk_targets, how="left")
         monthly_close = close.groupby(close.index.to_period("M")).last()
         monthly_return = monthly_close.pct_change().loc[:RESEARCH_END]
-        frame[f"{prefix}_future_left_tail_1m"] = (
-            stage35.stage34._causal_tail_event(monthly_return)
+        frame[f"{prefix}_future_left_tail_1m"] = stage35.stage34._causal_tail_event(
+            monthly_return
         )
-    return frame.loc[FULL_START:RESEARCH_END].replace(
-        [np.inf, -np.inf], np.nan
-    )
+    return frame.loc[FULL_START:RESEARCH_END].replace([np.inf, -np.inf], np.nan)
 
 
+# 현재 변동성 센서 신호가 미래 위험 지표에 대해 예측력이 있는지 확인하기 위해 회귀분석을 수행
 def asset_risk_predictive_regressions(frame: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     periods = {
@@ -251,8 +247,7 @@ def asset_risk_predictive_regressions(frame: pd.DataFrame) -> pd.DataFrame:
         controls = [
             f"{prefix}_recent_1m_return",
             f"{prefix}_realized_vol_21d",
-            "vix6_stress_score",
-            "macro_fragility",
+            "vix6_stress_score", "macro_fragility",  # (1-성장 강도)
         ]
         for period_name, (start, end) in periods.items():
             view = frame.loc[start:end]
@@ -266,9 +261,9 @@ def asset_risk_predictive_regressions(frame: pd.DataFrame) -> pd.DataFrame:
                     if len(complete) < 36:
                         continue
                     standardized = _standardize(complete, predictors)
-                    fit = sm.OLS(
-                        complete[target], sm.add_constant(standardized)
-                    ).fit(cov_type="HAC", cov_kwds={"maxlags": lags})
+                    fit = sm.OLS(complete[target], sm.add_constant(standardized)).fit(
+                        cov_type="HAC", cov_kwds={"maxlags": lags}
+                    )
                     ic, ic_p = spearmanr(
                         complete[feature], complete[target], nan_policy="omit"
                     )
@@ -314,7 +309,6 @@ def _solve_weights(
     mode: str,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     """Stage35 final optimizer plus asset-specific variance-only scaling."""
-
     _, base_covariance, moment_detail = stage35.estimate_conditional_moments(
         history=history,
         historical_probabilities=historical_probabilities,
@@ -325,14 +319,15 @@ def _solve_weights(
         current_recovery=current_recovery,
         use_short_term_stress=True,
     )
+    history_asset_return_mean = history.mean(axis=0).to_numpy(dtype=float)
     macro_expected_return = np.asarray(
         moment_detail["macro_expected_monthly_return"], dtype=float
-    )
+    ) # (n_assets,) historical macro mu is used for technical filtering, not the stress-adjusted version.
     original_stress_adjustment = np.asarray(
         moment_detail["stress_return_adjustment"], dtype=float
     )
     technical = stage35.stage20.apply_technical_inputs(
-        macro_expected_return, base_covariance, technical_signal
+        macro_expected_return, base_covariance, technical_signal, history_asset_return_mean
     )
     filtered_macro = np.asarray(
         technical["filtered_macro_expected_return"], dtype=float
@@ -340,40 +335,34 @@ def _solve_weights(
     stress_adjustment = original_stress_adjustment.copy()
 
     eps_mu = float(fundamental_signal["eps_mu_adjustment_KODEX200"])
-    valuation_mu = float(
-        fundamental_signal["valuation_mu_adjustment_KODEX200"]
-    )
-    credit_stress_multiplier = float(
-        fundamental_signal["credit_stress_multiplier"]
-    )
-    stress_adjustment[stage35.EQUITY_INDEX] *= credit_stress_multiplier
+    valuation_mu = float(fundamental_signal["valuation_mu_adjustment_KODEX200"])
+    credit_stress_multiplier = float(fundamental_signal["credit_stress_multiplier"])
+    #stress_adjustment[stage35.EQUITY_INDEX] *= credit_stress_multiplier
     filtered_macro[stage35.EQUITY_INDEX] += eps_mu + valuation_mu
     expected_return = filtered_macro + stress_adjustment
 
     covariance = np.asarray(technical["adjusted_covariance"], dtype=float)
-    credit_variance_multiplier = 1.0 + float(
-        fundamental_signal["credit_stress_rank"]
-    )
-    credit_scaling = np.eye(len(ASSETS), dtype=float)
-    credit_scaling[stage35.EQUITY_INDEX, stage35.EQUITY_INDEX] = math.sqrt(
-        credit_variance_multiplier
-    )
-    covariance = credit_scaling @ covariance @ credit_scaling
+    # credit_variance_multiplier = 1.0 + float(fundamental_signal["credit_stress_rank"])
+    # credit_scaling = np.eye(len(ASSETS), dtype=float)
+    # credit_scaling[stage35.EQUITY_INDEX, stage35.EQUITY_INDEX] = math.sqrt(
+    #     credit_variance_multiplier
+    # )
+    #covariance = credit_scaling @ covariance @ credit_scaling
 
-    gvz_multiplier = (
-        float(asset_vol_signal["gvz_gld_variance_multiplier"])
-        if _mode_uses_gvz(mode)
-        else 1.0
-    )
-    ovx_multiplier = (
-        float(asset_vol_signal["ovx_uso_variance_multiplier"])
-        if _mode_uses_ovx(mode)
-        else 1.0
-    )
-    asset_scaling = np.eye(len(ASSETS), dtype=float)
-    asset_scaling[GOLD_INDEX, GOLD_INDEX] = math.sqrt(gvz_multiplier)
-    asset_scaling[OIL_INDEX, OIL_INDEX] = math.sqrt(ovx_multiplier)
-    covariance = asset_scaling @ covariance @ asset_scaling
+    # gvz_multiplier = (
+    #     float(asset_vol_signal["gvz_gld_variance_multiplier"])
+    #     if _mode_uses_gvz(mode)
+    #     else 1.0
+    # )
+    # ovx_multiplier = (
+    #     float(asset_vol_signal["ovx_uso_variance_multiplier"])
+    #     if _mode_uses_ovx(mode)
+    #     else 1.0
+    # )
+    # asset_scaling = np.eye(len(ASSETS), dtype=float)
+    # asset_scaling[GOLD_INDEX, GOLD_INDEX] = math.sqrt(gvz_multiplier)
+    # asset_scaling[OIL_INDEX, OIL_INDEX] = math.sqrt(ovx_multiplier)
+    # covariance = asset_scaling @ covariance @ asset_scaling
 
     common = history.index.intersection(historical_stress.dropna().index)
     historical_returns = history.loc[common, ASSETS].to_numpy(dtype=float)
@@ -387,12 +376,8 @@ def _solve_weights(
         monthly_return = float(weights @ expected_return)
         monthly_variance = max(float(weights @ covariance @ weights), 0.0)
         realized_history = historical_returns @ weights
-        downside_semivariance = float(
-            np.mean(np.minimum(realized_history, 0.0) ** 2)
-        )
-        transaction_cost = stage35.expected_transaction_cost(
-            weights, pretrade
-        )
+        downside_semivariance = float(np.mean(np.minimum(realized_history, 0.0) ** 2))
+        transaction_cost = stage35.expected_transaction_cost(weights, pretrade)
         utility = (
             monthly_return
             - 0.5 * monthly_variance
@@ -413,26 +398,21 @@ def _solve_weights(
         return -portfolio_values(weights)["monthly_utility"]
 
     def annual_volatility(weights: np.ndarray) -> float:
-        return math.sqrt(
-            max(float(weights @ covariance @ weights), 0.0) * 12.0
-        )
+        return math.sqrt(max(float(weights @ covariance @ weights), 0.0) * 12.0)
 
     constraints = [
         {"type": "eq", "fun": lambda weights: float(weights.sum() - 1.0)},
         {
             "type": "ineq",
             "fun": lambda weights: (
-                stage35.CATASTROPHE_ANNUAL_VOLATILITY
-                - annual_volatility(weights)
+                stage35.CATASTROPHE_ANNUAL_VOLATILITY - annual_volatility(weights)
             ),
         },
         {
             "type": "ineq",
             "fun": lambda weights: (
                 stage35.CATASTROPHE_CDAR
-                + stage35.cdar(
-                    historical_returns @ weights, stage35.CDAR_CONFIDENCE
-                )
+                + stage35.cdar(historical_returns @ weights, stage35.CDAR_CONFIDENCE)
             ),
         },
     ]
@@ -488,16 +468,14 @@ def _solve_weights(
         "expected_annual_volatility": annual_vol,
         "historical_cdar": historical_cdar,
         "sum_error": abs(float(weights.sum()) - 1.0),
-        "volatility_slack": (
-            stage35.CATASTROPHE_ANNUAL_VOLATILITY - annual_vol
-        ),
+        "volatility_slack": (stage35.CATASTROPHE_ANNUAL_VOLATILITY - annual_vol),
         "cdar_slack": stage35.CATASTROPHE_CDAR + historical_cdar,
         "eps_mu_adjustment_KODEX200": eps_mu,
         "valuation_mu_adjustment_KODEX200": valuation_mu,
         "credit_stress_confirmation_multiplier": credit_stress_multiplier,
-        "credit_equity_variance_multiplier": credit_variance_multiplier,
-        "gvz_gold_variance_multiplier": gvz_multiplier,
-        "ovx_oil_variance_multiplier": ovx_multiplier,
+        #"credit_equity_variance_multiplier": credit_variance_multiplier,
+        #"gvz_gold_variance_multiplier": gvz_multiplier,
+        #"ovx_oil_variance_multiplier": ovx_multiplier,
         "gvz_mu_adjustment_GLD": 0.0,
         "ovx_mu_adjustment_USO": 0.0,
         "expected_mu_GLD": float(expected_return[GOLD_INDEX]),
@@ -539,23 +517,19 @@ def run_backtest(
         history = returns.loc[returns.index < month, ASSETS]
         if len(history) < stage35.ONE_CALENDAR_YEAR:
             continue
-        probability = probabilities.loc[month]
-        stress = float(stress_signals.loc[month, "stress_score"])
-        recovery = float(stress_signals.loc[month, "recovery_score"])
-        technical_signal = technical_signals.loc[month]
+        probability = probabilities.loc[month]  # 각 국면별 확률
+        stress = float(stress_signals.loc[month, "stress_score"])  # 스트레스 신호
+        recovery = float(stress_signals.loc[month, "recovery_score"])  # 회복 신호
+        technical_signal = technical_signals.loc[month]  # 기술적 신호
         fundamental_signal = fundamental_signals.loc[month]
         asset_vol_signal = asset_vol_signals.loc[month]
         weights, detail = _solve_weights(
             history,
             probabilities.loc[probabilities.index < month],
             probability,
-            stress_signals.loc[
-                stress_signals.index < month, "stress_score"
-            ],
+            stress_signals.loc[stress_signals.index < month, "stress_score"],
             stress,
-            stress_signals.loc[
-                stress_signals.index < month, "recovery_score"
-            ],
+            stress_signals.loc[stress_signals.index < month, "recovery_score"],
             recovery,
             technical_signal,
             fundamental_signal,
@@ -569,9 +543,7 @@ def run_backtest(
             if first_trade
             else 0.5 * float(np.abs(change).sum())
         )
-        trade_cost = (
-            float(np.abs(change).sum()) * stage35.DOMESTIC_TRADE_COST
-        )
+        trade_cost = float(np.abs(change).sum()) * stage35.DOMESTIC_TRADE_COST
         foreign_indices = [ASSETS.index("GLD"), ASSETS.index("USO")]
         fx_cost = (
             abs(float(change[foreign_indices].sum()))
@@ -587,19 +559,13 @@ def run_backtest(
 
         row: dict[str, Any] = {
             "month": month,
-            "asset_vol_signal_month": asset_vol_signal[
-                "asset_vol_signal_month"
-            ],
+            "asset_vol_signal_month": asset_vol_signal["asset_vol_signal_month"],
             "gvz_signal_date": asset_vol_signal["gvz_signal_date"],
             "ovx_signal_date": asset_vol_signal["ovx_signal_date"],
             "gvz_level": float(asset_vol_signal["gvz_level"]),
             "ovx_level": float(asset_vol_signal["ovx_level"]),
-            "gvz_causal_rank": float(
-                asset_vol_signal["gvz_causal_rank"]
-            ),
-            "ovx_causal_rank": float(
-                asset_vol_signal["ovx_causal_rank"]
-            ),
+            "gvz_causal_rank": float(asset_vol_signal["gvz_causal_rank"]),
+            "ovx_causal_rank": float(asset_vol_signal["ovx_causal_rank"]),
             "gvz_active": bool(asset_vol_signal["gvz_active"]),
             "ovx_active": bool(asset_vol_signal["ovx_active"]),
             "return": net_return,
@@ -631,9 +597,7 @@ def _performance_table(paths: dict[str, pd.DataFrame]) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     for name, path in paths.items():
         for period_name, (start, end) in periods.items():
-            rows.append(
-                stage35.metric_row(name, path, period_name, start, end)
-            )
+            rows.append(stage35.metric_row(name, path, period_name, start, end))
     return pd.DataFrame(rows)
 
 
@@ -666,18 +630,15 @@ def _risk_gate(risk_tests: pd.DataFrame, sensor: str) -> dict[str, Any]:
             ["future_realized_vol_1m", "future_max_drawdown_3m"]
         )
     ]
-    expected = (
-        rows["SensorStandardizedBeta"].gt(0.0)
-        & rows["SensorHACPValue"].lt(SIGNIFICANCE_LEVEL)
+    expected = rows["SensorStandardizedBeta"].gt(0.0) & rows["SensorHACPValue"].lt(
+        SIGNIFICANCE_LEVEL
     )
     return {
         "positive_sign_all_primary_targets": bool(
             rows["SensorStandardizedBeta"].gt(0.0).all()
         ),
         "at_least_one_primary_target_p_below_10pct": bool(expected.any()),
-        "pass": bool(
-            rows["SensorStandardizedBeta"].gt(0.0).all() and expected.any()
-        ),
+        "pass": bool(rows["SensorStandardizedBeta"].gt(0.0).all() and expected.any()),
     }
 
 
@@ -695,13 +656,9 @@ def gate_decision(
     common_test = perf.loc[(candidate_name, "common_2010_2026")]
     performance_gates = {
         "full_cagr_at_least_10pct": bool(full_test["CAGR"] >= 0.10),
-        "full_sharpe_not_lower": bool(
-            full_test["Sharpe"] >= full_base["Sharpe"]
-        ),
+        "full_sharpe_not_lower": bool(full_test["Sharpe"] >= full_base["Sharpe"]),
         "full_mdd_not_worse": bool(full_test["MDD"] >= full_base["MDD"]),
-        "common_sharpe_higher": bool(
-            common_test["Sharpe"] > common_base["Sharpe"]
-        ),
+        "common_sharpe_higher": bool(common_test["Sharpe"] > common_base["Sharpe"]),
         "common_mdd_better": bool(common_test["MDD"] > common_base["MDD"]),
         "common_cagr_not_lower_by_more_than_50bp": bool(
             common_test["CAGR"] >= common_base["CAGR"] - 0.005
@@ -715,14 +672,10 @@ def gate_decision(
     ].set_index("Metric")
     bootstrap_gates = {
         "common_sharpe_improvement_probability_at_least_60pct": bool(
-            combined_bootstrap.loc[
-                "delta_Sharpe", "ProbabilityPositive"
-            ]
-            >= 0.60
+            combined_bootstrap.loc["delta_Sharpe", "ProbabilityPositive"] >= 0.60
         ),
         "common_mdd_improvement_probability_at_least_50pct": bool(
-            combined_bootstrap.loc["delta_MDD", "ProbabilityPositive"]
-            >= 0.50
+            combined_bootstrap.loc["delta_MDD", "ProbabilityPositive"] >= 0.50
         ),
     }
     promote = bool(
@@ -742,9 +695,7 @@ def gate_decision(
             if promote
             else "retain_stage35_pending_stronger_asset_volatility_evidence"
         ),
-        "promoted_strategy": (
-            candidate_name if promote else "Stage35_Frozen"
-        ),
+        "promoted_strategy": (candidate_name if promote else "Stage35_Frozen"),
     }
 
 
@@ -756,12 +707,14 @@ def _plot_performance(performance: pd.DataFrame, path: Path) -> None:
         "Stage36_GVZ_OVXAssetRisk",
     ]
     labels = ["Stage35", "GVZ→Gold", "OVX→Oil", "GVZ+OVX"]
-    metrics = [("CAGR", 100.0, "CAGR (%)"), ("Sharpe", 1.0, "Sharpe"), ("MDD", 100.0, "MDD (%)")]
+    metrics = [
+        ("CAGR", 100.0, "CAGR (%)"),
+        ("Sharpe", 1.0, "Sharpe"),
+        ("MDD", 100.0, "MDD (%)"),
+    ]
     fig, axes = plt.subplots(2, 3, figsize=(15, 8.5))
     for row, period in enumerate(("full_2007_2026", "common_2010_2026")):
-        view = performance.loc[
-            performance["Period"].eq(period)
-        ].set_index("Strategy")
+        view = performance.loc[performance["Period"].eq(period)].set_index("Strategy")
         for column, (metric, scale, title) in enumerate(metrics):
             values = [float(view.loc[name, metric]) * scale for name in strategies]
             colors = ["#62788d", "#b38a32", "#b35b45", "#177b6d"]
@@ -844,9 +797,7 @@ def _html_table(frame: pd.DataFrame, percent: set[str] | None = None) -> str:
                 lambda value: f"{float(value) * 100:.3f}%"
             )
         elif pd.api.types.is_float_dtype(display[column]):
-            display[column] = display[column].map(
-                lambda value: f"{float(value):.6f}"
-            )
+            display[column] = display[column].map(lambda value: f"{float(value):.6f}")
     return display.to_html(index=False, escape=True, border=0)
 
 
@@ -872,7 +823,16 @@ def _render_html_report(
                 "locked_2018_2026",
             ]
         ),
-        ["Strategy", "Period", "CAGR", "Volatility", "Sharpe", "MDD", "AvgTurnover", "TotalCost"],
+        [
+            "Strategy",
+            "Period",
+            "CAGR",
+            "Volatility",
+            "Sharpe",
+            "MDD",
+            "AvgTurnover",
+            "TotalCost",
+        ],
     ]
     risk_view = risk_tests.loc[
         risk_tests["Period"].eq("common_2010_2026")
@@ -1003,13 +963,13 @@ def run_research(save: bool = True) -> dict[str, Any]:
     calibrated = stage35.add_causal_return_calibration(
         fundamental, equity_monthly_close.pct_change()
     )
+    print('Technical Path', stage35.stage20.OUTPUT_DIR / "monthly_technical_signals.csv")
+    exit()
     technical = stage35.stage34._load_period_csv(
         stage35.stage20.OUTPUT_DIR / "monthly_technical_signals.csv",
         "target_month",
     )
-    asset_vol_signals = build_monthly_asset_volatility_signals(
-        daily, returns.index
-    )
+    asset_vol_signals = build_monthly_asset_volatility_signals(daily, returns.index)
     risk_frame = build_asset_risk_research_frame(
         asset_vol_signals, returns, probabilities, stress, market
     )
@@ -1039,10 +999,7 @@ def run_research(save: bool = True) -> dict[str, Any]:
     reproduction = candidate_paths["Stage36_NoOverlayReproduction"]
     common = stage35_path.index.intersection(reproduction.index)
     max_return_error = float(
-        (
-            stage35_path.loc[common, "return"]
-            - reproduction.loc[common, "return"]
-        )
+        (stage35_path.loc[common, "return"] - reproduction.loc[common, "return"])
         .abs()
         .max()
     )
@@ -1065,12 +1022,8 @@ def run_research(save: bool = True) -> dict[str, Any]:
         "ovx_first_active_target": (
             str(ovx_active.index.min()) if not ovx_active.empty else None
         ),
-        "gvz_neutral_signal_months_all": int(
-            (~asset_vol_signals["gvz_active"]).sum()
-        ),
-        "ovx_neutral_signal_months_all": int(
-            (~asset_vol_signals["ovx_active"]).sum()
-        ),
+        "gvz_neutral_signal_months_all": int((~asset_vol_signals["gvz_active"]).sum()),
+        "ovx_neutral_signal_months_all": int((~asset_vol_signals["ovx_active"]).sum()),
         "gvz_neutral_backtest_months": int(
             (~asset_vol_signals.loc[FULL_START:RESEARCH_END, "gvz_active"]).sum()
         ),
@@ -1090,22 +1043,23 @@ def run_research(save: bool = True) -> dict[str, Any]:
             asset_vol_signals.loc[
                 ~asset_vol_signals["gvz_active"],
                 "gvz_gld_variance_multiplier",
-            ].eq(1.0).all()
+            ]
+            .eq(1.0)
+            .all()
             and asset_vol_signals.loc[
                 ~asset_vol_signals["ovx_active"],
                 "ovx_uso_variance_multiplier",
-            ].eq(1.0).all()
+            ]
+            .eq(1.0)
+            .all()
         ),
         "minimum_252_prior_observations": bool(
-            gvz_active["gvz_prior_valid_observations"].min()
-            >= MIN_SENSOR_HISTORY
-            and ovx_active["ovx_prior_valid_observations"].min()
-            >= MIN_SENSOR_HISTORY
+            gvz_active["gvz_prior_valid_observations"].min() >= MIN_SENSOR_HISTORY
+            and ovx_active["ovx_prior_valid_observations"].min() >= MIN_SENSOR_HISTORY
         ),
         "signal_month_precedes_target": bool(
             (
-                asset_vol_signals["asset_vol_signal_month"]
-                < asset_vol_signals.index
+                asset_vol_signals["asset_vol_signal_month"] < asset_vol_signals.index
             ).all()
         ),
         "signal_dates_not_after_prior_month_end": bool(
@@ -1113,20 +1067,16 @@ def run_research(save: bool = True) -> dict[str, Any]:
                 (
                     asset_vol_signals[f"{sensor}_signal_date"].dropna()
                     <= pd.Series(
-                    [
-                        period.to_timestamp("M")
-                        for period in asset_vol_signals.loc[
-                            asset_vol_signals[
-                                f"{sensor}_signal_date"
-                            ].notna()
-                        ].index
-                        - 1
-                    ],
-                    index=asset_vol_signals.loc[
-                        asset_vol_signals[
-                            f"{sensor}_signal_date"
-                        ].notna()
-                    ].index,
+                        [
+                            period.to_timestamp("M")
+                            for period in asset_vol_signals.loc[
+                                asset_vol_signals[f"{sensor}_signal_date"].notna()
+                            ].index
+                            - 1
+                        ],
+                        index=asset_vol_signals.loc[
+                            asset_vol_signals[f"{sensor}_signal_date"].notna()
+                        ].index,
                     )
                 ).all()
                 for sensor in ("gvz", "ovx")
@@ -1138,13 +1088,19 @@ def run_research(save: bool = True) -> dict[str, Any]:
                     "gvz_gld_variance_multiplier",
                     "ovx_uso_variance_multiplier",
                 ]
-            ].ge(1.0).all().all()
+            ]
+            .ge(1.0)
+            .all()
+            .all()
             and asset_vol_signals[
                 [
                     "gvz_gld_variance_multiplier",
                     "ovx_uso_variance_multiplier",
                 ]
-            ].le(2.0).all().all()
+            ]
+            .le(2.0)
+            .all()
+            .all()
         ),
         "no_directional_mu_adjustment": bool(
             all(
@@ -1161,12 +1117,8 @@ def run_research(save: bool = True) -> dict[str, Any]:
                 for path in all_candidate_paths
             )
         ),
-        "no_overlay_reproduces_stage35_returns": bool(
-            max_return_error < 5e-7
-        ),
-        "no_overlay_reproduces_stage35_weights": bool(
-            max_weight_error < 5e-6
-        ),
+        "no_overlay_reproduces_stage35_returns": bool(max_return_error < 5e-7),
+        "no_overlay_reproduces_stage35_weights": bool(max_weight_error < 5e-6),
         "all_candidate_solvers_feasible": bool(
             all(
                 path["solver_success"].all()
@@ -1219,8 +1171,7 @@ def run_research(save: bool = True) -> dict[str, Any]:
             "max_absolute_weight_error": max_weight_error,
         },
         "solver_audit": {
-            name: stage35.solver_summary(path)
-            for name, path in candidate_paths.items()
+            name: stage35.solver_summary(path) for name, path in candidate_paths.items()
         },
         "checks": checks,
         "source_manifest_before": source_before,
@@ -1243,29 +1194,19 @@ def run_research(save: bool = True) -> dict[str, Any]:
     if save:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         daily.to_csv(OUTPUT_DIR / "normalized_gvz_ovx_daily.csv")
-        asset_vol_signals.to_csv(
-            OUTPUT_DIR / "monthly_asset_volatility_signals.csv"
-        )
-        risk_frame.to_csv(
-            OUTPUT_DIR / "monthly_asset_risk_research_frame.csv"
-        )
+        asset_vol_signals.to_csv(OUTPUT_DIR / "monthly_asset_volatility_signals.csv")
+        risk_frame.to_csv(OUTPUT_DIR / "monthly_asset_risk_research_frame.csv")
         risk_tests.to_csv(
             OUTPUT_DIR / "asset_risk_predictive_regressions.csv", index=False
         )
-        performance.to_csv(
-            OUTPUT_DIR / "performance_comparison.csv", index=False
-        )
+        performance.to_csv(OUTPUT_DIR / "performance_comparison.csv", index=False)
         bootstrap.to_csv(
             OUTPUT_DIR / "paired_block_bootstrap_vs_stage35.csv",
             index=False,
         )
         for name, candidate_path in candidate_paths.items():
-            candidate_path.to_csv(
-                OUTPUT_DIR / f"{name.lower()}_monthly.csv"
-            )
-        _plot_performance(
-            performance, OUTPUT_DIR / "performance_comparison.png"
-        )
+            candidate_path.to_csv(OUTPUT_DIR / f"{name.lower()}_monthly.csv")
+        _plot_performance(performance, OUTPUT_DIR / "performance_comparison.png")
         _plot_nav(paths, OUTPUT_DIR / "nav_comparison.png")
         _plot_sensor_history(
             daily, asset_vol_signals, OUTPUT_DIR / "sensor_history.png"
@@ -1274,9 +1215,7 @@ def run_research(save: bool = True) -> dict[str, Any]:
             json.dumps(report, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
-        html = _render_html_report(
-            report, performance, risk_tests, bootstrap
-        )
+        html = _render_html_report(report, performance, risk_tests, bootstrap)
         (Path(__file__).resolve().parent / "stage36_gvz_ovx_report.html").write_text(
             html, encoding="utf-8"
         )
