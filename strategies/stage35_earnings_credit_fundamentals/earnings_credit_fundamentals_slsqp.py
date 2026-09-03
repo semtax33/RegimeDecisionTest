@@ -51,6 +51,7 @@ from strategies.stage34_futures_basis_oi_confirmation import (
     futures_basis_oi_confirmation_slsqp as stage34,
 )
 
+
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 EARNINGS_XLSX = ROOT / "raw_data" / "260829_fwdPE.EPS.rev.xlsx"
@@ -127,11 +128,19 @@ def load_fundamental_daily() -> tuple[pd.DataFrame, dict[str, Any]]:
         "eps_revision_1m_pct",
     ]
     earnings["date"] = pd.to_datetime(earnings["date"], errors="coerce")
-    earnings = earnings.dropna(subset=["date"]).set_index("date").sort_index()
+    earnings = (
+        earnings.dropna(subset=["date"])
+        .set_index("date")
+        .sort_index()
+    )
     earnings = earnings.apply(pd.to_numeric, errors="coerce")
     earnings = earnings.loc[~earnings.index.duplicated(keep="last")]
-    positive_eps = earnings["forward_eps_12m"].where(earnings["forward_eps_12m"] > 0.0)
-    earnings["computed_eps_revision_21d_pct"] = np.log(positive_eps).diff(21) * 100.0
+    positive_eps = earnings["forward_eps_12m"].where(
+        earnings["forward_eps_12m"] > 0.0
+    )
+    earnings["computed_eps_revision_21d_pct"] = (
+        np.log(positive_eps).diff(21) * 100.0
+    )
 
     credit = pd.read_excel(
         CREDIT_XLSX,
@@ -164,17 +173,18 @@ def load_fundamental_daily() -> tuple[pd.DataFrame, dict[str, Any]]:
         credit["corp_bbb_minus_3y_pct"] - credit["ktb_3y_pct"]
     )
     credit["quality_spread_pctpt"] = (
-        credit["corp_bbb_minus_3y_pct"] - credit["corp_aa_minus_3y_pct"]
+        credit["corp_bbb_minus_3y_pct"]
+        - credit["corp_aa_minus_3y_pct"]
     )
-    credit["aa_spread_widening_20d_pctpt"] = credit["aa_credit_spread_pctpt"].diff(
-        CREDIT_CHANGE_DAYS
-    )
-    credit["bbb_spread_widening_20d_pctpt"] = credit["bbb_credit_spread_pctpt"].diff(
-        CREDIT_CHANGE_DAYS
-    )
-    credit["quality_spread_widening_20d_pctpt"] = credit["quality_spread_pctpt"].diff(
-        CREDIT_CHANGE_DAYS
-    )
+    credit["aa_spread_widening_20d_pctpt"] = credit[
+        "aa_credit_spread_pctpt"
+    ].diff(CREDIT_CHANGE_DAYS)
+    credit["bbb_spread_widening_20d_pctpt"] = credit[
+        "bbb_credit_spread_pctpt"
+    ].diff(CREDIT_CHANGE_DAYS)
+    credit["quality_spread_widening_20d_pctpt"] = credit[
+        "quality_spread_pctpt"
+    ].diff(CREDIT_CHANGE_DAYS)
     credit["yield_curve_10y_minus_3y_pctpt"] = (
         credit["ktb_10y_pct"] - credit["ktb_3y_pct"]
     )
@@ -198,9 +208,13 @@ def load_fundamental_daily() -> tuple[pd.DataFrame, dict[str, Any]]:
             daily["aa_spread_widening_20d_pctpt"].dropna().index.min().date()
         ),
         "eps_revision_provider_field_used": True,
-        "eps_revision_formula": ("vendor EPS(Fwd.12M) one-month revision percentage"),
+        "eps_revision_formula": (
+            "vendor EPS(Fwd.12M) one-month revision percentage"
+        ),
         "computed_revision_role": "source cross-check only",
-        "provider_computed_revision_correlation": float(provider.corr().iloc[0, 1]),
+        "provider_computed_revision_correlation": float(
+            provider.corr().iloc[0, 1]
+        ),
         "eps_level_stale_share": float(
             daily["forward_eps_12m"]
             .dropna()
@@ -226,7 +240,9 @@ def _causal_zscore(series: pd.Series) -> pd.Series:
     prior = values.shift(1)
     mean = prior.expanding(min_periods=MIN_CAUSAL_MONTHS).mean()
     std = prior.expanding(min_periods=MIN_CAUSAL_MONTHS).std(ddof=1)
-    return ((values - mean) / std.where(std > 0.0)).replace([np.inf, -np.inf], np.nan)
+    return ((values - mean) / std.where(std > 0.0)).replace(
+        [np.inf, -np.inf], np.nan
+    )
 
 
 def build_monthly_fundamental_signals(daily: pd.DataFrame) -> pd.DataFrame:
@@ -270,7 +286,9 @@ def build_monthly_fundamental_signals(daily: pd.DataFrame) -> pd.DataFrame:
         )
     signals = pd.DataFrame(rows).set_index("target_month").sort_index()
     signals.index = pd.PeriodIndex(signals.index, freq="M")
-    signals["eps_revision_z"] = _causal_zscore(signals["eps_revision_1m_pct"])
+    signals["eps_revision_z"] = _causal_zscore(
+        signals["eps_revision_1m_pct"]
+    )
     signals["credit_widening_z"] = _causal_zscore(
         signals["aa_spread_widening_20d_pctpt"]
     )
@@ -279,7 +297,9 @@ def build_monthly_fundamental_signals(daily: pd.DataFrame) -> pd.DataFrame:
         signals["eps_revision_z"] + signals["credit_easing_z"]
     )
     signals["valuation_gap_z"] = _causal_zscore(signals["earnings_yield_gap"])
-    stress_rank = causal_expanding_midrank(signals["aa_spread_widening_20d_pctpt"])
+    stress_rank = causal_expanding_midrank(
+        signals["aa_spread_widening_20d_pctpt"]
+    )
     prior_count = (
         signals["aa_spread_widening_20d_pctpt"]
         .notna()
@@ -288,8 +308,12 @@ def build_monthly_fundamental_signals(daily: pd.DataFrame) -> pd.DataFrame:
         .astype(int)
         .cumsum()
     )
-    signals["credit_stress_rank"] = stress_rank.where(prior_count >= MIN_CAUSAL_MONTHS)
-    signals["credit_stress_multiplier"] = 2.0 * signals["credit_stress_rank"]
+    signals["credit_stress_rank"] = stress_rank.where(
+        prior_count >= MIN_CAUSAL_MONTHS
+    )
+    signals["credit_stress_multiplier"] = 2.0 * signals[
+        "credit_stress_rank"
+    ]
     return signals.replace([np.inf, -np.inf], np.nan)
 
 
@@ -306,7 +330,9 @@ def build_research_frame(
             returns["KODEX200"], horizon
         )
     frame["recent_1m_return"] = returns["KODEX200"].shift(1)
-    frame["realized_vol_21d"] = stage34._realized_volatility_signal(equity_close)
+    frame["realized_vol_21d"] = stage34._realized_volatility_signal(
+        equity_close
+    )
     frame["macro_fragility"] = (
         probabilities["p_Slowdown"] + probabilities["p_Stagflation"]
     )
@@ -327,10 +353,12 @@ def build_research_frame(
     frame["stage20_w_kodex200"] = stage20_path["w_KODEX200"]
     frame["stage14_w_kodex200"] = stage14_path["w_KODEX200"]
     frame["stage20_defense"] = np.where(
-        frame["stage20_w_kodex200"].notna() & frame["stage14_w_kodex200"].notna(),
-        (frame["stage20_w_kodex200"] < frame["stage14_w_kodex200"] - 1e-10).astype(
-            float
-        ),
+        frame["stage20_w_kodex200"].notna()
+        & frame["stage14_w_kodex200"].notna(),
+        (
+            frame["stage20_w_kodex200"]
+            < frame["stage14_w_kodex200"] - 1e-10
+        ).astype(float),
         np.nan,
     )
     frame["stage20_false_positive_1m"] = np.where(
@@ -338,7 +366,9 @@ def build_research_frame(
         (frame["stage20_return"] < frame["stage14_return"]).astype(float),
         np.nan,
     )
-    return frame.loc[FULL_START:RESEARCH_END].replace([np.inf, -np.inf], np.nan)
+    return frame.loc[FULL_START:RESEARCH_END].replace(
+        [np.inf, -np.inf], np.nan
+    )
 
 
 def _standardize(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
@@ -381,19 +411,19 @@ def return_predictive_regressions(frame: pd.DataFrame) -> pd.DataFrame:
     for horizon in RETURN_HORIZONS:
         target = f"future_{horizon}m_return"
         for model, predictors in models.items():
-            fit, complete = _fit_return_model(frame, target, predictors, horizon)
+            fit, complete = _fit_return_model(
+                frame, target, predictors, horizon
+            )
             aligned = frame.loc[
                 complete.index,
                 ["eps_revision_1m_pct", "credit_easing_z", target],
             ]
             eps_ic, _ = spearmanr(
-                aligned["eps_revision_1m_pct"],
-                aligned[target],
+                aligned["eps_revision_1m_pct"], aligned[target],
                 nan_policy="omit",
             )
             credit_ic, _ = spearmanr(
-                aligned["credit_easing_z"],
-                aligned[target],
+                aligned["credit_easing_z"], aligned[target],
                 nan_policy="omit",
             )
             rows.append(
@@ -458,13 +488,19 @@ def valuation_regressions(frame: pd.DataFrame) -> pd.DataFrame:
         fit, complete = _fit_return_model(
             frame, target, ["earnings_yield_gap", *CONTROL_COLUMNS], horizon
         )
-        ic, ic_p = spearmanr(complete["earnings_yield_gap"], complete[target])
+        ic, ic_p = spearmanr(
+            complete["earnings_yield_gap"], complete[target]
+        )
         rows.append(
             {
                 "HorizonMonths": horizon,
                 "Observations": int(len(complete)),
-                "ValuationGapStandardizedBeta": float(fit.params["earnings_yield_gap"]),
-                "ValuationGapHACPValue": float(fit.pvalues["earnings_yield_gap"]),
+                "ValuationGapStandardizedBeta": float(
+                    fit.params["earnings_yield_gap"]
+                ),
+                "ValuationGapHACPValue": float(
+                    fit.pvalues["earnings_yield_gap"]
+                ),
                 "SpearmanIC": float(ic),
                 "SpearmanICPValue": float(ic_p),
                 "Role": "eligible_slow_anchor_after_gate",
@@ -531,7 +567,9 @@ def false_positive_regression(frame: pd.DataFrame) -> pd.DataFrame:
         [
             {
                 "Observations": int(len(complete)),
-                "FalsePositiveEvents": int(complete["stage20_false_positive_1m"].sum()),
+                "FalsePositiveEvents": int(
+                    complete["stage20_false_positive_1m"].sum()
+                ),
                 "CreditWideningStandardizedBeta": float(
                     fit.params["aa_spread_widening_20d_pctpt"]
                 ),
@@ -578,8 +616,12 @@ def fundamental_state_table(frame: pd.DataFrame) -> pd.DataFrame:
                 "MeanFutureMaxDrawdown3M": float(
                     group["future_max_drawdown_3m"].mean()
                 ),
-                "FutureLeftTailRate1M": float(group["future_left_tail_1m"].mean()),
-                "MeanStage20KODEXWeight": float(group["stage20_w_kodex200"].mean()),
+                "FutureLeftTailRate1M": float(
+                    group["future_left_tail_1m"].mean()
+                ),
+                "MeanStage20KODEXWeight": float(
+                    group["stage20_w_kodex200"].mean()
+                ),
             }
         )
     return pd.DataFrame(rows)
@@ -614,7 +656,9 @@ def robustness_diagnostics(frame: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def _nonnegative_univariate_slope(feature: pd.Series, target: pd.Series) -> float:
+def _nonnegative_univariate_slope(
+    feature: pd.Series, target: pd.Series
+) -> float:
     complete = pd.concat([feature, target], axis=1).dropna()
     if len(complete) < MIN_CAUSAL_MONTHS:
         return 0.0
@@ -630,7 +674,7 @@ def _nonnegative_univariate_slope(feature: pd.Series, target: pd.Series) -> floa
     raw = float(x @ (y - y.mean()) / denominator)
     return max(raw, 0.0)
 
-# To Do: Sl
+
 def add_causal_return_calibration(
     signals: pd.DataFrame,
     equity_returns: pd.Series,
@@ -639,23 +683,33 @@ def add_causal_return_calibration(
     forward_12m_return = stage34._forward_compound(equity_returns, 12)
     rows: list[dict[str, Any]] = []
     for month in output.index:
-        history = output.index[output.index < month].intersection(equity_returns.index)
+        history = output.index[output.index < month].intersection(
+            equity_returns.index
+        )
         eps_feature = output.loc[history, "eps_revision_1m_pct"]
-        credit_feature = -output.loc[history, "aa_spread_widening_20d_pctpt"]
+        credit_feature = -output.loc[
+            history, "aa_spread_widening_20d_pctpt"
+        ]
         target = equity_returns.loc[history]
         eps_slope = _nonnegative_univariate_slope(eps_feature, target)
         credit_slope = _nonnegative_univariate_slope(credit_feature, target)
         complete = pd.concat([eps_feature, credit_feature, target], axis=1).dropna()
         standardized = complete.iloc[:, :2].copy()
-        standardized = (standardized - standardized.mean()) / standardized.std(ddof=1)
-        confirmation_history = 0.5 * (standardized.iloc[:, 0] + standardized.iloc[:, 1])
+        standardized = (
+            standardized - standardized.mean()
+        ) / standardized.std(ddof=1)
+        confirmation_history = 0.5 * (
+            standardized.iloc[:, 0] + standardized.iloc[:, 1]
+        )
         confirmation_slope = _nonnegative_univariate_slope(
             confirmation_history, complete.iloc[:, 2]
         )
-        valuation_history = output.index[output.index <= month - 12].intersection(
-            forward_12m_return.index
-        )
-        valuation_feature = output.loc[valuation_history, "earnings_yield_gap"]
+        valuation_history = output.index[
+            output.index <= month - 12
+        ].intersection(forward_12m_return.index)
+        valuation_feature = output.loc[
+            valuation_history, "earnings_yield_gap"
+        ]
         valuation_target = forward_12m_return.loc[valuation_history]
         valuation_complete = pd.concat(
             [valuation_feature, valuation_target], axis=1
@@ -672,7 +726,9 @@ def add_causal_return_calibration(
         credit_mu = credit_slope * current_credit
         confirmation_mu = confirmation_slope * current_confirmation
         valuation_mu = (
-            valuation_slope_12m * float(output.loc[month, "valuation_gap_z"]) / 12.0
+            valuation_slope_12m
+            * float(output.loc[month, "valuation_gap_z"])
+            / 12.0
         )
         rows.append(
             {
@@ -681,7 +737,9 @@ def add_causal_return_calibration(
                 "eps_calibration_slope": eps_slope,
                 "credit_calibration_slope": credit_slope,
                 "confirmation_calibration_slope": confirmation_slope,
-                "valuation_calibration_observations": int(len(valuation_complete)),
+                "valuation_calibration_observations": int(
+                    len(valuation_complete)
+                ),
                 "valuation_calibration_slope_12m": valuation_slope_12m,
                 "eps_mu_adjustment_KODEX200": eps_mu,
                 "credit_mu_adjustment_KODEX200": credit_mu,
@@ -739,15 +797,25 @@ def _solve_weights(
     valuation_mu = 0.0
     stress_multiplier = 1.0
     if mode in {"eps_alpha", "fundamental_dual_role"}:
-        eps_mu = float(fundamental_signal["eps_mu_adjustment_KODEX200"])
+        eps_mu = float(
+            fundamental_signal["eps_mu_adjustment_KODEX200"]
+        )
     if mode == "credit_alpha":
-        credit_mu = float(fundamental_signal["credit_mu_adjustment_KODEX200"])
+        credit_mu = float(
+            fundamental_signal["credit_mu_adjustment_KODEX200"]
+        )
     if mode in {"valuation_anchor", "fundamental_dual_role"}:
-        valuation_mu = float(fundamental_signal["valuation_mu_adjustment_KODEX200"])
+        valuation_mu = float(
+            fundamental_signal["valuation_mu_adjustment_KODEX200"]
+        )
     if mode in {"credit_risk_confirmation", "fundamental_dual_role"}:
-        stress_multiplier = float(fundamental_signal["credit_stress_multiplier"])
+        stress_multiplier = float(
+            fundamental_signal["credit_stress_multiplier"]
+        )
         stress_adjustment[EQUITY_INDEX] *= stress_multiplier
-    filtered_macro[EQUITY_INDEX] += eps_mu + credit_mu + confirmation_mu + valuation_mu
+    filtered_macro[EQUITY_INDEX] += (
+        eps_mu + credit_mu + confirmation_mu + valuation_mu
+    )
     expected_return = filtered_macro + stress_adjustment
     covariance = np.asarray(technical["adjusted_covariance"], dtype=float)
     credit_variance_multiplier = 1.0
@@ -756,7 +824,9 @@ def _solve_weights(
             fundamental_signal["credit_stress_rank"]
         )
         risk_scaling = np.eye(len(ASSETS), dtype=float)
-        risk_scaling[EQUITY_INDEX, EQUITY_INDEX] = math.sqrt(credit_variance_multiplier)
+        risk_scaling[EQUITY_INDEX, EQUITY_INDEX] = math.sqrt(
+            credit_variance_multiplier
+        )
         covariance = risk_scaling @ covariance @ risk_scaling
 
     common = history.index.intersection(historical_stress.dropna().index)
@@ -771,7 +841,9 @@ def _solve_weights(
         monthly_return = float(weights @ expected_return)
         monthly_variance = max(float(weights @ covariance @ weights), 0.0)
         realized_history = historical_returns @ weights
-        downside_semivariance = float(np.mean(np.minimum(realized_history, 0.0) ** 2))
+        downside_semivariance = float(
+            np.mean(np.minimum(realized_history, 0.0) ** 2)
+        )
         transaction_cost = expected_transaction_cost(weights, pretrade)
         utility = (
             monthly_return
@@ -806,7 +878,8 @@ def _solve_weights(
         {
             "type": "ineq",
             "fun": lambda weights: (
-                CATASTROPHE_CDAR + cdar(historical_returns @ weights, CDAR_CONFIDENCE)
+                CATASTROPHE_CDAR
+                + cdar(historical_returns @ weights, CDAR_CONFIDENCE)
             ),
         },
     ]
@@ -898,7 +971,9 @@ def run_backtest(
     months = returns.index.intersection(probabilities.index)
     months = months.intersection(stress_signals.index)
     months = months.intersection(technical_signals.index)
-    months = months.intersection(fundamental_signals.dropna(subset=required).index)
+    months = months.intersection(
+        fundamental_signals.dropna(subset=required).index
+    )
     rows: list[dict[str, Any]] = []
     pretrade = np.zeros(len(ASSETS), dtype=float)
     first_trade = True
@@ -917,9 +992,13 @@ def run_backtest(
             history,
             probabilities.loc[probabilities.index < month],
             probability,
-            stress_signals.loc[stress_signals.index < month, "stress_score"],
+            stress_signals.loc[
+                stress_signals.index < month, "stress_score"
+            ],
             stress,
-            stress_signals.loc[stress_signals.index < month, "recovery_score"],
+            stress_signals.loc[
+                stress_signals.index < month, "recovery_score"
+            ],
             recovery,
             technical_signal,
             fundamental_signal,
@@ -934,7 +1013,10 @@ def run_backtest(
         )
         trade_cost = float(np.abs(change).sum()) * DOMESTIC_TRADE_COST
         foreign_indices = [ASSETS.index("GLD"), ASSETS.index("USO")]
-        fx_cost = abs(float(change[foreign_indices].sum())) * FOREIGN_WEIGHT_CHANGE_COST
+        fx_cost = (
+            abs(float(change[foreign_indices].sum()))
+            * FOREIGN_WEIGHT_CHANGE_COST
+        )
         asset_return = returns.loc[month, ASSETS].to_numpy(dtype=float)
         gross_return = float(weights @ asset_return)
         net_return = gross_return - trade_cost - fx_cost
@@ -945,10 +1027,18 @@ def run_backtest(
         row: dict[str, Any] = {
             "month": month,
             "macro_signal_month": probability["signal_month"],
-            "stress_signal_month": stress_signals.loc[month, "stress_signal_month"],
-            "technical_signal_month": technical_signal["technical_signal_month"],
-            "fundamental_signal_month": fundamental_signal["fundamental_signal_month"],
-            "fundamental_signal_date": fundamental_signal["fundamental_signal_date"],
+            "stress_signal_month": stress_signals.loc[
+                month, "stress_signal_month"
+            ],
+            "technical_signal_month": technical_signal[
+                "technical_signal_month"
+            ],
+            "fundamental_signal_month": fundamental_signal[
+                "fundamental_signal_month"
+            ],
+            "fundamental_signal_date": fundamental_signal[
+                "fundamental_signal_date"
+            ],
             "stress_score": stress,
             "recovery_score": recovery,
             "return": net_return,
@@ -958,7 +1048,10 @@ def run_backtest(
             "turnover": turnover,
             "trade_cost": trade_cost,
             "fx_cost": fx_cost,
-            **{column: float(probability[column]) for column in REGIME_COLUMNS},
+            **{
+                column: float(probability[column])
+                for column in REGIME_COLUMNS
+            },
             **{
                 f"w_{asset}": float(weights[index])
                 for index, asset in enumerate(ASSETS)
@@ -1072,7 +1165,12 @@ def gate_decision(
             < SIGNIFICANCE_LEVEL
         ),
         "early_and_locked_1m_beta_positive": bool(
-            (stable.loc["EPS_1M", "StandardizedBeta"] > 0.0).all()
+            (
+                stable.loc[
+                    "EPS_1M", "StandardizedBeta"
+                ]
+                > 0.0
+            ).all()
         ),
         "full_3m_positive_p_below_10pct": bool(
             controlled.loc[("EPSFullControls", 3), "EPSStandardizedBeta"] > 0.0
@@ -1082,13 +1180,22 @@ def gate_decision(
     }
     credit_return_gates = {
         "full_3m_easing_positive_p_below_10pct": bool(
-            controlled.loc[("CreditFullControls", 3), "CreditEasingStandardizedBeta"]
+            controlled.loc[
+                ("CreditFullControls", 3), "CreditEasingStandardizedBeta"
+            ]
             > 0.0
-            and controlled.loc[("CreditFullControls", 3), "CreditHACPValue"]
+            and controlled.loc[
+                ("CreditFullControls", 3), "CreditHACPValue"
+            ]
             < SIGNIFICANCE_LEVEL
         ),
         "early_and_locked_3m_beta_positive": bool(
-            (stable.loc["Credit_3M", "StandardizedBeta"] > 0.0).all()
+            (
+                stable.loc[
+                    "Credit_3M", "StandardizedBeta"
+                ]
+                > 0.0
+            ).all()
         ),
     }
     positive_risk = risk_tests["CreditWideningStandardizedBeta"] > 0.0
@@ -1103,7 +1210,9 @@ def gate_decision(
         ]
     )
     credit_risk_gates = {
-        "positive_at_three_of_four_risk_targets": bool(int(positive_risk.sum()) >= 3),
+        "positive_at_three_of_four_risk_targets": bool(
+            int(positive_risk.sum()) >= 3
+        ),
         "significant_for_drawdown_or_tail": bool(
             (significant_risk & drawdown_or_tail).any()
         ),
@@ -1111,15 +1220,23 @@ def gate_decision(
     valuation_indexed = valuation_tests.set_index("HorizonMonths")
     valuation_gates = {
         "positive_p_below_10pct_at_6m_and_12m": bool(
-            (valuation_indexed.loc[[6, 12], "ValuationGapStandardizedBeta"] > 0.0).all()
+            (
+                valuation_indexed.loc[
+                    [6, 12], "ValuationGapStandardizedBeta"
+                ]
+                > 0.0
+            ).all()
             and (
-                valuation_indexed.loc[[6, 12], "ValuationGapHACPValue"]
+                valuation_indexed.loc[
+                    [6, 12], "ValuationGapHACPValue"
+                ]
                 < SIGNIFICANCE_LEVEL
             ).all()
         ),
         "twelve_month_ic_positive_p_below_10pct": bool(
             valuation_indexed.loc[12, "SpearmanIC"] > 0.0
-            and valuation_indexed.loc[12, "SpearmanICPValue"] < SIGNIFICANCE_LEVEL
+            and valuation_indexed.loc[12, "SpearmanICPValue"]
+            < SIGNIFICANCE_LEVEL
         ),
     }
     eps_pass = bool(all(eps_gates.values()))
@@ -1130,16 +1247,20 @@ def gate_decision(
         eps_pass and credit_return_pass and credit_risk_pass and valuation_pass
     )
 
-    full = performance.loc[performance["Period"].eq("full_2007_2026")].set_index(
-        "Strategy"
-    )
+    full = performance.loc[
+        performance["Period"].eq("full_2007_2026")
+    ].set_index("Strategy")
     baseline = full.loc["Stage20_Frozen"]
     candidate = full.loc["Stage35_FundamentalDualRole"]
     split = performance.set_index(["Strategy", "Period"])
     baseline_early = split.loc[("Stage20_Frozen", "early_2007_2017")]
-    candidate_early = split.loc[("Stage35_FundamentalDualRole", "early_2007_2017")]
+    candidate_early = split.loc[
+        ("Stage35_FundamentalDualRole", "early_2007_2017")
+    ]
     baseline_locked = split.loc[("Stage20_Frozen", "locked_2018_2026")]
-    candidate_locked = split.loc[("Stage35_FundamentalDualRole", "locked_2018_2026")]
+    candidate_locked = split.loc[
+        ("Stage35_FundamentalDualRole", "locked_2018_2026")
+    ]
     boot = bootstrap.loc[
         bootstrap["Candidate"].eq("Stage35_FundamentalDualRole")
     ].set_index("Metric")
@@ -1171,7 +1292,9 @@ def gate_decision(
     }
     performance_pass = bool(all(performance_gates.values()))
     promoted = (
-        "Stage35_FundamentalDualRole" if mechanism_pass and performance_pass else None
+        "Stage35_FundamentalDualRole"
+        if mechanism_pass and performance_pass
+        else None
     )
     decision = (
         "promote_stage35_fundamental_dual_role"
@@ -1245,7 +1368,9 @@ def _plot_mechanism(
 
 
 def _plot_performance(performance: pd.DataFrame, path: Path) -> None:
-    full = performance.loc[performance["Period"].eq("full_2007_2026")].copy()
+    full = performance.loc[
+        performance["Period"].eq("full_2007_2026")
+    ].copy()
     x = np.arange(len(full))
     labels = [
         name.replace("Stage35_", "").replace("Stage20_", "")
@@ -1298,11 +1423,13 @@ def _plot_nav(paths: dict[str, pd.DataFrame], path: Path) -> None:
 def run_research(save: bool = True) -> dict[str, Any]:
     source_before = source_manifest()
     frozen_before = frozen_manifest()
-    daily, data_audit = load_fundamental_daily()  # credit, earing data
+    daily, data_audit = load_fundamental_daily()
     signals = build_monthly_fundamental_signals(daily)
     returns, return_audit = load_monthly_asset_returns(False)
     probabilities, macro_audit = build_macro_probabilities(returns)
-    stress = build_monthly_stress_signals(returns.index, build_daily_stress_features())
+    stress = build_monthly_stress_signals(
+        returns.index, build_daily_stress_features()
+    )
     market, market_audit = stage20.load_daily_asset_ohlcv()
     equity_close = market["KODEX200"]["close"].dropna()
     research = build_research_frame(
@@ -1321,7 +1448,9 @@ def run_research(save: bool = True) -> dict[str, Any]:
         equity_close.index.to_period("M")
     ).last()
     equity_calibration_returns = equity_monthly_close.pct_change()
-    calibrated = add_causal_return_calibration(signals, equity_calibration_returns)
+    calibrated = add_causal_return_calibration(
+        signals, equity_calibration_returns
+    )
     technical = stage34._load_period_csv(
         stage20.OUTPUT_DIR / "monthly_technical_signals.csv", "target_month"
     )
@@ -1370,7 +1499,10 @@ def run_research(save: bool = True) -> dict[str, Any]:
     reproduction = candidate_paths["Stage35_NoChangeReproduction"]
     common = stage20_path.index.intersection(reproduction.index)
     max_return_error = float(
-        (stage20_path.loc[common, "return"] - reproduction.loc[common, "return"])
+        (
+            stage20_path.loc[common, "return"]
+            - reproduction.loc[common, "return"]
+        )
         .abs()
         .max()
     )
@@ -1390,10 +1522,14 @@ def run_research(save: bool = True) -> dict[str, Any]:
         "source_files_unchanged": source_before == source_after,
         "stage20_and_stage34_files_unchanged": frozen_before == frozen_after,
         "fundamental_signal_precedes_target": bool(
-            (calibrated["fundamental_signal_month"] < calibrated.index).all()
+            (
+                calibrated["fundamental_signal_month"]
+                < calibrated.index
+            ).all()
         ),
         "first_2007_signal_has_presample_calibration": bool(
-            calibrated.loc[FULL_START, "calibration_observations"] >= MIN_CAUSAL_MONTHS
+            calibrated.loc[FULL_START, "calibration_observations"]
+            >= MIN_CAUSAL_MONTHS
         ),
         "fixed_1m_eps_and_20d_credit_signals": bool(
             CREDIT_CHANGE_DAYS == 20 and MIN_CAUSAL_MONTHS == 60
@@ -1411,8 +1547,12 @@ def run_research(save: bool = True) -> dict[str, Any]:
                 for path in candidate_paths.values()
             )
         ),
-        "no_change_mode_reproduces_stage20_returns": bool(max_return_error < 5e-7),
-        "no_change_mode_reproduces_stage20_weights": bool(max_weight_error < 5e-6),
+        "no_change_mode_reproduces_stage20_returns": bool(
+            max_return_error < 5e-7
+        ),
+        "no_change_mode_reproduces_stage20_weights": bool(
+            max_weight_error < 5e-6
+        ),
         "all_candidate_solvers_feasible": bool(
             all(
                 path["solver_success"].all()
@@ -1449,14 +1589,18 @@ def run_research(save: bool = True) -> dict[str, Any]:
             "eps_direction_signal": (
                 "vendor Forward EPS 12M one-month revision percent"
             ),
-            "credit_signal": ("20-observation change in AA- corporate 3Y minus KTB 3Y"),
+            "credit_signal": (
+                "20-observation change in AA- corporate 3Y minus KTB 3Y"
+            ),
             "credit_return_direction": "easing positive",
             "credit_risk_direction": "widening positive",
             "controls": list(CONTROL_COLUMNS),
             "return_horizons_months": list(RETURN_HORIZONS),
             "causal_calibration_months": MIN_CAUSAL_MONTHS,
             "strategy_mapping": {
-                "EPSAlpha": ("non-negative expanding return slope times causal EPS z"),
+                "EPSAlpha": (
+                    "non-negative expanding return slope times causal EPS z"
+                ),
                 "CreditAlpha": (
                     "non-negative expanding return slope times causal easing z"
                 ),
@@ -1517,7 +1661,8 @@ def run_research(save: bool = True) -> dict[str, Any]:
             "max_absolute_weight_error": max_weight_error,
         },
         "solver_audit": {
-            name: solver_summary(path) for name, path in candidate_paths.items()
+            name: solver_summary(path)
+            for name, path in candidate_paths.items()
         },
         "checks": checks,
         "source_manifest_before": source_before,
@@ -1528,7 +1673,9 @@ def run_research(save: bool = True) -> dict[str, Any]:
     if save:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         daily.to_csv(OUTPUT_DIR / "normalized_earnings_credit_daily.csv")
-        calibrated.to_csv(OUTPUT_DIR / "monthly_earnings_credit_signals.csv")
+        calibrated.to_csv(
+            OUTPUT_DIR / "monthly_earnings_credit_signals.csv"
+        )
         research.to_csv(OUTPUT_DIR / "monthly_stage35_research_frame.csv")
         return_tests.to_csv(
             OUTPUT_DIR / "return_predictive_regressions.csv", index=False
@@ -1536,12 +1683,24 @@ def run_research(save: bool = True) -> dict[str, Any]:
         stability.to_csv(
             OUTPUT_DIR / "subperiod_stability_regressions.csv", index=False
         )
-        risk_tests.to_csv(OUTPUT_DIR / "credit_risk_regressions.csv", index=False)
-        valuation.to_csv(OUTPUT_DIR / "valuation_gap_diagnostic.csv", index=False)
-        robustness.to_csv(OUTPUT_DIR / "credit_measure_robustness.csv", index=False)
-        false_positive.to_csv(OUTPUT_DIR / "false_positive_regression.csv", index=False)
-        states.to_csv(OUTPUT_DIR / "fundamental_state_table.csv", index=False)
-        performance.to_csv(OUTPUT_DIR / "performance_comparison.csv", index=False)
+        risk_tests.to_csv(
+            OUTPUT_DIR / "credit_risk_regressions.csv", index=False
+        )
+        valuation.to_csv(
+            OUTPUT_DIR / "valuation_gap_diagnostic.csv", index=False
+        )
+        robustness.to_csv(
+            OUTPUT_DIR / "credit_measure_robustness.csv", index=False
+        )
+        false_positive.to_csv(
+            OUTPUT_DIR / "false_positive_regression.csv", index=False
+        )
+        states.to_csv(
+            OUTPUT_DIR / "fundamental_state_table.csv", index=False
+        )
+        performance.to_csv(
+            OUTPUT_DIR / "performance_comparison.csv", index=False
+        )
         bootstrap.to_csv(
             OUTPUT_DIR / "paired_block_bootstrap_vs_stage20.csv", index=False
         )
@@ -1550,7 +1709,9 @@ def run_research(save: bool = True) -> dict[str, Any]:
         _plot_mechanism(
             return_tests, risk_tests, OUTPUT_DIR / "mechanism_coefficients.png"
         )
-        _plot_performance(performance, OUTPUT_DIR / "performance_comparison.png")
+        _plot_performance(
+            performance, OUTPUT_DIR / "performance_comparison.png"
+        )
         _plot_nav(paths, OUTPUT_DIR / "nav_comparison.png")
         (OUTPUT_DIR / "validation_report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"

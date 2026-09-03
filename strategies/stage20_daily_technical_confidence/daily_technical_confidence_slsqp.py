@@ -293,23 +293,22 @@ def build_daily_technical_features(
         output["natr"] = output["atr"] / frame["close"]
         output["atr_percentile"] = causal_expanding_midrank(output["natr"])
         if asset == "KODEX200":
-            # output["price_rsi"] = price_rsi(frame["close"])
-            # volume_rsi_parts: list[pd.Series] = []
-            # for _, segment in frame.groupby("volume_segment", sort=False):
-            #     volume_rsi_parts.append(
-            #         volume_rsi(segment["close"], segment["volume"])
-            #     )
-            # output["volume_rsi"] = pd.concat(volume_rsi_parts).sort_index()
-            # output["price_strength"] = (
-            #     output["price_rsi"] - 50.0
-            # ) / 50.0
-            # output["volume_strength"] = (
-            #     output["volume_rsi"] - 50.0
-            # ) / 50.0
-            # output["technical_direction"] = output[
-            #     ["k_score", "price_strength", "volume_strength"]
-            # ].mean(axis=1)
-            output["technical_direction"] = output["k_score"]
+            output["price_rsi"] = price_rsi(frame["close"])
+            volume_rsi_parts: list[pd.Series] = []
+            for _, segment in frame.groupby("volume_segment", sort=False):
+                volume_rsi_parts.append(
+                    volume_rsi(segment["close"], segment["volume"])
+                )
+            output["volume_rsi"] = pd.concat(volume_rsi_parts).sort_index()
+            output["price_strength"] = (
+                output["price_rsi"] - 50.0
+            ) / 50.0
+            output["volume_strength"] = (
+                output["volume_rsi"] - 50.0
+            ) / 50.0
+            output["technical_direction"] = output[
+                ["k_score", "price_strength", "volume_strength"]
+            ].mean(axis=1)
         else:
             output["technical_direction"] = output["k_score"]
         features[asset] = output.replace([np.inf, -np.inf], np.nan)
@@ -351,13 +350,13 @@ def build_monthly_technical_signals(
                 "atr_percentile",
                 "technical_direction",
             ]
-            # if asset == "KODEX200":
-            #     required += [
-            #         "price_rsi",
-            #         "volume_rsi",
-            #         "price_strength",
-            #         "volume_strength",
-            #     ]
+            if asset == "KODEX200":
+                required += [
+                    "price_rsi",
+                    "volume_rsi",
+                    "price_strength",
+                    "volume_strength",
+                ]
             known = daily_features[asset].loc[:month_end].dropna(
                 subset=required
             )
@@ -380,16 +379,11 @@ def apply_technical_inputs(
     macro_expected_return: np.ndarray,
     covariance: np.ndarray,
     signal: pd.Series,
-    history_asset_return_mean: np.ndarray | None = None
 ) -> dict[str, np.ndarray | float]:
     """Apply direction inputs to mu confidence and ATR to current covariance."""
 
     macro = np.asarray(macro_expected_return, dtype=float)
-    if history_asset_return_mean is not None:
-        neutral = history_asset_return_mean
-    else:
-        raise ValueError("history_asset_return_mean must be provided for technical filtering.")
-    #neutral=float(macro_expected_return.mean())
+    neutral = float(macro.mean())
     macro_direction = np.sign(macro - neutral)
     technical_direction = np.array(
         [float(signal[f"technical_direction_{asset}"]) for asset in ASSETS]
@@ -398,23 +392,21 @@ def apply_technical_inputs(
         0.5 * (1.0 + macro_direction * technical_direction), 0.0, 1.0
     )
     filtered_macro = neutral + confidence * (macro - neutral)
-    # print("ltered_macro:", filtered_macro)
-    # exit()
 
     atr_percentile = np.array(
         [float(signal[f"atr_percentile_{asset}"]) for asset in ASSETS]
     )
-    variance_scale = 0.5 + np.clip(atr_percentile, 0.0, 1.0)
+    variance_scale = 1.0 + np.clip(atr_percentile, 0.0, 1.0)
     scaling = np.diag(np.sqrt(variance_scale))
-    adjusted_covariance = scaling @ covariance @ scaling 
+    adjusted_covariance = scaling @ covariance @ scaling
     return {
         "macro_neutral_return": neutral,
         "macro_relative_direction": macro_direction,
         "technical_direction": technical_direction,
         "macro_confidence": confidence,
         "filtered_macro_expected_return": filtered_macro,
-       "atr_percentile": atr_percentile,
-       "atr_variance_scale": variance_scale,
+        "atr_percentile": atr_percentile,
+        "atr_variance_scale": variance_scale,
         "adjusted_covariance": adjusted_covariance,
     }
 
@@ -444,17 +436,16 @@ def solve_weights(
             use_short_term_stress=True,
         )
     )
-    macro_expected_return = np.asarray( # historical macro mu is used for technical filtering, not the stress-adjusted version.
+    macro_expected_return = np.asarray(
         moment_detail["macro_expected_monthly_return"], dtype=float
     )
-    stress_adjustment = np.asarray( # historical stress adjustment (조정량)
+    stress_adjustment = np.asarray(
         moment_detail["stress_return_adjustment"], dtype=float
     )
-    history_asset_return_mean = history.mean(axis=0).to_numpy(dtype=float)
     technical = apply_technical_inputs(
-        macro_expected_return, base_covariance, technical_signal, history_asset_return_mean
+        macro_expected_return, base_covariance, technical_signal
     )
-    filtered_macro = np.asarray( # technical로 조정된 macro mu
+    filtered_macro = np.asarray(
         technical["filtered_macro_expected_return"], dtype=float
     )
     expected_return = filtered_macro + stress_adjustment
@@ -657,7 +648,7 @@ def run_backtest(
             "turnover": turnover,
             "trade_cost": trade_cost,
             "fx_cost": fx_cost,
-            #"macro_neutral_return": float(detail["macro_neutral_return"]),
+            "macro_neutral_return": float(detail["macro_neutral_return"]),
             **{
                 column: float(probability[column]) for column in REGIME_COLUMNS
             },
@@ -721,15 +712,15 @@ def run_backtest(
                 row[f"{feature}_{asset}"] = float(
                     technical_signal[f"{feature}_{asset}"]
                 )
-        # for feature in [
-        #     "price_rsi",
-        #     "volume_rsi",
-        #     "price_strength",
-        #     "volume_strength",
-        # ]:
-        #     row[f"{feature}_KODEX200"] = float(
-        #         technical_signal[f"{feature}_KODEX200"]
-        #     )
+        for feature in [
+            "price_rsi",
+            "volume_rsi",
+            "price_strength",
+            "volume_strength",
+        ]:
+            row[f"{feature}_KODEX200"] = float(
+                technical_signal[f"{feature}_KODEX200"]
+            )
         rows.append(row)
 
     output = pd.DataFrame(rows).set_index("month")
@@ -775,20 +766,20 @@ def feature_diagnostics(
                 },
             ]
         )
-    #equity = returns.loc[common, "KODEX200"]
-    # for feature in ["price_strength_KODEX200", "volume_strength_KODEX200"]:
-    #     rows.append(
-    #         {
-    #             "Period": f"{start}_{end}",
-    #             "Asset": "KODEX200",
-    #             "Feature": feature.removesuffix("_KODEX200"),
-    #             "Target": "same_target_month_return",
-    #             "SpearmanIC": float(
-    #                 path.loc[common, feature].corr(equity, method="spearman")
-    #             ),
-    #             "Observations": int(len(common)),
-    #         }
-    #     )
+    equity = returns.loc[common, "KODEX200"]
+    for feature in ["price_strength_KODEX200", "volume_strength_KODEX200"]:
+        rows.append(
+            {
+                "Period": f"{start}_{end}",
+                "Asset": "KODEX200",
+                "Feature": feature.removesuffix("_KODEX200"),
+                "Target": "same_target_month_return",
+                "SpearmanIC": float(
+                    path.loc[common, feature].corr(equity, method="spearman")
+                ),
+                "Observations": int(len(common)),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -841,13 +832,13 @@ def verify_monthly_signals_match_daily_features(
                 "atr_percentile",
                 "technical_direction",
             ]
-            # if asset == "KODEX200":
-            #     required += [
-            #         "price_rsi",
-            #         "volume_rsi",
-            #         "price_strength",
-            #         "volume_strength",
-            #     ]
+            if asset == "KODEX200":
+                required += [
+                    "price_rsi",
+                    "volume_rsi",
+                    "price_strength",
+                    "volume_strength",
+                ]
             known = daily[asset].loc[:month_end].dropna(subset=required)
             if known.empty or known.index[-1] != pd.Timestamp(
                 row[f"technical_signal_date_{asset}"]
@@ -941,7 +932,7 @@ def run_research(save: bool = True) -> dict[str, Any]:
             technical_path[
                 [f"k_ratio_{asset}" for asset in ASSETS]
                 + [f"atr_percentile_{asset}" for asset in ASSETS]
-              #  + ["price_rsi_KODEX200", "volume_rsi_KODEX200"]
+                + ["price_rsi_KODEX200", "volume_rsi_KODEX200"]
             ]
             .notna()
             .all()

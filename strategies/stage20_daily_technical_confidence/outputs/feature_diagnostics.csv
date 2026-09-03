@@ -1,12 +1,14 @@
 Period,Asset,Feature,Target,SpearmanIC,Observations
-2007-04_2026-07,KODEX200,KScore,same_target_month_return,0.05887208839702549,232
-2007-04_2026-07,KODEX200,ATRPercentile,same_target_month_absolute_return,0.29115453142388165,232
+2007-04_2026-07,KODEX200,KScore,same_target_month_return,0.05920363490290971,232
+2007-04_2026-07,KODEX200,ATRPercentile,same_target_month_absolute_return,0.29093830544178323,232
 2007-04_2026-07,BOND,KScore,same_target_month_return,0.15530699171686563,232
 2007-04_2026-07,BOND,ATRPercentile,same_target_month_absolute_return,0.1981221489696526,232
 2007-04_2026-07,GLD,KScore,same_target_month_return,0.10444003236662698,232
 2007-04_2026-07,GLD,ATRPercentile,same_target_month_absolute_return,0.236691531052934,232
 2007-04_2026-07,USO,KScore,same_target_month_return,0.04511050589191775,232
 2007-04_2026-07,USO,ATRPercentile,same_target_month_absolute_return,0.19810912781165846,232
+2007-04_2026-07,KODEX200,price_strength,same_target_month_return,-0.019716926554280402,232
+2007-04_2026-07,KODEX200,volume_strength,same_target_month_return,-0.0069105823878652045,232
 2018-01_2026-07,KODEX200,KScore,same_target_month_return,0.10567587752053771,103
 2018-01_2026-07,KODEX200,ATRPercentile,same_target_month_absolute_return,0.23954443614637794,103
 2018-01_2026-07,BOND,KScore,same_target_month_return,0.1677722620041295,103
@@ -15,3 +17,5 @@ Period,Asset,Feature,Target,SpearmanIC,Observations
 2018-01_2026-07,GLD,ATRPercentile,same_target_month_absolute_return,0.12616966129244828,103
 2018-01_2026-07,USO,KScore,same_target_month_return,-0.06950973070333435,103
 2018-01_2026-07,USO,ATRPercentile,same_target_month_absolute_return,0.11963493388393447,103
+2018-01_2026-07,KODEX200,price_strength,same_target_month_return,-0.04229451302552388,103
+2018-01_2026-07,KODEX200,volume_strength,same_target_month_return,-0.07193691516935379,103
