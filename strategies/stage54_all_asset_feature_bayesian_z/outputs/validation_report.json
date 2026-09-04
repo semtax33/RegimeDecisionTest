@@ -1,0 +1,171 @@
+{
+  "strategy": "Stage54_AllAssetFeatureBayesianZ",
+  "checks": {
+    "finite_returns": true,
+    "finite_weights": true,
+    "long_only": true,
+    "fully_invested": true,
+    "macro_signal_strictly_lagged": true,
+    "training_strictly_precedes_decision": true,
+    "covariance_strictly_lagged": true,
+    "positive_definite_covariance": true
+  },
+  "advisory_checks": {
+    "volatility_policy_satisfied": false,
+    "cdar_policy_satisfied": false
+  },
+  "all_checks_pass": true,
+  "months": 228,
+  "start": "2007-08",
+  "end": "2026-07",
+  "fallback_solver_months": 0,
+  "equal_weight_fallback_months": 0,
+  "binding_constraints": {
+    "annual_volatility": 0,
+    "historical_cdar": 0
+  },
+  "known_statistical_limitations": {
+    "regime_scores_are_calibrated_probabilities": false,
+    "ridge_prediction_is_reference_category_invariant": false,
+    "posterior_mean_uncertainty_enters_allocator": false,
+    "macro_point_in_time_vintages_verified": false
+  },
+  "declared_heuristics": {
+    "covariance_lookback_days": 252,
+    "trading_days_per_month": 21.0,
+    "observations_per_parameter": 5,
+    "use_risk_free_rate": false,
+    "risk_free_rate_item": "CD(91일)",
+    "risk_free_day_count": 365.0,
+    "asset_feature_columns": {
+      "KODEX200": [
+        "kospi_eps_revision_z",
+        "kospi_valuation_gap_z",
+        "kospi_credit_widening_z",
+        "kospi_k_score",
+        "kospi_option_direction_score",
+        "kospi_abnormal_bear_pressure_fast",
+        "kospi_abnormal_bear_pressure_slow"
+      ],
+      "BOND": [
+        "bond_carry_5y_monthly_z",
+        "bond_roll_down_5y_to_3y_monthly_z",
+        "bond_rate_momentum_5y_monthly_z",
+        "bond_curve_slope_10y_minus_3y_pctpt_z",
+        "bond_curve_total_return_proxy_z",
+        "bond_k_score",
+        "bond_atr_percentile"
+      ],
+      "GLD": [
+        "gld_real_yield_support",
+        "gld_fx_support",
+        "gld_gold_trend_support",
+        "gld_gold_composite_state",
+        "gld_gvz_causal_rank",
+        "gld_k_score",
+        "gld_atr_percentile"
+      ],
+      "GSG": [
+        "gsg_ovx_causal_rank",
+        "gsg_return_momentum_3m",
+        "gsg_return_momentum_12m",
+        "gsg_return_volatility_3m_rank"
+      ]
+    },
+    "annual_volatility_cap": 0.13,
+    "maximum_cdar": 0.16,
+    "cdar_confidence": 0.9,
+    "proportional_trade_cost": 0.0015,
+    "foreign_exchange_cost": 0.0005
+  },
+  "data_audit": {
+    "monthly_returns": {
+      "market_cache": "/Users/juho/project/RegimeDecisionTest/cache/market_daily.csv",
+      "monthly_return_definition": "first-open(t+1)/first-open(t)-1",
+      "return_type": "simple_return",
+      "risk_free_enabled": false,
+      "risk_free": null,
+      "foreign_assets_in_krw": true,
+      "rows": 241,
+      "start": "2006-07",
+      "end": "2026-07"
+    },
+    "daily_risk_returns": {
+      "ohlcv_cache": "/Users/juho/project/RegimeDecisionTest/cache/regime_lightgbm_ohlcv.csv",
+      "foreign_assets_in_krw": true,
+      "return_type": "simple_return",
+      "risk_free_enabled": false,
+      "risk_free": null,
+      "business_day_forward_fill_limit": 5,
+      "rows": 6957,
+      "start": "2000-01-04",
+      "end": "2026-09-02"
+    },
+    "macro_regime_scores": {
+      "source_columns": [
+        "GDP_YoY",
+        "Export_YoY",
+        "BSI",
+        "CPI_YoY",
+        "PPI_YoY",
+        "ImportPrice_YoY"
+      ],
+      "equal_weight_within_growth_and_inflation": true,
+      "calibrated_probabilities": false,
+      "point_in_time_vintages_verified": false,
+      "rows": 241
+    },
+    "asset_features": {
+      "feature_scope": "asset-specific regression features",
+      "features_by_asset": {
+        "KODEX200": [
+          "kospi_eps_revision_z",
+          "kospi_valuation_gap_z",
+          "kospi_credit_widening_z",
+          "kospi_k_score",
+          "kospi_option_direction_score",
+          "kospi_abnormal_bear_pressure_fast",
+          "kospi_abnormal_bear_pressure_slow"
+        ],
+        "BOND": [
+          "bond_carry_5y_monthly_z",
+          "bond_roll_down_5y_to_3y_monthly_z",
+          "bond_rate_momentum_5y_monthly_z",
+          "bond_curve_slope_10y_minus_3y_pctpt_z",
+          "bond_curve_total_return_proxy_z",
+          "bond_k_score",
+          "bond_atr_percentile"
+        ],
+        "GLD": [
+          "gld_real_yield_support",
+          "gld_fx_support",
+          "gld_gold_trend_support",
+          "gld_gold_composite_state",
+          "gld_gvz_causal_rank",
+          "gld_k_score",
+          "gld_atr_percentile"
+        ],
+        "GSG": [
+          "gsg_ovx_causal_rank",
+          "gsg_return_momentum_3m",
+          "gsg_return_momentum_12m",
+          "gsg_return_volatility_3m_rank"
+        ]
+      },
+      "source_files": {
+        "fundamental": "/Users/juho/project/RegimeDecisionTest/strategies/stage35_earnings_credit_fundamentals/outputs/monthly_earnings_credit_signals.csv",
+        "technical": "/Users/juho/project/RegimeDecisionTest/strategies/stage24_equity_k_ratio_only/outputs/monthly_technical_signals.csv",
+        "option_directional_surface": "/Users/juho/project/RegimeDecisionTest/strategies/stage28_option_directional_surface/outputs/monthly_option_direction_signals.csv",
+        "abnormal_option_surface": "/Users/juho/project/RegimeDecisionTest/strategies/stage30_abnormal_surface_erp/outputs/monthly_option_alpha_signals.csv",
+        "bond_curve": "/Users/juho/project/RegimeDecisionTest/strategies/stage37_bond_curve_alpha/outputs/monthly_bond_curve_signals.csv",
+        "gold_state": "/Users/juho/project/RegimeDecisionTest/strategies/stage38_gold_state_alpha/outputs/monthly_gold_state_signals.csv",
+        "asset_implied_volatility": "/Users/juho/project/RegimeDecisionTest/strategies/stage36_asset_implied_volatility_risk/outputs/monthly_asset_volatility_signals.csv",
+        "gsg_momentum": "derived from lagged historical_monthly_returns.csv"
+      },
+      "rows": 241,
+      "start": "2006-07",
+      "end": "2026-07",
+      "complete_rows": 205
+    }
+  }
+}
